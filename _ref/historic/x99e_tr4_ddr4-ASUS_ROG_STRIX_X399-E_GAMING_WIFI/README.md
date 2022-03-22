@@ -2,7 +2,7 @@
 
 
 Linux kernel 'lts_5.10.61-intel' . Config file in this directory. Relatively stable and functional across many machines.
-IIRC, the 'AMD' specific kernel was never required or used in production.
+IIRC (mirage335), the 'AMD' specific kernel was never required or used in production.
 
 
 Some Intel machines may have had uptime exceeding months without incident.
