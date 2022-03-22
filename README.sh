@@ -60,50 +60,46 @@ See the end of the file for license conditions.
 See license.txt for mirage335KernelBuild license conditions.
 
 
-A program able to call other programs and extensively self-test. Compatible nominally with at least typical Unix-similar and MSW distributions.'
+Assistance for ensuring reasonably correct Linux kernel configuration and building.'
 _t '
 
 
 '
 _heading1 'Usage'
-_paragraph_begin
-_o _messagePlain_probe './ubiquitous_bash.sh'
-_paragraph_end
-_paragraph_begin
+_t 'Copy &#39;.config&#39; files to &#39; "$scriptLib"/linux/lts/.config &#39; or similar.
+
+'
+_o _messagePlain_probe './_fetchKernel'
+_o _messagePlain_probe './_build'
 _t '
 
 
 '
-_page
+_ _page
 _heading1 'Design'
-_paragraph_begin
 _t ' '
-_paragraph_end
 _t '
 
 
 '
-_page
+_ _page
 _heading1 'Safety'
-_paragraph_begin
-_t ' '
-_paragraph_end
+_t 'Reasonably sane Linux kernel configuration still does not ensure reliability, security, performance, etc. Be careful to at least understand the choices presented, experiment thoroughly, and when appropriate, update frequently. Your accident is your accident. You have been warned.'
 _t '
 
 
 '
-_page
+_ _page
 _heading1 'Reference'
-_paragraph_begin
-_t ' '
-_paragraph_end
+_t 'https://en.wikipedia.org/wiki/Menuconfig
+	&#39;Configuring Linux is a significant labor&#39;
+		Maybe not so much anymore.'
 _t '
 
 
 '
-_page
+_ _page
 _heading1 'Copyright'
-_paragraph_begin
 _t '
 This file is part of mirage335KernelBuild.
 
@@ -120,7 +116,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with mirage335KernelBuild.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
 '
-_paragraph_end
 _t '
 
 
