@@ -361,7 +361,7 @@ _export_cloud() {
 		# Export single compressed files NOT directory.
 		cp "$scriptLocal"/lts/* "$scriptLocal"/_tmp/lts/
 		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/lts/* "$scriptLocal"/_tmp/lts/.
-		rm -f "$scriptLocal"/_tmp/lts/'*.orig.tar.gz'
+		rm -f "$scriptLocal"/_tmp/lts/*.orig.tar.gz
 		
 		cd "$scriptLocal"/_tmp
 		tar -czvf linux-lts-amd64-debian.tar.gz ./lts/
