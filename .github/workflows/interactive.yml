@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+    - name: _getMost_ubuntu20
+      run: |
+        ./ubiquitous_bash.sh _getMost_ubuntu20
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       timeout-minutes: 15
-      
-      #name: _getMost_ubuntu20
-      #./ubiquitous_bash.sh _getMost_ubuntu20
 
