@@ -6,6 +6,18 @@
 _getMinimal_cloud() {
 	"$scriptAbsoluteLocation" _setupUbiquitous
 	
+	
+	
+	#https://askubuntu.com/questions/876240/how-to-automate-setting-up-of-keyboard-configuration-package
+	#apt-get install -y debconf-utils
+	export DEBIAN_FRONTEND=noninteractive
+	
+	_set_getMost_backend "$@"
+	_test_getMost_backend "$@"
+	#_getMost_debian11_aptSources "$@"
+	
+	
+	
 	_getMost_backend apt-get update
 	_getMost_backend_aptGetInstall sudo
 	_getMost_backend_aptGetInstall gpg
@@ -123,10 +135,14 @@ _getMinimal_cloud() {
 	_getMost_backend_aptGetInstall hdf5-helpers libaec-dev libegl-dev libfftw3-bin libfftw3-dev libfftw3-long3 libfftw3-quad3 libgl-dev libgl1-mesa-dev libgles-dev libgles1 libgles libglvnd-dev libglx-dev libhdf5-cpp-103 libhdf5-dev liboctave-dev libopengl-dev libopengl0
 	
 	
+	_getMost_backend_aptGetInstall axel
+	
 	_getMost_backend_aptGetInstall dwarves
 	
 	
+	
 	_getMost_backend apt-get upgrade
+	
 	
 	
 	"$scriptAbsoluteLocation" _test

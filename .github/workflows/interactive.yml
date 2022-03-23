@@ -1,5 +1,9 @@
 
 name: interactive
+# https://github.community/t/self-hosted-not-using-bashrc/18358
+defaults:
+  run:
+    shell: bash -ieo pipefail {0}
 on:
   workflow_dispatch:
 
@@ -20,9 +24,13 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
-    - name: .bash_profile
-      run: |
-        echo '. ~/.bashrc' > ~/.bash_profile
+    - #name: hook: .bash_profile
+      #run: |
+      #  echo '. ~/.bashrc' > ~/.bash_profile
+      # https://github.com/marketplace/actions/debugging-with-tmate
+      #$RUNNER_WORKSPACE
+      #sudo touch /continue
+      #bash -i
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       #ssh -i <path-to-key> <tmate-connection-string>
