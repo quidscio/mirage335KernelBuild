@@ -1,5 +1,5 @@
 
-name: interactive
+name: experiment
 # https://github.community/t/self-hosted-not-using-bashrc/18358
 defaults:
   run:
