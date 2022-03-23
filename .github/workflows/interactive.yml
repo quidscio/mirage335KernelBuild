@@ -2,6 +2,9 @@
 name: interactive
 on:
   workflow_dispatch:
+  schedule:
+    - cron: '5 1 * * 6'
+    #- cron: '5 1 * * 6,2,4'
 
 concurrency:
   group: ci-tests-${{ github.ref }}-1
@@ -33,12 +36,12 @@ jobs:
     # source ~/.bashrc
     # Type 'q' at the 'Web shell' or use SSH .
     - name: Setup tmate session
-      #if: ${{ failure() }}
+      if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
       # ssh -i <path-to-key> <tmate-connection-string>
       with:
         limit-access-to-actor: true
-      timeout-minutes: 90
+      timeout-minutes: 5
 
 
 
