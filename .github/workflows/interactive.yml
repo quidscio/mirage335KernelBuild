@@ -7,7 +7,7 @@ on:
     #- cron: '5 1 * * 6,2,4'
 
 concurrency:
-  group: ci-tests-${{ github.ref }}-1
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
