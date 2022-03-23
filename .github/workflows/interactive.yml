@@ -1,9 +1,5 @@
 
 name: interactive
-# https://github.community/t/self-hosted-not-using-bashrc/18358
-defaults:
-  run:
-    shell: bash -ieo pipefail {0}
 on:
   workflow_dispatch:
 
@@ -19,8 +15,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: _getMinimal_cloud
       #$RUNNER_WORKSPACE
-      #sudo touch /continue
-      #bash -i
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
