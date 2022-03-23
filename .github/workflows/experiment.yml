@@ -23,4 +23,4 @@ jobs:
       - name: Run a multi-line script
         run: |
           echo experiment
-          ubiquitous_bash.sh _messagePlain_probe experiment
+          /ubiquitous_bash.sh _messagePlain_probe experiment
