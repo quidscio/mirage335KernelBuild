@@ -21,7 +21,8 @@ jobs:
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
     - name: .bash_profile
-      echo '. ~/.bashrc' > ~/.bash_profile
+      run: |
+        echo '. ~/.bashrc' > ~/.bash_profile
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       #ssh -i <path-to-key> <tmate-connection-string>
