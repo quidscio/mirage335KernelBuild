@@ -14,24 +14,28 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: _getMinimal_cloud
-      #$RUNNER_WORKSPACE
+      # $RUNNER_WORKSPACE
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
-      # https://github.com/marketplace/actions/debugging-with-tmate
-      #$RUNNER_WORKSPACE
-      #sudo touch /continue
-      #bash -i
-      # Type 'q' at the 'Web shell' or use SSH .
-    - name: bashrc
-      run: |
-        source ~/.bashrc
+    - name: _fetchKernel
+      ./ubiquitous_bash.sh _fetchKernel
+      timeout-minutes: 45
+    #- name: _build_cloud
+      #./ubiquitous_bash.sh _build_cloud
+      #timeout-minutes: 330
+    # https://github.com/marketplace/actions/debugging-with-tmate
+    # $RUNNER_WORKSPACE
+    # sudo touch /continue
+    # bash -i
+    # source ~/.bashrc
+    # Type 'q' at the 'Web shell' or use SSH .
     - name: Setup tmate session
       #if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
-      #ssh -i <path-to-key> <tmate-connection-string>
-      #with:
-        #limit-access-to-actor: true
+      # ssh -i <path-to-key> <tmate-connection-string>
+      with:
+        limit-access-to-actor: true
       timeout-minutes: 90
 
 
