@@ -24,14 +24,16 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
-    #- name: hook: .bash_profile
-      #run: |
-      #  echo '. ~/.bashrc' > ~/.bash_profile
       # https://github.com/marketplace/actions/debugging-with-tmate
       #$RUNNER_WORKSPACE
       #sudo touch /continue
       #bash -i
+      # Type 'q' at the 'Web shell' or use SSH .
+    - name: bashrc
+      run: |
+        source ~/.bashrc
     - name: Setup tmate session
+      #if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
       #ssh -i <path-to-key> <tmate-connection-string>
       #with:
