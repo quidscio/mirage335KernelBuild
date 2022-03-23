@@ -3,7 +3,9 @@ name: interactive
 on:
   workflow_dispatch:
 
-
+concurrency:
+  group: ci-tests-${{ github.ref }}-1
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -11,9 +13,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
-    - name: _getMost_ubuntu20
+    - name: _getMinimal_cloud
       run: |
-        ./ubiquitous_bash.sh _getMost_ubuntu20
+        ./ubiquitous_bash.sh _getMinimal_cloud
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
       timeout-minutes: 15

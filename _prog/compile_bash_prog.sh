@@ -1,5 +1,22 @@
 _compile_bash_deps_prog() {
-	true
+	if [[ "$1" == "mirage335KernelBuild" ]]
+	then
+		_deps_notLean
+		
+		_deps_git
+		_deps_repo
+		
+		_deps_stopwatch
+		
+		_deps_distro
+		_deps_linux
+		
+		_deps_python
+		
+		_deps_calculators
+		
+		return 0
+	fi
 }
 
 #Default is to include all, or run a specified configuration. For this reason, it will be more typical to override this entire function, rather than append any additional code.

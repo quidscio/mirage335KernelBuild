@@ -1,6 +1,58 @@
 ##### Core
 
 
+
+# Unusual. Strongly discouraged. Building Linux Kernel with fewer resources is helpful for compatibility and performance with some constrained and repetitive cloud services.
+_getMinimal_cloud() {
+	"$scriptAbsoluteLocation" _setupUbiquitous
+	
+	_getMost_backend apt-get update
+	_getMost_backend_aptGetInstall sudo
+	_getMost_backend_aptGetInstall gpg
+	_getMost_backend_aptGetInstall --reinstall wget
+	
+	_getMost_backend_aptGetInstall vim
+	
+	_getMost_backend_aptGetInstall linux-image-amd64
+	
+	_getMost_backend_aptGetInstall pigz
+	
+	_getMost_backend_aptGetInstall qalc
+	
+	_getMost_backend_aptGetInstall octave
+	
+	_getMost_backend_aptGetInstall curl
+	_getMost_backend_aptGetInstall gdisk
+	_getMost_backend_aptGetInstall lz4
+	_getMost_backend_aptGetInstall mawk
+	_getMost_backend_aptGetInstall nano
+	
+	_getMost_backend_aptGetInstall build-essential
+	_getMost_backend_aptGetInstall bison
+	_getMost_backend_aptGetInstall libelf-dev
+	_getMost_backend_aptGetInstall elfutils
+	
+	_getMost_backend_aptGetInstall librecode0
+	_getMost_backend_aptGetInstall wkhtmltopdf
+	
+	_getMost_backend_aptGetInstall sed
+	
+	
+	_getMost_backend_aptGetInstall curl
+	
+	_messagePlain_probe 'install: rclone'
+	_getMost_backend curl https://rclone.org/install.sh | _getMost_backend bash -s beta
+	
+	
+	_getMost_backend apt-get upgrade
+	
+	
+	"$scriptAbsoluteLocation" _test
+	
+}
+
+
+
 _test_build_kernel() {
 	_getDep wget
 	_getDep axel
