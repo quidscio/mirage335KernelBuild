@@ -149,6 +149,9 @@ _getMinimal_cloud() {
 	_getMost_backend_aptGetInstall dwarves
 	
 	
+	_getMost_backend_aptGetInstall rsync
+	
+	
 	# May not be useful for anything, may cause delay or fail .
 	#_getMost_backend apt-get upgrade
 	
@@ -191,6 +194,8 @@ _test_build_kernel() {
 	_getDep gelf.h
 	_getDep eu-strip
 	
+	_getDep rsync
+	
 	_test_kernelConfig
 }
 
@@ -198,8 +203,13 @@ _test_build_kernel() {
 
 
 _fetchKernel-lts() {
+	# DANGER: NOTICE: Do NOT export without corresponding source code!
+	rm -f "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
+	_safeRMR "$scriptLocal"/lts
+	
 	mkdir -p "$scriptLocal"/lts
 	cd "$scriptLocal"/lts
+	
 	#currentKernelURL="https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.10.61.tar.xz"
 	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep '5\.10' | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
 	export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
@@ -333,6 +343,52 @@ _build_cloud() {
 
 
 
+_export_cloud() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	_start
+	
+	mkdir -p "$scriptLocal"/_export
+	mkdir -p "$scriptLocal"/_tmp
+	
+	
+	cd "$scriptLocal"/_tmp
+	# DANGER: NOTICE: Do NOT export without corresponding source code!
+	if ls -1 "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
+	then
+		mkdir -p "$scriptLocal"/_tmp/lts
+		
+		# Export single compressed files NOT directory.
+		cp "$scriptLocal"/lts/* "$scriptLocal"/_tmp/lts/
+		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/lts/* "$scriptLocal"/_tmp/lts/.
+		rm -f "$scriptLocal"/_tmp/lts/'*.orig.tar.gz'
+		
+		cd "$scriptLocal"/_tmp
+		tar -czvf linux-lts-amd64-debian.tar.gz ./lts/
+		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
+		
+		_safeRMR "$scriptLocal"/_tmp/lts
+	fi
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	_stop
+	cd "$functionEntryPWD"
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -340,6 +396,7 @@ _build_cloud() {
 _refresh_anchors() {
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_fetchKernel
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_export_cloud
 }
 
 
