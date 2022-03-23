@@ -19,11 +19,13 @@ jobs:
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
     - name: _fetchKernel
-      ./ubiquitous_bash.sh _fetchKernel
+      run: |
+        ./ubiquitous_bash.sh _fetchKernel
       timeout-minutes: 45
     #- name: _build_cloud
-      #./ubiquitous_bash.sh _build_cloud
-      #timeout-minutes: 330
+      #run: |
+        #./ubiquitous_bash.sh _build_cloud
+        #timeout-minutes: 330
     # https://github.com/marketplace/actions/debugging-with-tmate
     # $RUNNER_WORKSPACE
     # sudo touch /continue
