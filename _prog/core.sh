@@ -25,6 +25,13 @@ _test_build_kernel() {
 	_getDep lz4
 	_getDep lz4c
 	
+	_getDep bison
+	_getDep flex
+	
+	_getDep libelf.so
+	_getDep gelf.h
+	_getDep eu-strip
+	
 	_test_kernelConfig
 }
 
