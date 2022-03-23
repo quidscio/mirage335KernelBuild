@@ -124,6 +124,25 @@ scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-to
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
  '_' '_page'
+ '_heading1' 'Redistribution and Preservation'
+if false; then true; # -->
+<!-- # --><h1>Redistribution and Preservation</h1>
+<!--
+fi
+_t '
+scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+git clone --depth 1 git@github.com:mirage335/mirage335KernelBuild.git
+cd mirage335KernelBuild/
+git submodule update --init --depth 1 --recursive
+<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
+'
+_t '
+scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+
+
+<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
+'
+ '_' '_page'
  '_heading1' 'Safety'
 if false; then true; # -->
 <!-- # --><h1>Safety</h1>

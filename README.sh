@@ -82,6 +82,17 @@ _t '
 
 
 '
+
+_ _page
+_heading1 'Redistribution and Preservation'
+_t 'git clone --depth 1 git@github.com:mirage335/mirage335KernelBuild.git
+cd mirage335KernelBuild/
+git submodule update --init --depth 1 --recursive'
+_t '
+
+
+'
+
 _ _page
 _heading1 'Safety'
 _t 'Reasonably sane Linux kernel configuration still does not ensure reliability, security, performance, etc. Be careful to at least understand the choices presented, experiment thoroughly, and when appropriate, update frequently. Your accident is your accident. You have been warned.'
