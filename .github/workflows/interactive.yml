@@ -24,7 +24,7 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
-    - #name: hook: .bash_profile
+    #- name: hook: .bash_profile
       #run: |
       #  echo '. ~/.bashrc' > ~/.bash_profile
       # https://github.com/marketplace/actions/debugging-with-tmate
