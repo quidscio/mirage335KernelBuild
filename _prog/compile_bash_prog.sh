@@ -11,9 +11,9 @@ _compile_bash_deps_prog() {
 		_deps_distro
 		_deps_linux
 		
-		_deps_python
+		#_deps_python
 		
-		_deps_calculators
+		#_deps_calculators
 		
 		return 0
 	fi

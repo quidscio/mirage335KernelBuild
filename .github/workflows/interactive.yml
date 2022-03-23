@@ -14,9 +14,23 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: _getMinimal_cloud
+      #$RUNNER_WORKSPACE
+      #sudo touch /continue
+      #bash -i
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
+      timeout-minutes: 45
+    - name: .bash_profile
+      echo '. ~/.bashrc' > ~/.bash_profile
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 15
+      #ssh -i <path-to-key> <tmate-connection-string>
+      #with:
+        #limit-access-to-actor: true
+      timeout-minutes: 90
+
+
+
+
+
 
