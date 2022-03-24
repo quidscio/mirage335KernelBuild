@@ -2,7 +2,7 @@
 name: interactive
 on:
   workflow_dispatch:
-  schedule:
+  #schedule:
     #- cron: '5 1 * * 6'
     #- cron: '5 1 * * 6,2,4'
 
