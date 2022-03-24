@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='1064739570'
+export ub_setScriptChecksum_contents='4196262160'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -14733,8 +14733,8 @@ _fetchKernel() {
 	
 	
 	
-	_stop
 	cd "$functionEntryPWD"
+	_stop
 }
 
 
@@ -14796,8 +14796,8 @@ _build_cloud() {
 	
 	
 	
-	_stop
 	cd "$functionEntryPWD"
+	_stop
 }
 
 
@@ -14834,12 +14834,14 @@ _export_cloud() {
 		
 		
 		cd "$scriptLocal"/_tmp
-		tar -czvf linux-lts-amd64-debian.tar.gz ./lts/
+		tar -czf linux-lts-amd64-debian.tar.gz ./lts/
 		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
 		
 		
 		cd "$scriptLocal"
-		tar -czvf linux-lts-amd64-all.tar.gz ./lts/
+		#tar -czf linux-lts-amd64-all.tar.gz ./lts/
+		#env XZ_OPT=-e9 tar -cJvf linux-lts-amd64-all.tar.xz ./lts/
+		env XZ_OPT=-5 tar -cJvf linux-lts-amd64-all.tar.xz ./lts/
 		mv linux-lts-amd64-all.tar.gz "$scriptLocal"/_export
 		
 		
@@ -14852,10 +14854,10 @@ _export_cloud() {
 	
 	
 	
+	du -sh "$scriptLocal"/_export/*
 	
-	
-	_stop
 	cd "$functionEntryPWD"
+	_stop
 }
 
 

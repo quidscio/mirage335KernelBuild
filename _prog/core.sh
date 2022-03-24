@@ -268,8 +268,8 @@ _fetchKernel() {
 	
 	
 	
-	_stop
 	cd "$functionEntryPWD"
+	_stop
 }
 
 
@@ -331,8 +331,8 @@ _build_cloud() {
 	
 	
 	
-	_stop
 	cd "$functionEntryPWD"
+	_stop
 }
 
 
@@ -369,12 +369,14 @@ _export_cloud() {
 		
 		
 		cd "$scriptLocal"/_tmp
-		tar -czvf linux-lts-amd64-debian.tar.gz ./lts/
+		tar -czf linux-lts-amd64-debian.tar.gz ./lts/
 		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
 		
 		
 		cd "$scriptLocal"
-		tar -czvf linux-lts-amd64-all.tar.gz ./lts/
+		#tar -czf linux-lts-amd64-all.tar.gz ./lts/
+		#env XZ_OPT=-e9 tar -cJvf linux-lts-amd64-all.tar.xz ./lts/
+		env XZ_OPT=-5 tar -cJvf linux-lts-amd64-all.tar.xz ./lts/
 		mv linux-lts-amd64-all.tar.gz "$scriptLocal"/_export
 		
 		
@@ -387,10 +389,10 @@ _export_cloud() {
 	
 	
 	
+	du -sh "$scriptLocal"/_export/*
 	
-	
-	_stop
 	cd "$functionEntryPWD"
+	_stop
 }
 
 
