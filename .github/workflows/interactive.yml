@@ -42,13 +42,13 @@ jobs:
         ./ubiquitous_bash.sh _export_cloud
       timeout-minutes: 90
     # https://github.com/marketplace/actions/github-action-for-rclone
-    - name: rclone
-      uses: wei/rclone@v1
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
-      with:
-        args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
-      timeout-minutes: 90
+    #- name: rclone
+      #uses: wei/rclone@v1
+      #env:
+        #RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+      #with:
+        #args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
+      #timeout-minutes: 90
     - name: write! secrets
       shell: bash
       env:
