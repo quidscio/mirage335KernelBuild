@@ -281,6 +281,7 @@ _buildKernel-lts() {
 	_messageNormal "init: buildKernel-lts: ""$currentKernelPath"
 	make olddefconfig
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
+	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/_tmp/lts/
 	
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
@@ -363,9 +364,19 @@ _export_cloud() {
 		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/lts/* "$scriptLocal"/_tmp/lts/.
 		rm -f "$scriptLocal"/_tmp/lts/*.orig.tar.gz
 		
+		# Export '.config' from kernel .
+		cp "$scriptLocal"/lts/*/.config "$scriptLocal"/_tmp/lts/
+		
+		
 		cd "$scriptLocal"/_tmp
 		tar -czvf linux-lts-amd64-debian.tar.gz ./lts/
 		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
+		
+		
+		cd "$scriptLocal"
+		tar -czvf linux-lts-amd64-all.tar.gz ./lts/
+		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
+		
 		
 		_safeRMR "$scriptLocal"/_tmp/lts
 	fi
