@@ -47,7 +47,7 @@ jobs:
       with:
         args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
       timeout-minutes: 90
-    - name: write: secrets
+    - name: write! secrets
       shell: bash
       #run: |
         #true "$RCLONE_CONF"
