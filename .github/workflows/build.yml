@@ -1,0 +1,79 @@
+
+name: build-buildJet
+on:
+  workflow_dispatch:
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  schedule:
+    - cron: '5 1 * * 6'
+    - cron: '5 1 * * 6,2,4'
+
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    #runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
+    #runs-on: buildjet-64vcpu-ubuntu-2004
+    steps:
+    - uses: actions/checkout@v2
+    - name: _getMinimal_cloud
+      shell: bash
+      # $RUNNER_WORKSPACE
+      run: |
+        ./ubiquitous_bash.sh _getMinimal_cloud
+      timeout-minutes: 90
+    #- name: _fetchKernel
+      #shell: bash
+      #run: |
+        #./ubiquitous_bash.sh _fetchKernel
+      #timeout-minutes: 90
+    - name: _build_cloud
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _build_cloud
+      timeout-minutes: 330
+    - name: _export_cloud
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _export_cloud
+      timeout-minutes: 90
+    # https://github.com/marketplace/actions/github-action-for-rclone
+    - name: rclone
+      uses: wei/rclone@v1
+      env:
+        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+      with:
+        args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
+      timeout-minutes: 90
+    - name: write! secrets
+      shell: bash
+      env:
+        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+      run: |
+        #true "$RCLONE_CONF"
+        echo "$RCLONE_CONF" | sudo -n tee /rclone.conf > /dev/null
+      timeout-minutes: 5
+    # https://github.com/marketplace/actions/debugging-with-tmate
+    # $RUNNER_WORKSPACE
+    # rclone config --config="/rclone.conf"
+    # sudo touch /continue
+    # bash -i
+    # source ~/.bashrc
+    # Type 'q' at the 'Web shell' or use SSH .
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      # ssh -i <path-to-key> <tmate-connection-string>
+      with:
+        limit-access-to-actor: true
+      timeout-minutes: 5
+
+
+
+
+
+
