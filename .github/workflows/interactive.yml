@@ -15,7 +15,9 @@ concurrency:
 jobs:
   build:
     #runs-on: ubuntu-latest
-    runs-on: ubuntu-20.04
+    #runs-on: ubuntu-20.04
+    runs-on: buildjet-2vcpu-ubuntu-2004
+    #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
     - uses: actions/checkout@v2
     - name: _getMinimal_cloud
