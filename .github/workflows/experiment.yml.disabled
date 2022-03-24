@@ -6,9 +6,13 @@ defaults:
     shell: bash -ieo pipefail {0}
 on:
   workflow_dispatch:
+  #schedule:
+    #- cron: '5 1 * * 6'
+    #- cron: '5 1 * * 6,2,4'
 
 concurrency:
-  group: ci-tests-${{ github.ref }}-1
+  #group: ci-tests-${{ github.ref }}-1
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -22,6 +26,14 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
+    - name: _fetchKernel
+      run: |
+        ./ubiquitous_bash.sh _fetchKernel
+      timeout-minutes: 45
+    #- name: _build_cloud
+      #run: |
+        #./ubiquitous_bash.sh _build_cloud
+      #timeout-minutes: 330
     #- name: hook: .bash_profile
       #run: |
         #echo '. ~/.bashrc' > ~/.bash_profile
@@ -34,6 +46,7 @@ jobs:
     #bash -i
     # Type 'q' at the 'Web shell' or use SSH .
     - name: Setup tmate session
+      #if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
       #ssh -i <path-to-key> <tmate-connection-string>
       #with:
