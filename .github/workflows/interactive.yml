@@ -23,12 +23,12 @@ jobs:
       # $RUNNER_WORKSPACE
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
-      timeout-minutes: 45
+      timeout-minutes: 90
     - name: _fetchKernel
       shell: bash
       run: |
         ./ubiquitous_bash.sh _fetchKernel
-      timeout-minutes: 45
+      timeout-minutes: 90
     #- name: _build_cloud
       #shell: bash
       #run: |
@@ -39,22 +39,23 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _export_cloud
       timeout-minutes: 90
-    - name: FAIL
-      shell: bash
-      run: |
-        false
-      timeout-minutes: 90
-    # https://github.com/marketplace/actions/action-megacmd
-    - name: Upload 
-      uses: Difegue/action-megacmd@master
-      with:
-        args: put ./_local/_export/linux-lts-amd64-debian.tar.gz /Public/mirage335KernelBuild/
+    # https://github.com/marketplace/actions/github-action-for-rclone
+    - name: rclone
+      uses: wei/rclone@v1
       env:
-        USERNAME: ${{ secrets.USERNAME }}
-        PASSWORD: ${{ secrets.PASSWORD }}
+        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+      with:
+        args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
       timeout-minutes: 90
+    - name: write: secrets
+      shell: bash
+      #run: |
+        #true "$RCLONE_CONF"
+        echo "$RCLONE_CONF" > /rclone.conf
+      timeout-minutes: 5
     # https://github.com/marketplace/actions/debugging-with-tmate
     # $RUNNER_WORKSPACE
+    # rclone config --config="/rclone.conf"
     # sudo touch /continue
     # bash -i
     # source ~/.bashrc
