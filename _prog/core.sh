@@ -375,7 +375,7 @@ _export_cloud() {
 		
 		cd "$scriptLocal"
 		tar -czvf linux-lts-amd64-all.tar.gz ./lts/
-		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
+		mv linux-lts-amd64-all.tar.gz "$scriptLocal"/_export
 		
 		
 		_safeRMR "$scriptLocal"/_tmp/lts
