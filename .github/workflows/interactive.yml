@@ -49,7 +49,9 @@ jobs:
       timeout-minutes: 90
     - name: write! secrets
       shell: bash
-      #run: |
+      env:
+        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
+      run: |
         #true "$RCLONE_CONF"
         echo "$RCLONE_CONF" > /rclone.conf
       timeout-minutes: 5
