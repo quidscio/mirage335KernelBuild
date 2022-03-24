@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='660057383'
+export ub_setScriptChecksum_contents='2413506905'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -14676,7 +14676,7 @@ _fetchKernel-lts() {
 	cd "$scriptLocal"/lts
 	
 	#currentKernelURL="https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.10.61.tar.xz"
-	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep '5\.10' | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
+	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep '5\.10' | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
 	export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
 	export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
 	
@@ -14693,7 +14693,28 @@ _fetchKernel-lts() {
 }
 
 _fetchKernel-mainline() {
-	true
+	# DANGER: NOTICE: Do NOT export without corresponding source code!
+	rm -f "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
+	_safeRMR "$scriptLocal"/mainline
+	
+	mkdir -p "$scriptLocal"/mainline
+	cd "$scriptLocal"/mainline
+	
+	#currentKernelURL="https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.10.61.tar.xz"
+	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
+	export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
+	export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
+	
+	if ! ls -1 "$currentKernelName"* > /dev/null 2>&1
+	then
+		wget "$currentKernelURL"
+		tar xf "$currentKernelName"*
+	fi
+	cd "$currentKernelName"
+	
+	
+	mkdir -p "$scriptLib"/linux/mainline/
+	cp "$scriptLib"/linux/mainline/.config "$scriptLocal"/mainline/"$currentKernelName"/
 }
 
 
@@ -14759,8 +14780,17 @@ _buildKernel-lts() {
 
 _buildKernel-mainline() {
 	_messageNormal "init: buildKernel-mainline: ""$currentKernelPath"
+	make olddefconfig
+	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
+	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
 	
-	false
+	#make -j $(nproc)
+	#[[ "$?" != "0" ]] && _messageFAIL
+	
+	make deb-pkg -j $(nproc)
+	[[ "$?" != "0" ]] && _messageFAIL
+	
+	return 0
 }
 
 
@@ -14857,7 +14887,40 @@ _export_cloud() {
 	
 	
 	
-	
+	cd "$scriptLocal"/_tmp
+	# DANGER: NOTICE: Do NOT export without corresponding source code!
+	if ls -1 "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
+	then
+		_messageNormal '_export_cloud: mainline'
+		
+		mkdir -p "$scriptLocal"/_tmp/mainline
+		
+		# Export single compressed files NOT directory.
+		cp "$scriptLocal"/mainline/* "$scriptLocal"/_tmp/mainline/
+		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/mainline/* "$scriptLocal"/_tmp/mainline/.
+		rm -f "$scriptLocal"/_tmp/mainline/*.orig.tar.gz
+		
+		# Export '.config' from kernel .
+		cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/_tmp/mainline/
+		
+		
+		_messagePlain_nominal '_export_cloud: mainline: debian'
+		cd "$scriptLocal"/_tmp
+		tar -czf linux-mainline-amd64-debian.tar.gz ./mainline/
+		mv linux-mainline-amd64-debian.tar.gz "$scriptLocal"/_export
+		
+		
+		# Gentoo specific. Unusual. Strongly discouraged.
+		#_messagePlain_nominal '_export_cloud: mainline: all'
+		#cd "$scriptLocal"
+		#tar -czf linux-mainline-amd64-all.tar.gz ./mainline/
+		##env XZ_OPT=-e9 tar -cJf linux-mainline-amd64-all.tar.xz ./mainline/
+		##env XZ_OPT=-5 tar -cJf linux-mainline-amd64-all.tar.xz ./mainline/
+		#mv linux-mainline-amd64-all.tar.gz "$scriptLocal"/_export
+		
+		
+		_safeRMR "$scriptLocal"/_tmp/mainline
+	fi
 	
 	
 	
