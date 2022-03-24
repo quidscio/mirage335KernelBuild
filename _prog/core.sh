@@ -281,7 +281,7 @@ _buildKernel-lts() {
 	_messageNormal "init: buildKernel-lts: ""$currentKernelPath"
 	make olddefconfig
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
-	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/_tmp/lts/
+	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
 	
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
