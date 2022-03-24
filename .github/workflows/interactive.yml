@@ -19,22 +19,32 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: _getMinimal_cloud
+      shell: bash
       # $RUNNER_WORKSPACE
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 45
     - name: _fetchKernel
+      shell: bash
       run: |
         ./ubiquitous_bash.sh _fetchKernel
       timeout-minutes: 45
     #- name: _build_cloud
+      #shell: bash
       #run: |
         #./ubiquitous_bash.sh _build_cloud
       #timeout-minutes: 330
     - name: _export_cloud
+      shell: bash
       run: |
         ./ubiquitous_bash.sh _export_cloud
       timeout-minutes: 90
+    - name: FAIL
+      shell: bash
+      run: |
+        false
+      timeout-minutes: 90
+    # https://github.com/marketplace/actions/action-megacmd
     - name: Upload 
       uses: Difegue/action-megacmd@master
       with:
