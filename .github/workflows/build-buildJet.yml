@@ -1,5 +1,5 @@
 
-name: interactive
+name: build-buildJet
 on:
   workflow_dispatch:
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
@@ -15,9 +15,9 @@ concurrency:
 jobs:
   build:
     #runs-on: ubuntu-latest
-    runs-on: ubuntu-20.04
+    #runs-on: ubuntu-20.04
     #runs-on: buildjet-2vcpu-ubuntu-2004
-    #runs-on: buildjet-64vcpu-ubuntu-2004
+    runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
     - uses: actions/checkout@v2
     - name: _getMinimal_cloud
@@ -25,22 +25,22 @@ jobs:
       # $RUNNER_WORKSPACE
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
-      timeout-minutes: 90
-    - name: _fetchKernel
-      shell: bash
-      run: |
-        ./ubiquitous_bash.sh _fetchKernel
-      timeout-minutes: 90
-    #- name: _build_cloud
+      timeout-minutes: 30
+    #- name: _fetchKernel
       #shell: bash
       #run: |
-        #./ubiquitous_bash.sh _build_cloud
-      #timeout-minutes: 330
+        #./ubiquitous_bash.sh _fetchKernel
+      #timeout-minutes: 30
+    - name: _build_cloud
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _build_cloud
+      timeout-minutes: 30
     - name: _export_cloud
       shell: bash
       run: |
         ./ubiquitous_bash.sh _export_cloud
-      timeout-minutes: 90
+      timeout-minutes: 30
     # https://github.com/marketplace/actions/github-action-for-rclone
     - name: rclone
       uses: wei/rclone@v1
@@ -48,7 +48,7 @@ jobs:
         RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
       with:
         args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
-      timeout-minutes: 90
+      timeout-minutes: 30
     - name: write! secrets
       shell: bash
       env:
@@ -65,7 +65,7 @@ jobs:
     # source ~/.bashrc
     # Type 'q' at the 'Web shell' or use SSH .
     - name: Setup tmate session
-      #if: ${{ failure() }}
+      if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
       # ssh -i <path-to-key> <tmate-connection-string>
       with:

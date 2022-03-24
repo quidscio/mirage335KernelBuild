@@ -377,12 +377,14 @@ _export_cloud() {
 		tar -czf linux-lts-amd64-debian.tar.gz ./lts/
 		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
 		
-		_messagePlain_nominal '_export_cloud: lts: all'
-		cd "$scriptLocal"
-		tar -czf linux-lts-amd64-all.tar.gz ./lts/
-		#env XZ_OPT=-e9 tar -cJf linux-lts-amd64-all.tar.xz ./lts/
-		#env XZ_OPT=-5 tar -cJf linux-lts-amd64-all.tar.xz ./lts/
-		mv linux-lts-amd64-all.tar.gz "$scriptLocal"/_export
+		
+		# Gentoo specific. Unusual. Strongly discouraged.
+		#_messagePlain_nominal '_export_cloud: lts: all'
+		#cd "$scriptLocal"
+		#tar -czf linux-lts-amd64-all.tar.gz ./lts/
+		##env XZ_OPT=-e9 tar -cJf linux-lts-amd64-all.tar.xz ./lts/
+		##env XZ_OPT=-5 tar -cJf linux-lts-amd64-all.tar.xz ./lts/
+		#mv linux-lts-amd64-all.tar.gz "$scriptLocal"/_export
 		
 		
 		_safeRMR "$scriptLocal"/_tmp/lts
