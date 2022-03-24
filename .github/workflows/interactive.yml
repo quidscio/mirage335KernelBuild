@@ -2,10 +2,12 @@
 name: interactive
 on:
   workflow_dispatch:
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   #schedule:
     #- cron: '5 1 * * 6'
     #- cron: '5 1 * * 6,2,4'
 
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -29,6 +31,18 @@ jobs:
       #run: |
         #./ubiquitous_bash.sh _build_cloud
       #timeout-minutes: 330
+    - name: _export_cloud
+      run: |
+        ./ubiquitous_bash.sh _export_cloud
+      timeout-minutes: 90
+    - name: Upload 
+        uses: Difegue/action-megacmd@master
+        with:
+          args: put ./_local/_export/linux-lts-amd64-debian.tar.gz /Public/mirage335KernelBuild/
+        env:
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+      timeout-minutes: 90
     # https://github.com/marketplace/actions/debugging-with-tmate
     # $RUNNER_WORKSPACE
     # sudo touch /continue
