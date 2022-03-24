@@ -63,7 +63,7 @@ jobs:
     # source ~/.bashrc
     # Type 'q' at the 'Web shell' or use SSH .
     - name: Setup tmate session
-      if: ${{ failure() }}
+      #if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
       # ssh -i <path-to-key> <tmate-connection-string>
       with:

@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='4196262160'
+export ub_setScriptChecksum_contents='2005122044'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -14814,6 +14814,8 @@ _export_cloud() {
 	functionEntryPWD="$PWD"
 	_start
 	
+	_messageNormal "init: _export_cloud"
+	
 	mkdir -p "$scriptLocal"/_export
 	mkdir -p "$scriptLocal"/_tmp
 	
@@ -14822,6 +14824,8 @@ _export_cloud() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	if ls -1 "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
 	then
+		_messageNormal '_export_cloud: lts'
+		
 		mkdir -p "$scriptLocal"/_tmp/lts
 		
 		# Export single compressed files NOT directory.
@@ -14833,15 +14837,16 @@ _export_cloud() {
 		cp "$scriptLocal"/lts/*/.config "$scriptLocal"/_tmp/lts/
 		
 		
+		_messagePlain_nominal '_export_cloud: lts: debian'
 		cd "$scriptLocal"/_tmp
 		tar -czf linux-lts-amd64-debian.tar.gz ./lts/
 		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
 		
-		
+		_messagePlain_nominal '_export_cloud: lts: all'
 		cd "$scriptLocal"
-		#tar -czf linux-lts-amd64-all.tar.gz ./lts/
-		#env XZ_OPT=-e9 tar -cJvf linux-lts-amd64-all.tar.xz ./lts/
-		env XZ_OPT=-5 tar -cJvf linux-lts-amd64-all.tar.xz ./lts/
+		tar -czf linux-lts-amd64-all.tar.gz ./lts/
+		#env XZ_OPT=-e9 tar -cJf linux-lts-amd64-all.tar.xz ./lts/
+		#env XZ_OPT=-5 tar -cJf linux-lts-amd64-all.tar.xz ./lts/
 		mv linux-lts-amd64-all.tar.gz "$scriptLocal"/_export
 		
 		
