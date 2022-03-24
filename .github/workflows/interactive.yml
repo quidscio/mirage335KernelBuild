@@ -36,12 +36,12 @@ jobs:
         ./ubiquitous_bash.sh _export_cloud
       timeout-minutes: 90
     - name: Upload 
-        uses: Difegue/action-megacmd@master
-        with:
-          args: put ./_local/_export/linux-lts-amd64-debian.tar.gz /Public/mirage335KernelBuild/
-        env:
-          USERNAME: ${{ secrets.USERNAME }}
-          PASSWORD: ${{ secrets.PASSWORD }}
+      uses: Difegue/action-megacmd@master
+      with:
+        args: put ./_local/_export/linux-lts-amd64-debian.tar.gz /Public/mirage335KernelBuild/
+      env:
+        USERNAME: ${{ secrets.USERNAME }}
+        PASSWORD: ${{ secrets.PASSWORD }}
       timeout-minutes: 90
     # https://github.com/marketplace/actions/debugging-with-tmate
     # $RUNNER_WORKSPACE
