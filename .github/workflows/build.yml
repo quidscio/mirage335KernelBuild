@@ -1,5 +1,5 @@
 
-name: build-buildJet
+name: build
 on:
   workflow_dispatch:
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
