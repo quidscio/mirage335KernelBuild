@@ -83,5 +83,31 @@ workflows:
     jobs:
       - nothing
 
+  regular:
+      triggers:
+        - schedule:
+            cron: "*/5 * * * *"
+            filters:
+              branches:
+                only:
+                  - main
+      jobs:
+        - build
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
