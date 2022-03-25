@@ -27,7 +27,8 @@ jobs:
       image: ubuntu-2004:current
     resource_class: medium
     steps:
-      - checkout- run:
+      - checkout
+      - run:
           name: _false
           shell: /bin/bash
           command: |
