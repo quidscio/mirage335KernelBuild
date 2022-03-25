@@ -1,19 +1,43 @@
 version: 2.1
 
 parameters:
-  run_integration_tests:
-    type: boolean
-    default: true
-
-workflows:
-  version: 2
-  integration_tests:
-    when: << pipeline.parameters.run_integration_tests >>
-    jobs:
-      - mytestjob
+  action:
+    type: enum
+    enum: [build, report]
+    default: build
 
 jobs:
-  mytestjob:
+  build:
+    machine: true
+    steps:
+      - checkout
+      - run: ./run-tests.sh
+
+  report:
+    machine: true
+    steps:
+      - checkout
+      - run: ./create-report.sh
+
+workflows:
+  build:
+    when:
+      equal: [ build, << pipeline.parameters.action >> ]
+    jobs:
+      - build
+
+  report:
+    when:
+      equal: [ report, << pipeline.parameters.action >> ]
+    jobs:
+      - report
+
+jobs:
+  build:
+    steps:
+      - checkout
+      - run: echo experiment
+  report:
     steps:
       - checkout
       - run: echo experiment
