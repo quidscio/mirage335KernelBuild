@@ -3,10 +3,11 @@ workflows:
   version: 2
   build:
     triggers:
-      filters:
-        branches:
-          ignore:
-            - main
+      -schedule:
+        filters:
+          branches:
+            ignore:
+              - main
     jobs:
       - build
 
