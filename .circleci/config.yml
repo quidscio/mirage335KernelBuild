@@ -33,15 +33,15 @@ workflows:
               #ignore: /.*/
               #ignore: /pull.*/
               #ignore: /push.*/
-  my-job:
-  steps:
+  conditional-workflow:
     when:
-      condition:
-        or:
-          - << pipeline.parameters.run-deploy >>
-          - equal: [ master, << pipeline.git.branch >> ]
-      jobs:
-        - build
+      and: # All must be true to trigger
+        - equal: [ main, << pipeline.git.branch >> ]
+        - not: << pipeline.parameters.param1 >>
+        - or: [ << pipeline.parameters.param1 >>, << pipeline.parameters.param2 >> ]
+
+    jobs:
+      - job-on-condition
 
 
 jobs:
