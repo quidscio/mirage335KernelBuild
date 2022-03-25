@@ -9,6 +9,8 @@ workflows:
             branches:
               only: main
               #ignore: /.*/
+              ignore: /pull.*/
+              ignore: /push.*/
 
 
 jobs:
