@@ -1,14 +1,4 @@
 
-# https://discuss.circleci.com/t/branch-filtering-ignore/24301
-workflows:
-  version: 2
-  all:
-    jobs:
-      - build:
-          filters:
-            branches:
-              ignore: /.*/
-
 
 jobs:
   build:
