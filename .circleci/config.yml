@@ -91,6 +91,8 @@ workflows:
             branches:
               only:
                 - main
+    jobs:
+      - nothing
 
 
 
