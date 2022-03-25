@@ -5,6 +5,14 @@ workflows:
   commit:
     jobs:
       - onCommit
+  nightly:
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
   #all:
     #jobs:
       #- build:
@@ -19,14 +27,6 @@ workflows:
               #ignore: /.*/
               #ignore: /pull.*/
               #ignore: /push.*/
-  nightly:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - main
 
 
 jobs:
