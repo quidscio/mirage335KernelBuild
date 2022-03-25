@@ -33,6 +33,15 @@ workflows:
               #ignore: /.*/
               #ignore: /pull.*/
               #ignore: /push.*/
+  my-job:
+  steps:
+    when:
+      condition:
+        or:
+          - << pipeline.parameters.run-deploy >>
+          - equal: [ master, << pipeline.git.branch >> ]
+      jobs:
+        - build
 
 
 jobs:
