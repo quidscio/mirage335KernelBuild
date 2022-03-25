@@ -27,13 +27,13 @@ workflows:
                 #- main
     #jobs:
       #- onBuild
-  build:
-    jobs:
-      - onBuild:
-          filters:
-            branches:
+  #build:
+    #jobs:
+      #- onBuild:
+          #filters:
+            #branches:
               #only: /^doNotMatch/
-              only: main
+              #only: main
               #ignore:
                 #- /.*/
                 #- /pull.*/
@@ -41,24 +41,7 @@ workflows:
               #ignore: /.*/
               #ignore: /pull.*/
               #ignore: /push.*/
-
-
-jobs:
-  onCommit:
-    machine:
-      image: ubuntu-2004:current
-    steps:
-      - checkout
-      - run:
-          name: _messagePlain_good nothing
-          #shell: /bin/bash -eo pipefail
-          command: |
-            ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
-  onBuild:
-    machine:
-      image: ubuntu-2004:current
-    #resource_class: large
-    resource_class: medium
+  build:
     when:
       condition:
           - equal: [ "true", << pipeline.parameters.goBuild >> ]
@@ -82,6 +65,25 @@ jobs:
             name: _export_cloud
             command: |
               ./ubiquitous_bash.sh _export_cloud
+
+
+jobs:
+  onCommit:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - run:
+          name: _messagePlain_good nothing
+          #shell: /bin/bash -eo pipefail
+          command: |
+            ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
+  onBuild:
+    machine:
+      image: ubuntu-2004:current
+    #resource_class: large
+    resource_class: medium
+
 
 
 
