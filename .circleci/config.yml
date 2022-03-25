@@ -31,13 +31,3 @@ workflows:
       equal: [ report, << pipeline.parameters.action >> ]
     jobs:
       - report
-
-jobs:
-  build:
-    steps:
-      - checkout
-      - run: echo experiment
-  report:
-    steps:
-      - checkout
-      - run: echo experiment
