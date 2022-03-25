@@ -1,23 +1,68 @@
+
+# https://discuss.circleci.com/t/branch-filtering-ignore/24301
+# https://circleci.com/docs/2.0/workflows/#nightly-example
+# https://circleci.com/docs/2.0/workflows/
+# https://support.circleci.com/hc/en-us/articles/360043638052-Conditional-steps-in-jobs-and-conditional-workflows
+# https://discuss.circleci.com/t/advanced-logic-in-config/36011
+# https://circleci.com/docs/2.0/pipeline-variables/
+# https://circleci.com/docs/2.0/configuration-cookbook/#using-logic-in-configuration
+
+
 version: 2.1
 
 parameters:
   action:
     type: enum
-    enum: [build, report]
-    default: build
+    enum: [build, test, nothing]
+    default: nothing
 
 jobs:
   build:
-    machine: true
+    machine:
+      image: ubuntu-2004:current
     steps:
       - checkout
-      - run: ./run-tests.sh
+          - run:
+              name: _getMinimal_cloud
+              #shell: /bin/bash -eo pipefail
+              command: |
+                ./ubiquitous_bash.sh _getMinimal_cloud
+              when: always
+          - run:
+              name: _fetchKernel
+              command: |
+                ./ubiquitous_bash.sh _fetchKernel
+          #- run:
+              #name: _build_cloud
+              #command: |
+                #./ubiquitous_bash.sh _build_cloud
+          - run:
+              name: _export_cloud
+              command: |
+                ./ubiquitous_bash.sh _export_cloud
 
-  report:
-    machine: true
+  test:
+    machine:
+      image: ubuntu-2004:current
     steps:
       - checkout
-      - run: ./create-report.sh
+      - run: ./test.sh
+
+
+  nothing:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - run:
+          name: _messagePlain_good nothing
+          #shell: /bin/bash -eo pipefail
+          command: |
+            ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
+
+
+
+
 
 workflows:
   build:
@@ -26,8 +71,17 @@ workflows:
     jobs:
       - build
 
-  report:
+  test:
     when:
-      equal: [ report, << pipeline.parameters.action >> ]
+      equal: [ test, << pipeline.parameters.action >> ]
     jobs:
-      - report
+      - test
+
+  nothing:
+    when:
+      equal: [ nothing, << pipeline.parameters.action >> ]
+    jobs:
+      - nothing
+
+
+
