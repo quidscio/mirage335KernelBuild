@@ -62,7 +62,9 @@ jobs:
     steps:
       when:
         condition:
-            - equal: [ "true", << pipeline.parameters.goBuild >> ]
+          or:
+          - << pipeline.parameters.goBuild >>
+          - equal: [ master, << pipeline.git.branch >> ]
         steps:
           - checkout
           - run:
