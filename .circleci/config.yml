@@ -29,7 +29,7 @@ workflows:
       #- onBuild
   build:
     jobs:
-      - onBuild:
+      - onBuild
         goBuild: "false"
           filters:
             branches:
