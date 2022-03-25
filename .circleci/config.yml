@@ -1,5 +1,10 @@
 
 version: 2.1
+parameters:
+  build:
+    type: boolean
+    default: false
+
 
 
 # https://discuss.circleci.com/t/branch-filtering-ignore/24301
@@ -7,6 +12,7 @@ version: 2.1
 # https://circleci.com/docs/2.0/workflows/
 # https://support.circleci.com/hc/en-us/articles/360043638052-Conditional-steps-in-jobs-and-conditional-workflows
 # https://discuss.circleci.com/t/advanced-logic-in-config/36011
+# https://circleci.com/docs/2.0/pipeline-variables/
 workflows:
   commit:
     jobs:
@@ -24,7 +30,7 @@ workflows:
   all:
     condition:
         or:
-          - << pipeline.parameters.run-deploy >>
+          - << pipeline.parameters.build >>
     jobs:
       - build:
           filters:
