@@ -7,7 +7,7 @@ workflows:
       - build:
           filters:
             branches:
-              only: main
+              only: /^doNotMatch/
               ignore:
                 - /.*/
                 - /pull.*/
