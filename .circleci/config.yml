@@ -22,9 +22,9 @@ workflows:
     #jobs:
       #- build
   all:
-    when:
-      and: # All must be true to trigger
-        - equal: [ main, << pipeline.git.branch >> ]
+    condition:
+        or:
+          - << pipeline.parameters.run-deploy >>
     jobs:
       - build:
           filters:
