@@ -30,6 +30,7 @@ workflows:
   build:
     jobs:
       - onBuild:
+        goBuild: "false"
           filters:
             branches:
               #only: /^doNotMatch/
@@ -55,6 +56,10 @@ jobs:
           command: |
             ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
   onBuild:
+    parameters:
+      goBuild:
+        type: string
+        default: "false"
     machine:
       image: ubuntu-2004:current
     #resource_class: large
