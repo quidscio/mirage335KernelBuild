@@ -1,6 +1,8 @@
 
 # https://discuss.circleci.com/t/branch-filtering-ignore/24301
 # https://circleci.com/docs/2.0/workflows/#nightly-example
+# https://circleci.com/docs/2.0/workflows/
+# https://support.circleci.com/hc/en-us/articles/360043638052-Conditional-steps-in-jobs-and-conditional-workflows
 workflows:
   version: 2
   commit:
@@ -17,14 +19,17 @@ workflows:
     #jobs:
       #- build
   all:
+    when:
+      and: # All must be true to trigger
+        - equal [ build, << pipeline.parameters.param1 >> ]
     jobs:
       - build:
           filters:
             branches:
-              only: /^doNotMatch/
-              #only: main
-              ignore:
-                - /.*/
+              #only: /^doNotMatch/
+              only: main
+              #ignore:
+                #- /.*/
                 #- /pull.*/
                 #- /push.*/
               #ignore: /.*/
