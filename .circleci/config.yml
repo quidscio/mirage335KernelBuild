@@ -5,7 +5,7 @@
 # https://support.circleci.com/hc/en-us/articles/360043638052-Conditional-steps-in-jobs-and-conditional-workflows
 # https://discuss.circleci.com/t/advanced-logic-in-config/36011
 workflows:
-  version: 2
+  version: 2.1
   commit:
     jobs:
       - onCommit
