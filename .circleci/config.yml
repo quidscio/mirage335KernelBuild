@@ -1,7 +1,7 @@
 
 workflows:
   version: 2
-  run-all-tests:
+  all:
     jobs:
       - build:
           filters:
