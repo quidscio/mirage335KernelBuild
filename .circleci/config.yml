@@ -30,7 +30,7 @@ workflows:
   build:
     when:
       condition:
-          - equal: [ "true", << pipeline.parameters.goBuild >> ]
+          - equal: [ "false", << pipeline.parameters.goBuild >> ]
     jobs:
       - onBuild:
           filters:
