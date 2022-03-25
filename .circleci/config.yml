@@ -3,26 +3,26 @@
 # https://circleci.com/docs/2.0/workflows/#nightly-example
 workflows:
   version: 2
-  push:
+  commit:
     jobs:
       - onCommit
-  regular:
-    triggers:
-      - schedule:
-          cron: "0 0 * * *"
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - build
+  #regular:
+    #triggers:
+      #- schedule:
+          #cron: "0 0 * * *"
+          #filters:
+            #branches:
+              #only:
+                #- main
+    #jobs:
+      #- build
   all:
     jobs:
       - build:
           filters:
             branches:
-              #only: /^doNotMatch/
-              only: main
+              only: /^doNotMatch/
+              #only: main
               ignore:
                 - /.*/
                 #- /pull.*/
