@@ -21,7 +21,9 @@ workflows:
   all:
     when:
       condition:
-        - equal: [ build, << pipeline.parameters.param1 >> ]
+        or:
+          - << pipeline.parameters.run-deploy >>
+          - equal: [ master, << pipeline.git.branch >> ]
     jobs:
       - build:
           filters:
