@@ -1,12 +1,12 @@
 
 workflows:
   version: 2
-  compile_kernels:
+  run-all-tests:
     jobs:
       - build:
-        filters:
-          branches:
-            ignore: /.*/
+          filters:
+            branches:
+              ignore: /.*/
 
 
 jobs:
