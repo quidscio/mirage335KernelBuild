@@ -8,9 +8,12 @@ workflows:
           filters:
             branches:
               only: main
+              ignore:
+                - /pull.*/
+                - /push.*/
               #ignore: /.*/
-              ignore: /pull.*/
-              ignore: /push.*/
+              #ignore: /pull.*/
+              #ignore: /push.*/
 
 
 jobs:
