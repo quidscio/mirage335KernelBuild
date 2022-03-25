@@ -20,11 +20,6 @@ workflows:
     #jobs:
       #- build
   all:
-    when:
-      condition:
-        or:
-          - << pipeline.parameters.run-deploy >>
-          - equal: [ master, << pipeline.git.branch >> ]
     jobs:
       - build:
           filters:
