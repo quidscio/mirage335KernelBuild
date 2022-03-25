@@ -23,14 +23,13 @@ workflows:
               #only:
                 #- main
     #jobs:
-      #- build
-  all:
+      #- onBuild
+  build:
     when:
       condition:
-          or:
-            - equal: [ master, << pipeline.git.branch >> ]
+          - << pipeline.parameters.run-deploy >>
     jobs:
-      - build:
+      - onBuild:
           filters:
             branches:
               #only: /^doNotMatch/
@@ -55,7 +54,7 @@ jobs:
           #shell: /bin/bash -eo pipefail
           command: |
             ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
-  build:
+  onBuild:
     machine:
       image: ubuntu-2004:current
     #resource_class: large
