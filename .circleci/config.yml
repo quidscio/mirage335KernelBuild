@@ -1,4 +1,13 @@
 
+workflows:
+  build:
+    triggers:
+      filters:
+        branches:
+          ignore:
+            - main
+
+
 jobs:
   build:
     machine:
