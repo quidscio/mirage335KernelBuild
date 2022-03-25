@@ -30,34 +30,34 @@ jobs:
       - checkout
       - run:
           name: _false
-          #shell: /bin/bash
+          shell: /bin/bash -o pipefail
           command: |
-            set +e
+            #set +e
             ./ubiquitous_bash.sh _false
       - run:
           name: _getMinimal_cloud
-          #shell: /bin/bash
+          shell: /bin/bash -o pipefail
           command: |
-            set +e
+            #set +e
             ./ubiquitous_bash.sh _getMinimal_cloud
           when: always
       - run:
           name: _fetchKernel
-          #shell: /bin/bash
+          shell: /bin/bash -o pipefail
           command: |
-            set +e
+            #set +e
             ./ubiquitous_bash.sh _fetchKernel
       #- run:
           #name: _build_cloud
-          #shell: /bin/bash
+          #shell: /bin/bash -o pipefail
           #command: |
-            #set +e
+            ##set +e
             #./ubiquitous_bash.sh _build_cloud
       - run:
           name: _export_cloud
-          #shell: /bin/bash
+          shell: /bin/bash -o pipefail
           command: |
-            set +e
+            #set +e
             ./ubiquitous_bash.sh _export_cloud
 
   test:
