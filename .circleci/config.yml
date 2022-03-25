@@ -46,7 +46,11 @@ jobs:
       image: ubuntu-2004:current
     steps:
       - checkout
-      - run: ./test.sh
+      - run:
+          name: _messagePlain_good nothing
+          #shell: /bin/bash -eo pipefail
+          command: |
+            ./ubiquitous_bash.sh _messagePlain_nominal 'test'
 
 
   nothing:
@@ -92,7 +96,7 @@ workflows:
               only:
                 - main
     jobs:
-      - nothing
+      - test
 
 
 
