@@ -8,6 +8,9 @@
 # https://circleci.com/docs/2.0/configuration-cookbook/#using-logic-in-configuration
 
 
+# A build may happen if and as the 'regular' cron schedule specifies, or as the 'Trigger Pipeline' button is used with the 'action' parameter set to 'build' .
+
+
 version: 2.1
 
 parameters:
