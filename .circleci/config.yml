@@ -25,9 +25,10 @@ workflows:
     #jobs:
       #- build
   all:
-    condition:
-        or:
-          - equal: [ master, << pipeline.git.branch >> ]
+    when:
+      condition:
+          or:
+            - equal: [ master, << pipeline.git.branch >> ]
     jobs:
       - build:
           filters:
