@@ -93,7 +93,7 @@ workflows:
   regular:
     triggers:
       - schedule:
-          cron: "* * * * *"
+          cron: '5 1 * * 6,2,4'
           filters:
             branches:
               only:
