@@ -31,19 +31,19 @@ workflows:
     when:
       condition:
           - equal: [ "false", << pipeline.parameters.goBuild >> ]
-    jobs:
-      - onBuild:
-          filters:
-            branches:
-              #only: /^doNotMatch/
-              only: main
-              #ignore:
-                #- /.*/
-                #- /pull.*/
-                #- /push.*/
-              #ignore: /.*/
-              #ignore: /pull.*/
-              #ignore: /push.*/
+      jobs:
+        - onBuild:
+            filters:
+              branches:
+                #only: /^doNotMatch/
+                only: main
+                #ignore:
+                  #- /.*/
+                  #- /pull.*/
+                  #- /push.*/
+                #ignore: /.*/
+                #ignore: /pull.*/
+                #ignore: /push.*/
 
 
 jobs:
