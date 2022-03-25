@@ -21,7 +21,7 @@ workflows:
   all:
     when:
       and: # All must be true to trigger
-        - equal [ build, << pipeline.parameters.param1 >> ]
+        - equal: [ build, << pipeline.parameters.param1 >> ]
     jobs:
       - build:
           filters:
