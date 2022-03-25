@@ -2,8 +2,8 @@
 version: 2.1
 parameters:
   build:
-    type: boolean
-    default: false
+    type: string
+    default: "false"
 
 
 
@@ -30,7 +30,7 @@ workflows:
   build:
     when:
       condition:
-          - equal: [ true, << pipeline.parameters.build >> ]
+          - equal: [ "true", << pipeline.parameters.build >> ]
     jobs:
       - onBuild:
           filters:
