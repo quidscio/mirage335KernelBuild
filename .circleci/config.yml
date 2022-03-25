@@ -27,7 +27,7 @@ workflows:
   all:
     condition:
         or:
-          - << pipeline.parameters.build >>
+          - equal: [ master, << pipeline.git.branch >> ]
     jobs:
       - build:
           filters:
