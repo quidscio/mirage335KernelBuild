@@ -41,7 +41,7 @@ jobs:
           name: _true
           #shell: /bin/bash -eo pipefail
           command: |
-            ./ubiquitous_bash.sh _true
+            ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
   build:
     machine:
       image: ubuntu-2004:current
