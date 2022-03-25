@@ -20,7 +20,7 @@ workflows:
       #- build
   all:
     when:
-      and: # All must be true to trigger
+      condition:
         - equal: [ build, << pipeline.parameters.param1 >> ]
     jobs:
       - build:
