@@ -1,11 +1,12 @@
 
 # https://discuss.circleci.com/t/branch-filtering-ignore/24301
+# https://circleci.com/docs/2.0/workflows/#nightly-example
 workflows:
   version: 2
-  commit:
+  push:
     jobs:
       - onCommit
-  nightly:
+  regular:
     triggers:
       - schedule:
           cron: "0 0 * * *"
@@ -15,15 +16,15 @@ workflows:
                 - main
     jobs:
       - build
-  #all:
-    #jobs:
-      #- build:
-          #filters:
-            #branches:
+  all:
+    jobs:
+      - build:
+          filters:
+            branches:
               #only: /^doNotMatch/
-              #only: main
-              #ignore:
-                #- /.*/
+              only: main
+              ignore:
+                - /.*/
                 #- /pull.*/
                 #- /push.*/
               #ignore: /.*/
@@ -38,7 +39,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: _true
+          name: _messagePlain_good nothing
           #shell: /bin/bash -eo pipefail
           command: |
             ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
