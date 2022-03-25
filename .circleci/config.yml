@@ -10,33 +10,10 @@ workflows:
   integration_tests:
     when: << pipeline.parameters.run_integration_tests >>
     jobs:
-      - onBuild
+      - mytestjob
 
 jobs:
-  onBuild:
+  mytestjob:
     steps:
       - checkout
-      - run:
-          name: _getMinimal_cloud
-          #shell: /bin/bash -eo pipefail
-          command: |
-            ./ubiquitous_bash.sh _getMinimal_cloud
-          when: always
-      - run:
-          name: _fetchKernel
-          command: |
-            ./ubiquitous_bash.sh _fetchKernel
-      #- run:
-          #name: _build_cloud
-          #command: |
-            #./ubiquitous_bash.sh _build_cloud
-      - run:
-          name: _export_cloud
-          command: |
-            ./ubiquitous_bash.sh _export_cloud
-
-
-
-
-
-
+      - ... # job steps
