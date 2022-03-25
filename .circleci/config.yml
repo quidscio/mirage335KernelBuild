@@ -10,6 +10,8 @@
 
 # A build may happen if and as the 'regular' cron schedule specifies, or as the 'Trigger Pipeline' button is used with the 'action' parameter set to 'build' .
 
+# "$CIRCLE_WORKING_DIRECTORY"
+
 
 version: 2.1
 
@@ -23,30 +25,39 @@ jobs:
   build:
     machine:
       image: ubuntu-2004:current
+    resource_class: medium
     steps:
-      - checkout
+      - checkout- run:
+          name: _false
+          shell: /bin/bash
+          command: |
+            ./ubiquitous_bash.sh _false
       - run:
           name: _getMinimal_cloud
-          #shell: /bin/bash -eo pipefail
+          shell: /bin/bash
           command: |
             ./ubiquitous_bash.sh _getMinimal_cloud
           when: always
       - run:
           name: _fetchKernel
+          shell: /bin/bash
           command: |
             ./ubiquitous_bash.sh _fetchKernel
       #- run:
           #name: _build_cloud
+          #shell: /bin/bash
           #command: |
             #./ubiquitous_bash.sh _build_cloud
       - run:
           name: _export_cloud
+          #shell: /bin/bash
           command: |
             ./ubiquitous_bash.sh _export_cloud
 
   test:
     machine:
       image: ubuntu-2004:current
+    resource_class: medium
     steps:
       - checkout
       - run:
@@ -59,6 +70,7 @@ jobs:
   nothing:
     machine:
       image: ubuntu-2004:current
+    resource_class: medium
     steps:
       - checkout
       - run:
