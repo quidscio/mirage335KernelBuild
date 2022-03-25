@@ -3,6 +3,7 @@
 # https://circleci.com/docs/2.0/workflows/#nightly-example
 # https://circleci.com/docs/2.0/workflows/
 # https://support.circleci.com/hc/en-us/articles/360043638052-Conditional-steps-in-jobs-and-conditional-workflows
+# https://discuss.circleci.com/t/advanced-logic-in-config/36011
 workflows:
   version: 2
   commit:
