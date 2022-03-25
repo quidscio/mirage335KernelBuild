@@ -13,6 +13,8 @@ workflows:
             branches:
               only:
                 - main
+    jobs:
+      - build
   #all:
     #jobs:
       #- build:
