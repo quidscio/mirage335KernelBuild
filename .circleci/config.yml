@@ -20,6 +20,11 @@ workflows:
     #jobs:
       #- build
   all:
+    when:
+      and: # All must be true to trigger
+        - equal: [ main, << pipeline.git.branch >> ]
+        - not: << pipeline.parameters.param1 >>
+        - or: [ << pipeline.parameters.param1 >>, << pipeline.parameters.param2 >> ]
     jobs:
       - build:
           filters:
@@ -33,15 +38,6 @@ workflows:
               #ignore: /.*/
               #ignore: /pull.*/
               #ignore: /push.*/
-  conditional-workflow:
-    when:
-      and: # All must be true to trigger
-        - equal: [ main, << pipeline.git.branch >> ]
-        - not: << pipeline.parameters.param1 >>
-        - or: [ << pipeline.parameters.param1 >>, << pipeline.parameters.param2 >> ]
-
-    jobs:
-      - job-on-condition
 
 
 jobs:
