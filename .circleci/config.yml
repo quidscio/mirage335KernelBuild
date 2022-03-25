@@ -2,12 +2,15 @@
 # https://discuss.circleci.com/t/branch-filtering-ignore/24301
 workflows:
   version: 2
-  all:
+  commit:
     jobs:
-      - build:
-          filters:
-            branches:
-              only: /^doNotMatch/
+      - onCommit
+  #all:
+    #jobs:
+      #- build:
+          #filters:
+            #branches:
+              #only: /^doNotMatch/
               #only: main
               #ignore:
                 #- /.*/
@@ -16,17 +19,27 @@ workflows:
               #ignore: /.*/
               #ignore: /pull.*/
               #ignore: /push.*/
-  regular:
+  nightly:
     triggers:
       - schedule:
-        cron: "0 0 * * *"
-        filters:
-          branches:
-            only:
-              - main
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main
 
 
 jobs:
+  onCommit:
+    machine:
+      image: ubuntu-2004:current
+    steps:
+      - checkout
+      - run:
+          name: _true
+          #shell: /bin/bash -eo pipefail
+          command: |
+            ./ubiquitous_bash.sh _true
   build:
     machine:
       image: ubuntu-2004:current
