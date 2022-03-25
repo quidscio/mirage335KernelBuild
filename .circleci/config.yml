@@ -16,4 +16,4 @@ jobs:
   mytestjob:
     steps:
       - checkout
-      - ... # job steps
+      - run: echo experiment
