@@ -30,7 +30,7 @@ workflows:
   build:
     when:
       condition:
-          - << pipeline.parameters.run-deploy >>
+          - << pipeline.parameters.build >>
     jobs:
       - onBuild:
           filters:
