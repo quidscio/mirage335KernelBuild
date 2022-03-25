@@ -1,9 +1,6 @@
 
 version: 2.1
-parameters:
-  build:
-    type: boolean
-    default: false
+
 
 
 
