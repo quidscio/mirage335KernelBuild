@@ -1,22 +1,31 @@
 version: 0.2
 
 # https://docs.aws.amazon.com/codebuild/latest/userguide/getting-started-cli-create-build-spec.html
-# You cannot change the spelling of these build phase names, and you cannot create more build phase names.
+#  'You cannot change the spelling of these build phase names, and you cannot create more build phase names.'
 
+
+# amazon.command
+#  'You can use Parameter Store in Amazon EC2 Systems Manager to store sensitive values required by your builds. For example, passwords and AWS access IDs.'
 
 # https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html
-# 'strongly discourage the storing of sensitive values, especially AWS access key IDs and secret access keys, in environment variables' 'recommend that you use parameter-store or secrets-manager mapping instead'
-# 'must add the ssm:GetParameters action to your CodeBuild service role'
-# 
+#  'strongly discourage the storing of sensitive values, especially AWS access key IDs and secret access keys, in environment variables' 'recommend that you use parameter-store or secrets-manager mapping instead'
+#  'must add the ssm:GetParameters action to your CodeBuild service role'
+
+# https://aws.amazon.com/about-aws/whats-new/2018/03/longer-role-sessions/
+#  'extend the maximum session duration for an IAM role to up to 12 hours using the IAM console or CLI'
+#  'new feature is available in all AWS Regions where AWS Security Token Service (AWS STS) is available'
+# > Build projects -> 'project' -> Build details -> Service role 'link' ->
+#  'Maximum session duration' '1 hour' 'Edit'
+
 
 env:
   #variables:
      # key: "value"
      # key: "value"
-  #parameter-store:
-     # rclone_limited_conf_base64: "rclone_limited_conf_base64"
-  secrets-manager:
-     key: rclone_limited_conf_base64
+  parameter-store:
+      rclone_limited_conf_base64: "rclone_limited_conf_base64"
+  #secrets-manager:
+     #key: rclone_limited_conf_base64
   #exported-variables:
      # - variable
      # - variable
