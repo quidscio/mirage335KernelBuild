@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='2302201593'
+export ub_setScriptChecksum_contents='3400181874'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -14896,21 +14896,14 @@ _build_cloud() {
 
 
 
-
-
-
-
-_export_cloud() {
-	local functionEntryPWD
-	functionEntryPWD="$PWD"
-	_start
-	
-	_messageNormal "init: _export_cloud"
+_export_cloud_prepare() {
+	_messagePlain_nominal "init: _export_cloud_prepare"
 	
 	mkdir -p "$scriptLocal"/_export
 	mkdir -p "$scriptLocal"/_tmp
-	
-	
+}
+
+_export_cloud_lts() {
 	cd "$scriptLocal"/_tmp
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	if ls -1 "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
@@ -14944,10 +14937,12 @@ _export_cloud() {
 		
 		
 		_safeRMR "$scriptLocal"/_tmp/lts
+		
+		du -sh "$scriptLocal"/_export/linux-lts*
 	fi
-	
-	
-	
+}
+
+_export_cloud_mainline() {
 	cd "$scriptLocal"/_tmp
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	if ls -1 "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
@@ -14981,10 +14976,27 @@ _export_cloud() {
 		
 		
 		_safeRMR "$scriptLocal"/_tmp/mainline
+		
+		du -sh "$scriptLocal"/_export/linux-mainline*
 	fi
+}
+
+
+
+_export_cloud() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	_start
 	
+	_messageNormal "init: _export_cloud"
 	
+	_export_cloud_prepare
 	
+	_export_cloud_lts
+	
+	_export_cloud_mainline
+	
+	echo "_"
 	du -sh "$scriptLocal"/_export/*
 	
 	cd "$functionEntryPWD"
@@ -14994,9 +15006,50 @@ _export_cloud() {
 
 
 
+# ATTENTION: Override with 'ops.sh' or similar!
+_upload_lts() {
+	_rclone_limited copy "$scriptLocal"/_export/linux-mainline-lts-debian.tar.gz mega:/Public/mirage335KernelBuild/
+}
+
+# ATTENTION: Override with 'ops.sh' or similar!
+_upload_mainline() {
+	_rclone_limited copy "$scriptLocal"/_export/linux-mainline-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
+}
 
 
+_create_lts() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	_start
+	
+	_build_cloud_prepare
+	_build_cloud_lts
+	
+	_export_cloud_prepare
+	_export_cloud_lts
+	
+	_upload_lts
+	
+	cd "$functionEntryPWD"
+	_stop
+}
 
+_create_mainline() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	_start
+	
+	_build_cloud_prepare
+	_build_cloud_mainline
+	
+	_export_cloud_prepare
+	_export_cloud_mainline
+	
+	_upload_mainline
+	
+	cd "$functionEntryPWD"
+	_stop
+}
 
 
 
@@ -15008,6 +15061,9 @@ _refresh_anchors() {
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_prepare
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_lts
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_mainline
+	
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_create_lts
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_create_mainline
 	
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_fetchKernel
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_export_cloud
