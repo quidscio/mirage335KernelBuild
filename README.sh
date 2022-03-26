@@ -59,60 +59,46 @@ _t 'Copyright (C) 2022 mirage335
 See the end of the file for license conditions.
 See license.txt for mirage335KernelBuild license conditions.
 
-
 Assistance for ensuring reasonably correct Linux kernel configuration and building.'
-_t '
-
-
-'
 _heading1 'Usage'
 _t 'Copy &#39;.config&#39; files to &#39; "$scriptLib"/linux/lts/.config &#39; or similar.
 
 '
-_o _messagePlain_probe './_fetchKernel'
-_o _messagePlain_probe './_build'
-_t '
-
-
-'
+_o _messagePlain_probe './_getMinimal_cloud'
+_o _messagePlain_probe './_build_cloud'
+_o _messagePlain_probe '#./_build_cloud_lts'
+_o _messagePlain_probe '#./_build_cloud_mainline'
+_o _messagePlain_probe './_export_cloud'
+_o _messagePlain_probe '#./_export_cloud_lts'
+_o _messagePlain_probe '#./_export_cloud_mainline'
+_o _messagePlain_probe './_upload_cloud'
+_o _messagePlain_probe '#./_upload_cloud_lts'
+_o _messagePlain_probe '#./_upload_cloud_mainline'
+_t ' '
+_o _messagePlain_probe './_getMinimal_cloud'
+_o _messagePlain_probe './_create_lts'
+_o _messagePlain_probe './_create_mainline'
 _ _page
 _heading1 'Design'
-_t ' '
-_t '
+_t 'Local build and upload included.
 
-
-'
-
+Multiple cloud build service configurations may be included - GitHub Actions, BuildJet, AWS CodeBuilder, etc.'
 _ _page
 _heading1 'Redistribution and Preservation'
 _t 'git clone --depth 1 git@github.com:mirage335/mirage335KernelBuild.git
 cd mirage335KernelBuild/
-git submodule update --init --depth 1 --recursive'
-_t '
-
-
-'
-
+./ubiquitous_bash.sh _gitBest submodule update --init --depth 1 --recursive'
 _ _page
 _heading1 'Safety'
 _t 'Reasonably sane Linux kernel configuration still does not ensure reliability, security, performance, etc. Be careful to at least understand the choices presented, experiment thoroughly, and when appropriate, update frequently. Your accident is your accident. You have been warned.'
-_t '
-
-
-'
 _ _page
 _heading1 'Reference'
 _t 'https://en.wikipedia.org/wiki/Menuconfig
 	&#39;Configuring Linux is a significant labor&#39;
 		Maybe not so much anymore.'
-_t '
-
-
-'
 _ _page
 _heading1 'Copyright'
-_t '
-This file is part of mirage335KernelBuild.
+_t 'This file is part of mirage335KernelBuild.
 
 mirage335KernelBuild is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -125,12 +111,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with mirage335KernelBuild.  If not, see &lt;http://www.gnu.org/licenses/&gt;.
-'
-_t '
-
-
-'
+along with mirage335KernelBuild.  If not, see &lt;http://www.gnu.org/licenses/&gt;.'
 #__FOOTER_uk4uPhB663kVcygT0q_FOOTER__
 # NOTICE: DOCUMENT
 #y

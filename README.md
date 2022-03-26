@@ -64,15 +64,8 @@ Copyright (C) 2022 mirage335
 See the end of the file for license conditions.
 See license.txt for mirage335KernelBuild license conditions.
 
-
 Assistance for ensuring reasonably correct Linux kernel configuration and 
 building.
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-
-
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
  '_heading1' 'Usage'
@@ -87,26 +80,101 @@ or similar.
 
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
- '_o' '_messagePlain_probe' './_fetchKernel'
+ '_o' '_messagePlain_probe' './_getMinimal_cloud'
 if false; then true; # -->
 <!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_fetchKernel</span>
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_getMinimal_cloud</span>
 <!-- # --></pre>
 <!--
 fi
- '_o' '_messagePlain_probe' './_build'
+ '_o' '_messagePlain_probe' './_build_cloud'
 if false; then true; # -->
 <!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_build</span>
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_build_cloud</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' '#./_build_cloud_lts'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_build_cloud_lts</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' '#./_build_cloud_mainline'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_build_cloud_mainline</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' './_export_cloud'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_export_cloud</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' '#./_export_cloud_lts'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_export_cloud_lts</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' '#./_export_cloud_mainline'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_export_cloud_mainline</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' './_upload_cloud'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_upload_cloud</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' '#./_upload_cloud_lts'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_upload_cloud_lts</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' '#./_upload_cloud_mainline'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_upload_cloud_mainline</span>
 <!-- # --></pre>
 <!--
 fi
 _t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-
-
+scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;"> 
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
+ '_o' '_messagePlain_probe' './_getMinimal_cloud'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_getMinimal_cloud</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' './_create_lts'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_create_lts</span>
+<!-- # --></pre>
+<!--
+fi
+ '_o' '_messagePlain_probe' './_create_mainline'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_create_mainline</span>
+<!-- # --></pre>
+<!--
+fi
  '_' '_page'
  '_heading1' 'Design'
 if false; then true; # -->
@@ -114,13 +182,10 @@ if false; then true; # -->
 <!--
 fi
 _t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;"> 
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">Local build and upload included.
 
-
+Multiple cloud build service configurations may be included - GitHub 
+Actions, BuildJet, AWS CodeBuilder, etc.
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
  '_' '_page'
@@ -133,13 +198,7 @@ _t '
 scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
 git clone --depth 1 git@github.com:mirage335/mirage335KernelBuild.git
 cd mirage335KernelBuild/
-git submodule update --init --depth 1 --recursive
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-
-
+./ubiquitous_bash.sh _gitBest submodule update --init --depth 1 --recursive
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
  '_' '_page'
@@ -156,12 +215,6 @@ the choices presented, experiment thoroughly, and when appropriate, update
 frequently. Your accident is your accident. You have been warned.
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-
-
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
  '_' '_page'
  '_heading1' 'Reference'
 if false; then true; # -->
@@ -175,12 +228,6 @@ https://en.wikipedia.org/wiki/Menuconfig
 		Maybe not so much anymore.
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-
-
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
  '_' '_page'
  '_heading1' 'Copyright'
 if false; then true; # -->
@@ -188,8 +235,7 @@ if false; then true; # -->
 <!--
 fi
 _t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-This file is part of mirage335KernelBuild.
+scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">This file is part of mirage335KernelBuild.
 
 mirage335KernelBuild is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -204,12 +250,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with mirage335KernelBuild.  If not, see 
 &lt;http://www.gnu.org/licenses/&gt;.
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-
-
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
 
