@@ -1,4 +1,12 @@
 
+
+# WARNING: May be untested due to CircleCI timeout (which seems relatively short).
+# 'Try out a larger resource class or running tests in parallel to speed up job execution.  Upgrade your pricing plan to take advantage of longer max job runtimes.'
+# 'context deadline exceeded'
+# https://discuss.circleci.com/t/context-deadline-exceeded/42030
+# https://support.circleci.com/hc/en-us/articles/4410707277083-Context-deadline-exceeded-after-1-hour-Build-timed-out-Free-tier-only-
+#  'This is part of an update to our new pricing plans. In particular, builds on the Free plan are limited to a maximum duration of 1 hour.'
+
 # https://discuss.circleci.com/t/branch-filtering-ignore/24301
 # https://circleci.com/docs/2.0/workflows/#nightly-example
 # https://circleci.com/docs/2.0/workflows/
@@ -25,7 +33,6 @@ jobs:
   build_lts:
     machine:
       image: ubuntu-2004:current
-    parallelism: 2
     resource_class: large
     steps:
       - checkout
@@ -68,7 +75,6 @@ jobs:
   build_mainline:
     machine:
       image: ubuntu-2004:current
-    parallelism: 2
     resource_class: large
     steps:
       - checkout
@@ -113,7 +119,7 @@ jobs:
   nothing:
     machine:
       image: ubuntu-2004:current
-    resource_class: medium
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -144,17 +150,17 @@ workflows:
     jobs:
       - nothing
 
-  regular:
-    triggers:
-      - schedule:
-          #cron: '5 1 * * 6,2,4'
-          cron: '5 1 * * 6'
-          filters:
-            branches:
-              only:
-                - main
-    jobs:
-      - nothing
+  #regular:
+    #triggers:
+      #- schedule:
+          ##cron: '5 1 * * 6,2,4'
+          #cron: '5 1 * * 6'
+          #filters:
+            #branches:
+              #only:
+                #- main
+    #jobs:
+      #- nothing
 
 
 
