@@ -22,7 +22,7 @@ parameters:
     default: nothing
 
 jobs:
-  build:
+  build_lts:
     machine:
       image: ubuntu-2004:current
     resource_class: large
@@ -43,25 +43,26 @@ jobs:
             ./ubiquitous_bash.sh _getMinimal_cloud
           when: on_success
       - run:
-          name: _build_cloud
+          name: _build_cloud_lts
           shell: /bin/bash -o pipefail
           command: |
             #set +e
-            ./ubiquitous_bash.sh _build_cloud
+            ./ubiquitous_bash.sh _build_cloud_prepare
+            ./ubiquitous_bash.sh _build_cloud_lts
           when: on_success
       - run:
-          name: _export_cloud
+          name: _export_cloud_lts
           shell: /bin/bash -o pipefail
           command: |
             #set +e
-            ./ubiquitous_bash.sh _export_cloud
+            ./ubiquitous_bash.sh _export_cloud_lts
           when: on_success
       - run:
-          name: _upload_cloud
+          name: _upload_cloud_lts
           shell: /bin/bash -o pipefail
           command: |
             #set +e
-            ./ubiquitous_bash.sh _upload_cloud
+            ./ubiquitous_bash.sh _upload_cloud_lts
           when: on_success
 
   nothing:
@@ -89,7 +90,8 @@ workflows:
     when:
       equal: [ build, << pipeline.parameters.action >> ]
     jobs:
-      - build
+      - build_lts
+      - build_mainline
 
   nothing:
     when:

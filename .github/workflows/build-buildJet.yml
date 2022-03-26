@@ -3,9 +3,9 @@ name: build-buildJet
 on:
   workflow_dispatch:
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
-  schedule:
-    - cron: '5 1 * * 6'
-    - cron: '5 1 * * 2,4'
+  #schedule:
+    #- cron: '5 1 * * 6'
+    #- cron: '5 1 * * 2,4'
 
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
