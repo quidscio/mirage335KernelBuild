@@ -25,7 +25,7 @@ jobs:
   build:
     machine:
       image: ubuntu-2004:current
-    resource_class: medium
+    resource_class: large
     steps:
       - checkout
       - run:
@@ -36,25 +36,25 @@ jobs:
             ./ubiquitous_bash.sh _getMinimal_cloud
           when: on_success
       - run:
-          name: _fetchKernel
+          name: _build_cloud
           shell: /bin/bash -o pipefail
           command: |
             #set +e
-            ./ubiquitous_bash.sh _fetchKernel
+            ./ubiquitous_bash.sh _build_cloud
           when: on_success
-      #- run:
-          #name: _build_cloud
-          #shell: /bin/bash -o pipefail
-          #command: |
-            ##set +e
-            #./ubiquitous_bash.sh _build_cloud
-          #when: on_success
       - run:
           name: _export_cloud
           shell: /bin/bash -o pipefail
           command: |
             #set +e
             ./ubiquitous_bash.sh _export_cloud
+          when: on_success
+      - run:
+          name: _export_cloud
+          shell: /bin/bash -o pipefail
+          command: |
+            #set +e
+            ./ubiquitous_bash.sh _upload_cloud
           when: on_success
 
   nothing:

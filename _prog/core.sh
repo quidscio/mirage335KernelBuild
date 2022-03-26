@@ -500,13 +500,18 @@ _export_cloud() {
 
 
 # ATTENTION: Override with 'ops.sh' or similar!
-_upload_lts() {
+_upload_cloud_lts() {
 	_rclone_limited --progress copy "$scriptLocal"/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
 }
 
 # ATTENTION: Override with 'ops.sh' or similar!
-_upload_mainline() {
+_upload_cloud_mainline() {
 	_rclone_limited --progress copy "$scriptLocal"/_export/linux-mainline-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
+}
+
+_upload_cloud() {
+	_upload_cloud_lts
+	_upload_cloud_mainline
 }
 
 
@@ -519,7 +524,7 @@ _create_lts() {
 	
 	_export_cloud_lts
 	
-	_upload_lts
+	_upload_cloud_lts
 	
 	cd "$functionEntryPWD"
 	_stop
@@ -534,7 +539,7 @@ _create_mainline() {
 	
 	_export_cloud_mainline
 	
-	_upload_mainline
+	_upload_cloud_mainline
 	
 	cd "$functionEntryPWD"
 	_stop
@@ -547,6 +552,7 @@ _create_mainline() {
 _refresh_anchors() {
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_export_cloud
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_upload_cloud
 	
 	
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_prepare
@@ -556,6 +562,9 @@ _refresh_anchors() {
 	
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_export_cloud_lts
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_export_cloud_mainline
+	
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_upload_cloud_lts
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_upload_cloud_mainline
 	
 	
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_create_lts
