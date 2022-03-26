@@ -1,0 +1,69 @@
+version: 0.2
+
+# https://docs.aws.amazon.com/codebuild/latest/userguide/getting-started-cli-create-build-spec.html
+# You cannot change the spelling of these build phase names, and you cannot create more build phase names.
+
+#env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  #secrets-manager:
+     # key: secret-id:json-key:version-stage:version-id
+     # key: secret-id:json-key:version-stage:version-id
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+#batch:
+  #fast-fail: true
+  #build-list:
+  #build-matrix:
+  #build-graph:
+phases:
+  #install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    #runtime-versions:
+      # name: version
+      # name: version
+    #commands:
+      # - command
+      # - command
+  pre_build:
+    commands:
+      - ./ubiquitous_bash.sh _gitBest submodule update --init --depth 1 --recursive
+      - ./_getMinimal_cloud
+  build:
+    commands:
+      #- ./_build_cloud_lts
+      - ./_build_cloud_mainline
+      #- ./_build_cloud
+  post_build:
+    commands:
+      #- ./_export_cloud_lts
+      - ./_export_cloud_mainline
+      #- ./_export_cloud
+      #- ./_upload_cloud_lts
+      - ./_upload_cloud_mainline
+      #- ./_upload_cloud
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+#artifacts:
+  #files:
+    # - location
+    # - location
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths
