@@ -64,6 +64,49 @@ jobs:
             #set +e
             ./ubiquitous_bash.sh _upload_cloud_lts
           when: on_success
+  build_mainline:
+    machine:
+      image: ubuntu-2004:current
+    resource_class: large
+    steps:
+      - checkout
+      - run:
+          name: write! secrets
+          shell: /bin/bash -o pipefail
+          command: |
+            #set +e
+            echo "$rclone_limited_conf_base64" | base64 -d | sudo -n tee /rclone.conf > /dev/null
+          when: on_success
+      - run:
+          name: _getMinimal_cloud
+          shell: /bin/bash -o pipefail
+          command: |
+            #set +e
+            ./ubiquitous_bash.sh _getMinimal_cloud
+          when: on_success
+      - run:
+          name: _build_cloud_mainline
+          shell: /bin/bash -o pipefail
+          command: |
+            #set +e
+            ./ubiquitous_bash.sh _build_cloud_prepare
+            ./ubiquitous_bash.sh _build_cloud_mainline
+          when: on_success
+      - run:
+          name: _export_cloud_mainline
+          shell: /bin/bash -o pipefail
+          command: |
+            #set +e
+            ./ubiquitous_bash.sh _export_cloud_mainline
+          when: on_success
+      - run:
+          name: _upload_cloud_mainline
+          shell: /bin/bash -o pipefail
+          command: |
+            #set +e
+            ./ubiquitous_bash.sh _upload_cloud_mainline
+          when: on_success
+
 
   nothing:
     machine:
