@@ -54,7 +54,7 @@ jobs:
           shell: /bin/bash -o pipefail
           command: |
             #set +e
-            echo "$rclone_limited_conf_base64" | base64 -d > /rclone.conf
+            echo "$rclone_limited_conf_base64" | base64 -d | sudo -n tee /rclone.conf > /dev/null
           when: on_success
       - run:
           name: _upload_cloud
@@ -75,7 +75,7 @@ jobs:
           shell: /bin/bash -o pipefail
           command: |
             #set +e
-            echo "$rclone_limited_conf_base64" | base64 -d > /rclone.conf
+            echo "$rclone_limited_conf_base64" | base64 -d | sudo -n tee /rclone.conf > /dev/null
             ./ubiquitous_bash.sh _setupUbiquitous
             ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
           when: on_success
