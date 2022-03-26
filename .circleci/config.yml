@@ -50,7 +50,14 @@ jobs:
             ./ubiquitous_bash.sh _export_cloud
           when: on_success
       - run:
-          name: _export_cloud
+          name: write! secrets
+          shell: /bin/bash -o pipefail
+          command: |
+            #set +e
+            echo "$rclone_limited_conf_base64" | base64 -d > /rclone.conf
+          when: on_success
+      - run:
+          name: _upload_cloud
           shell: /bin/bash -o pipefail
           command: |
             #set +e
@@ -65,9 +72,13 @@ jobs:
       - checkout
       - run:
           name: _messagePlain_good nothing
-          #shell: /bin/bash -eo pipefail
+          shell: /bin/bash -o pipefail
           command: |
+            #set +e
+            echo "$rclone_limited_conf_base64" | base64 -d > /rclone.conf
+            ./ubiquitous_bash.sh _setupUbiquitous
             ./ubiquitous_bash.sh _messagePlain_good 'good: nothing'
+          when: on_success
 
 
 
