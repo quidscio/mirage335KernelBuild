@@ -501,7 +501,7 @@ _export_cloud() {
 
 # ATTENTION: Override with 'ops.sh' or similar!
 _upload_lts() {
-	_rclone_limited copy "$scriptLocal"/_export/linux-mainline-lts-debian.tar.gz mega:/Public/mirage335KernelBuild/
+	_rclone_limited copy "$scriptLocal"/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
 }
 
 # ATTENTION: Override with 'ops.sh' or similar!
