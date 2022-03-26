@@ -18,7 +18,7 @@ version: 2.1
 parameters:
   action:
     type: enum
-    enum: [build, test, nothing]
+    enum: [build, nothing]
     default: nothing
 
 jobs:
@@ -28,13 +28,6 @@ jobs:
     resource_class: medium
     steps:
       - checkout
-      - run:
-          name: _false
-          shell: /bin/bash -o pipefail
-          command: |
-            #set +e
-            ./ubiquitous_bash.sh _false
-          when: on_success
       - run:
           name: _getMinimal_cloud
           shell: /bin/bash -o pipefail
@@ -63,19 +56,6 @@ jobs:
             #set +e
             ./ubiquitous_bash.sh _export_cloud
           when: on_success
-
-  test:
-    machine:
-      image: ubuntu-2004:current
-    resource_class: medium
-    steps:
-      - checkout
-      - run:
-          name: _messagePlain_good nothing
-          #shell: /bin/bash -eo pipefail
-          command: |
-            ./ubiquitous_bash.sh _messagePlain_nominal 'test'
-
 
   nothing:
     machine:
@@ -121,7 +101,7 @@ workflows:
               only:
                 - main
     jobs:
-      - test
+      - nothing
 
 
 
