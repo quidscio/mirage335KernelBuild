@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='4257075'
+export ub_setScriptChecksum_contents='2302201593'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -14839,11 +14839,8 @@ _buildKernel-mainline() {
 }
 
 
-_build_cloud() {
-	local functionEntryPWD
-	functionEntryPWD="$PWD"
-	_start
-	
+
+_build_cloud_prepare() {
 	if _test_fetchKernel_updateInterval-setupUbiquitous
 	then
 		rm -f "$scriptLocal"/.retest-setupUbiquitous > /dev/null 2>&1
@@ -14854,22 +14851,41 @@ _build_cloud() {
 	fi
 	
 	_test_build_kernel "$@"
+}
+
+
+
+
+_build_cloud_lts() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
 	
-	
-	cd "$functionEntryPWD"
 	_fetchKernel-lts "$@"
 	_buildKernel-lts "$@"
 	
-	
-	
-	
 	cd "$functionEntryPWD"
+}
+
+_build_cloud_mainline() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	
 	_fetchKernel-mainline "$@"
 	_buildKernel-mainline "$@"
 	
+	cd "$functionEntryPWD"
+}
+
+_build_cloud() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	_start
 	
+	_build_cloud_prepare "$@"
 	
+	_build_cloud_lts "$@"
 	
+	_build_cloud_mainline "$@"
 	
 	cd "$functionEntryPWD"
 	_stop
@@ -14988,6 +15004,11 @@ _export_cloud() {
 
 _refresh_anchors() {
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud
+	
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_prepare
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_lts
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_mainline
+	
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_fetchKernel
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_export_cloud
 }

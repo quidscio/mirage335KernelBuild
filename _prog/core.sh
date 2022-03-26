@@ -332,11 +332,8 @@ _buildKernel-mainline() {
 }
 
 
-_build_cloud() {
-	local functionEntryPWD
-	functionEntryPWD="$PWD"
-	_start
-	
+
+_build_cloud_prepare() {
 	if _test_fetchKernel_updateInterval-setupUbiquitous
 	then
 		rm -f "$scriptLocal"/.retest-setupUbiquitous > /dev/null 2>&1
@@ -347,22 +344,41 @@ _build_cloud() {
 	fi
 	
 	_test_build_kernel "$@"
+}
+
+
+
+
+_build_cloud_lts() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
 	
-	
-	cd "$functionEntryPWD"
 	_fetchKernel-lts "$@"
 	_buildKernel-lts "$@"
 	
-	
-	
-	
 	cd "$functionEntryPWD"
+}
+
+_build_cloud_mainline() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	
 	_fetchKernel-mainline "$@"
 	_buildKernel-mainline "$@"
 	
+	cd "$functionEntryPWD"
+}
+
+_build_cloud() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	_start
 	
+	_build_cloud_prepare "$@"
 	
+	_build_cloud_lts "$@"
 	
+	_build_cloud_mainline "$@"
 	
 	cd "$functionEntryPWD"
 	_stop
@@ -481,6 +497,11 @@ _export_cloud() {
 
 _refresh_anchors() {
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud
+	
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_prepare
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_lts
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_build_cloud_mainline
+	
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_fetchKernel
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_export_cloud
 }
