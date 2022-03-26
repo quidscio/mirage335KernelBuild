@@ -25,6 +25,7 @@ jobs:
   build_lts:
     machine:
       image: ubuntu-2004:current
+    parallelism: 2
     resource_class: large
     steps:
       - checkout
@@ -67,6 +68,7 @@ jobs:
   build_mainline:
     machine:
       image: ubuntu-2004:current
+    parallelism: 2
     resource_class: large
     steps:
       - checkout
