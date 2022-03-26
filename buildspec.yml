@@ -47,6 +47,7 @@ phases:
       # - command
   pre_build:
     commands:
+      - ./ubiquitous_bash.sh _prepare_rclone_limited_file
       - ./ubiquitous_bash.sh _gitBest submodule update --init --depth 1 --recursive
       - ./_getMinimal_cloud
   build:
