@@ -32,25 +32,25 @@ jobs:
       shell: bash
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
-      timeout-minutes: 90
+      timeout-minutes: 10
     - name: _build_cloud_lts
       shell: bash
       run: |
         ./ubiquitous_bash.sh _build_cloud_prepare
         ./ubiquitous_bash.sh _build_cloud_lts
-      timeout-minutes: 180
+      timeout-minutes: 20
     - name: _export_cloud_lts
       shell: bash
       run: |
         ./ubiquitous_bash.sh _export_cloud_lts
-      timeout-minutes: 90
+      timeout-minutes: 10
     - name: rclone_lts
       uses: wei/rclone@v1
       env:
         RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
       with:
         args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
-      timeout-minutes: 90
+      timeout-minutes: 10
   build_mainline:
     runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
@@ -66,18 +66,18 @@ jobs:
       shell: bash
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
-      timeout-minutes: 90
+      timeout-minutes: 10
     - name: _build_cloud_mainline
       shell: bash
       run: |
         ./ubiquitous_bash.sh _build_cloud_prepare
         ./ubiquitous_bash.sh _build_cloud_mainline
-      timeout-minutes: 180
+      timeout-minutes: 20
     - name: _export_cloud_mainline
       shell: bash
       run: |
         ./ubiquitous_bash.sh _export_cloud_mainline
-      timeout-minutes: 90
+      timeout-minutes: 10
     # https://github.com/marketplace/actions/debugging-with-tmate
     # $RUNNER_WORKSPACE
     # rclone config --config="/rclone.conf"
@@ -99,7 +99,7 @@ jobs:
         RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
       with:
         args: copy ./_local/_export/linux-mainline-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
-      timeout-minutes: 90
+      timeout-minutes: 10
 
 
 
