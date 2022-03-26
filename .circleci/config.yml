@@ -80,12 +80,6 @@ workflows:
     jobs:
       - build
 
-  test:
-    when:
-      equal: [ test, << pipeline.parameters.action >> ]
-    jobs:
-      - test
-
   nothing:
     when:
       equal: [ nothing, << pipeline.parameters.action >> ]
