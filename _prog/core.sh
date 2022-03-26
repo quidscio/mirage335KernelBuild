@@ -397,6 +397,7 @@ _export_cloud_prepare() {
 }
 
 _export_cloud_lts() {
+	_export_cloud_prepare
 	cd "$scriptLocal"/_tmp
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	if ls -1 "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
@@ -436,6 +437,7 @@ _export_cloud_lts() {
 }
 
 _export_cloud_mainline() {
+	_export_cloud_prepare
 	cd "$scriptLocal"/_tmp
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	if ls -1 "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
@@ -483,8 +485,6 @@ _export_cloud() {
 	
 	_messageNormal "init: _export_cloud"
 	
-	_export_cloud_prepare
-	
 	_export_cloud_lts
 	
 	_export_cloud_mainline
@@ -515,10 +515,8 @@ _create_lts() {
 	functionEntryPWD="$PWD"
 	_start
 	
-	_build_cloud_prepare
 	_build_cloud_lts
 	
-	_export_cloud_prepare
 	_export_cloud_lts
 	
 	_upload_lts
@@ -532,10 +530,8 @@ _create_mainline() {
 	functionEntryPWD="$PWD"
 	_start
 	
-	_build_cloud_prepare
 	_build_cloud_mainline
 	
-	_export_cloud_prepare
 	_export_cloud_mainline
 	
 	_upload_mainline
