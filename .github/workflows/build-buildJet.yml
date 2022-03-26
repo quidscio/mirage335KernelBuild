@@ -18,7 +18,7 @@ jobs:
     # runs-on: buildjet-2vcpu-ubuntu-2004
     # runs-on: buildjet-64vcpu-ubuntu-2004
   build_lts:
-    runs-on: ubuntu-20.04
+    runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
     - uses: actions/checkout@v2
     - name: write! secrets
@@ -52,7 +52,7 @@ jobs:
         args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
       timeout-minutes: 90
   build_mainline:
-    runs-on: ubuntu-20.04
+    runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
     - uses: actions/checkout@v2
     - name: write! secrets
