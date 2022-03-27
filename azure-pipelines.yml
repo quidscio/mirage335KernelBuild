@@ -29,7 +29,7 @@ jobs:
         ./ubiquitous_bash.sh _setupUbiquitous
         echo test
         ./ubiquitous_bash.sh _prepare_rclone_limited_file
-        ls -lad .
+        ls -la ..
         ./_getMinimal_cloud
       displayName: _getMinimal_cloud
     - bash: |
