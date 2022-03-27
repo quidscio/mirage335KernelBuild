@@ -18,40 +18,51 @@ jobs:
 - job: build_lts
   steps:
     - bash: |
+        set +e
         echo $(rclone_limited_conf_base64) | base64 -d | sudo -n tee /rclone.conf > /dev/null
       displayName: write! secrets
     - bash: |
+        set +e
+        ls /rclone.conf
         ./ubiquitous_bash.sh _prepare_rclone_limited_file
         ./_getMinimal_cloud
       displayName: _getMinimal_cloud
     - bash: |
+        set +e
         ./_build_cloud_prepare
         ./_build_cloud_lts
       displayName: _build_cloud_lts
     - bash: |
+        set +e
         ./_export_cloud_lts
       displayName: _export_cloud_lts
     - bash: |
+        set +e
         ./_upload_cloud_lts
       displayName: _upload_cloud_lts
 
 - job: build_mainline
   steps:
     - bash: |
+        set +e
         echo $(rclone_limited_conf_base64) | base64 -d | sudo -n tee /rclone.conf > /dev/null
       displayName: write! secrets
     - bash: |
+        set +e
         ./ubiquitous_bash.sh _prepare_rclone_limited_file
         ./_getMinimal_cloud
       displayName: _getMinimal_cloud
     - bash: |
+        set +e
         ./_build_cloud_prepare
         ./_build_cloud_mainline
       displayName: _build_cloud_mainline
     - bash: |
+        set +e
         ./_export_cloud_mainline
       displayName: _export_cloud_mainline
     - bash: |
+        set +e
         ./_upload_cloud_mainline
       displayName: _upload_cloud_mainline
 
