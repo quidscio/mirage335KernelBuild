@@ -12,42 +12,47 @@ pool:
 variables:
 - name: rclone_limited_conf_base64
 
-#steps:
-  #- bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  #- bash: ./_getMinimal_cloud
-  #- bash: ./_build_cloud
-  #- bash: ./_export_cloud
-  #- bash: ./_upload_cloud
-
-
-
-
 
 jobs:
 
-#- job: build
-  #steps:
-  #- bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  #- bash: ./_getMinimal_cloud
-  #- bash: ./_build_cloud
-  #- bash: ./_export_cloud
-  #- bash: ./_upload_cloud
-
 - job: build_lts
   steps:
-  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  - bash: ./_getMinimal_cloud
-  - bash: ./_build_cloud_prepare
-  - bash: ./_build_cloud_lts
-  - bash: ./_export_cloud_lts
-  - bash: ./_upload_cloud_lts
+    - bash: |
+        echo $(rclone_limited_conf_base64) | base64 -d | sudo -n tee /rclone.conf > /dev/null
+      displayName: write! secrets
+    - bash: |
+        ./ubiquitous_bash.sh _prepare_rclone_limited_file
+        ./_getMinimal_cloud
+      displayName: _getMinimal_cloud
+    - bash: |
+        ./_build_cloud_prepare
+        ./_build_cloud_lts
+      displayName: _build_cloud_lts
+    - bash: |
+        ./_export_cloud_lts
+      displayName: _export_cloud_lts
+    - bash: |
+        ./_upload_cloud_lts
+      displayName: _upload_cloud_lts
 
 - job: build_mainline
   steps:
-  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  - bash: ./_getMinimal_cloud
-  - bash: ./_build_cloud_prepare
-  - bash: ./_build_cloud_mainline
-  - bash: ./_export_cloud_mainline
-  - bash: ./_upload_cloud_mainline
+    - bash: |
+        echo $(rclone_limited_conf_base64) | base64 -d | sudo -n tee /rclone.conf > /dev/null
+      displayName: write! secrets
+    - bash: |
+        ./ubiquitous_bash.sh _prepare_rclone_limited_file
+        ./_getMinimal_cloud
+      displayName: _getMinimal_cloud
+    - bash: |
+        ./_build_cloud_prepare
+        ./_build_cloud_mainline
+      displayName: _build_cloud_mainline
+    - bash: |
+        ./_export_cloud_mainline
+      displayName: _export_cloud_mainline
+    - bash: |
+        ./_upload_cloud_mainline
+      displayName: _upload_cloud_mainline
+
 
