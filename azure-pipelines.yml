@@ -9,6 +9,9 @@ pool:
   #vmImage: ubuntu-latest
   name: Default
 
+variables:
+- name: rclone_limited_conf_base64
+
 #steps:
   #- bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
   #- bash: ./_getMinimal_cloud
