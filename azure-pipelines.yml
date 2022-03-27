@@ -7,17 +7,27 @@ trigger: none
 pool:
   vmImage: ubuntu-latest
 
-
-
-jobs:
-
-- job: build
-  steps:
-  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  - bash: ./_getMinimal_cloud
+steps:
+  - bash: |
+    ./ubiquitous_bash.sh _prepare_rclone_limited_file
+    ./_getMinimal_cloud
   - bash: ./_build_cloud
   - bash: ./_export_cloud
   - bash: ./_upload_cloud
+
+
+
+
+
+#jobs:
+
+#- job: build
+  #steps:
+  #- bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
+  #- bash: ./_getMinimal_cloud
+  #- bash: ./_build_cloud
+  #- bash: ./_export_cloud
+  #- bash: ./_upload_cloud
 
 #- job: build_lts
   #steps:
