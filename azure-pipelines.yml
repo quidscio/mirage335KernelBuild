@@ -9,6 +9,7 @@ pool:
   #vmImage: ubuntu-latest
   name: Default
 
+# Untested.
 #variables:
 #- rclone_limited_conf_base64: $(rclone_limited_conf_base64)
 
@@ -27,6 +28,7 @@ jobs:
         set +e
         du -sh /rclone.conf
         ls -la
+        false
         sudo -n echo sudo test
         ./ubiquitous_bash.sh _prepare_rclone_limited_file
         ./_getMinimal_cloud
