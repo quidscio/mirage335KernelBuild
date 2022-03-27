@@ -8,11 +8,13 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  - bash: ./_getMinimal_cloud
-  - bash: ./_build_cloud
-  - bash: ./_export_cloud
-  - bash: ./_upload_cloud
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: |
+    echo Add other tasks to build, test, and deploy your project.
+    echo See https://aka.ms/yaml
+  displayName: 'Run a multi-line script'
 
 
 
