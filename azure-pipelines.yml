@@ -1,24 +1,26 @@
 
 # https://aka.ms/yaml
+# https://docs.microsoft.com/en-us/answers/questions/477716/how-to-resolve-34no-hosted-parallelism-has-been-pu.html
 
 trigger: none
 #- main
 
 pool:
   vmImage: ubuntu-latest
+  #name: local
 
-steps:
-  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  - bash: ./_getMinimal_cloud
-  - bash: ./_build_cloud
-  - bash: ./_export_cloud
-  - bash: ./_upload_cloud
-
-
-
+#steps:
+  #- bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
+  #- bash: ./_getMinimal_cloud
+  #- bash: ./_build_cloud
+  #- bash: ./_export_cloud
+  #- bash: ./_upload_cloud
 
 
-#jobs:
+
+
+
+jobs:
 
 #- job: build
   #steps:
@@ -28,21 +30,21 @@ steps:
   #- bash: ./_export_cloud
   #- bash: ./_upload_cloud
 
-#- job: build_lts
-  #steps:
-  #- bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  #- bash: ./_getMinimal_cloud
-  #- bash: ./_build_cloud_prepare
-  #- bash: ./_build_cloud_lts
-  #- bash: ./_export_cloud_lts
-  #- bash: ./_upload_cloud_lts
+- job: build_lts
+  steps:
+  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
+  - bash: ./_getMinimal_cloud
+  - bash: ./_build_cloud_prepare
+  - bash: ./_build_cloud_lts
+  - bash: ./_export_cloud_lts
+  - bash: ./_upload_cloud_lts
 
-#- job: build_mainline
-  #steps:
-  #- bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
-  #- bash: ./_getMinimal_cloud
-  #- bash: ./_build_cloud_prepare
-  #- bash: ./_build_cloud_mainline
-  #- bash: ./_export_cloud_mainline
-  #- bash: ./_upload_cloud_mainline
+- job: build_mainline
+  steps:
+  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
+  - bash: ./_getMinimal_cloud
+  - bash: ./_build_cloud_prepare
+  - bash: ./_build_cloud_mainline
+  - bash: ./_export_cloud_mainline
+  - bash: ./_upload_cloud_mainline
 
