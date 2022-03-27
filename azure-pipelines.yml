@@ -26,11 +26,9 @@ jobs:
         rclone_limited_conf_base64: $(rclone_limited_conf_base64)
     - bash: |
         set +e
+        ./ubiquitous_bash.sh _setupUbiquitous
+        echo test
         ./ubiquitous_bash.sh _prepare_rclone_limited_file
-        du -sh /rclone.conf
-        ls -la
-        false
-        sudo -n echo sudo test
         ./_getMinimal_cloud
       displayName: _getMinimal_cloud
     - bash: |
