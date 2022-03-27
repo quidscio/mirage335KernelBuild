@@ -8,9 +8,8 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-  - bash: |
-    ./ubiquitous_bash.sh _prepare_rclone_limited_file
-    ./_getMinimal_cloud
+  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
+  - bash: ./_getMinimal_cloud
   - bash: ./_build_cloud
   - bash: ./_export_cloud
   - bash: ./_upload_cloud
