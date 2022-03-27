@@ -1,0 +1,27 @@
+
+# https://aka.ms/yaml
+
+trigger: none
+#- main
+
+pool:
+  vmImage: ubuntu-latest
+jobs:
+- job: build_lts
+  steps:
+  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
+  - bash: ./_getMinimal_cloud
+  - bash: ./_build_cloud_prepare
+  - bash: ./_build_cloud_lts
+  - bash: ./_export_cloud_lts
+  - bash: ./_upload_cloud_lts
+
+- job: build_mainline
+  steps:
+  - bash: ./ubiquitous_bash.sh _prepare_rclone_limited_file
+  - bash: ./_getMinimal_cloud
+  - bash: ./_build_cloud_prepare
+  - bash: ./_build_cloud_mainline
+  - bash: ./_export_cloud_mainline
+  - bash: ./_upload_cloud_mainline
+
