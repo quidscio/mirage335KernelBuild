@@ -130,16 +130,18 @@ _variableLocalTest_sequence() {
 	[[ "$currentLocalC" != 'true' ]] && _stop 1
 	echo test7
 	! env -i  HOME="$HOME" TERM="${TERM}" SHELL="${SHELL}" PATH="${PATH}" PWD="$PWD" scriptAbsoluteLocation="$scriptAbsoluteLocation" scriptAbsoluteFolder="$scriptAbsoluteFolder" sessionid="$sessionid" LD_PRELOAD="$LD_PRELOAD" USER="$USER" "bash" -c '[[ "$sessionid" != "" ]]' && _stop 1
+	echo 7.1
 	env -i  HOME="$HOME" TERM="${TERM}" SHELL="${SHELL}" PATH="${PATH}" PWD="$PWD" scriptAbsoluteLocation="$scriptAbsoluteLocation" scriptAbsoluteFolder="$scriptAbsoluteFolder" sessionid="" LD_PRELOAD="$LD_PRELOAD" USER="$USER" "bash" -c '[[ "$sessionid" != "" ]]' && _stop 1
+	echo 7.2
 	env -i HOME="$HOME" TERM="${TERM}" SHELL="${SHELL}" PATH="${PATH}" PWD="$PWD" scriptAbsoluteLocation="$scriptAbsoluteLocation" scriptAbsoluteFolder="$scriptAbsoluteFolder" LD_PRELOAD="$LD_PRELOAD" USER="$USER" "bash" -c '[[ "$sessionid" != "" ]]' && _stop 1
-	
+	echo 7.3
 	local currentBashBinLocation
 	currentBashBinLocation=$(type -p bash)
 	[[ "$sessionid" == '' ]] &&  _stop 1
 	! env -i sessionid="$sessionid" "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
 	env -i sessionid="" "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
 	env -i "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
-	
+	echo 7.4
 	
 	
 	local currentVariableFunctionText
@@ -148,6 +150,7 @@ _variableLocalTest_sequence() {
 	currentVariableFunctionText=$(bash -c "$UB_TEST_VARIABLE_FUNCTION_COMMAND")
 	#currentVariableFunctionText=$($UB_TEST_VARIABLE_FUNCTION_COMMAND)
 	[[ "$currentVariableFunctionText" != "true" ]] && _messageFAIL && _stop 1
+	echo 7.5
 	export UB_TEST_VARIABLE_FUNCTION_COMMAND=
 	unset UB_TEST_VARIABLE_FUNCTION_COMMAND
 	echo test8
