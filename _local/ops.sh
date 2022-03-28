@@ -143,7 +143,7 @@ _variableLocalTest_sequence() {
 	echo 7.3.3
 	! env -i sessionid="$sessionid" "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
 	echo 7.3.4
-	env -i sessionid="" "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
+	env -i sessionid="" "$currentBashBinLocation" --norc -c '[[ "$sessionid" != "" ]]' && _stop 1
 	echo 7.3.5
 	env -i "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
 	echo 7.4
