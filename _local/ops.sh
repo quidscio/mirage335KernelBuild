@@ -136,10 +136,15 @@ _variableLocalTest_sequence() {
 	env -i HOME="$HOME" TERM="${TERM}" SHELL="${SHELL}" PATH="${PATH}" PWD="$PWD" scriptAbsoluteLocation="$scriptAbsoluteLocation" scriptAbsoluteFolder="$scriptAbsoluteFolder" LD_PRELOAD="$LD_PRELOAD" USER="$USER" "bash" -c '[[ "$sessionid" != "" ]]' && _stop 1
 	echo 7.3
 	local currentBashBinLocation
+	echo 7.3.1
 	currentBashBinLocation=$(type -p bash)
+	echo 7.3.2
 	[[ "$sessionid" == '' ]] &&  _stop 1
+	echo 7.3.3
 	! env -i sessionid="$sessionid" "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
+	echo 7.3.4
 	env -i sessionid="" "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
+	echo 7.3.5
 	env -i "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
 	echo 7.4
 	
