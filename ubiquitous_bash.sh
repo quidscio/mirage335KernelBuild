@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='3381340602'
+export ub_setScriptChecksum_contents='3577639461'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -1598,7 +1598,7 @@ _test_realpath_L_s_sequence() {
 _test_realpath_L_s() {
 	#Optional safety check. Nonconformant realpath solution should be caught by synthetic test cases.
 	#_compat_realpath
-	#! [[ -e "$compat_realpath_bin" ]] && [[ "$compat_realpath_bin" != "" ]] && echo 'crit: missing: realpath' && _stop 1
+	#  ! [[ -e "$compat_realpath_bin" ]] && [[ "$compat_realpath_bin" != "" ]] && echo 'crit: missing: realpath' && _stop 1
 	
 	"$scriptAbsoluteLocation" _test_realpath_L_s_sequence "$@"
 	[[ "$?" != "0" ]] && _stop 1
@@ -1772,7 +1772,7 @@ _cygwin_translation_rootFileParameter() {
 
 #Critical prerequsites.
 _getAbsolute_criticalDep() {
-	#! type realpath > /dev/null 2>&1 && return 1
+	#  ! type realpath > /dev/null 2>&1 && return 1
 	! type readlink > /dev/null 2>&1 && return 1
 	! type dirname > /dev/null 2>&1 && return 1
 	! type basename > /dev/null 2>&1 && return 1
@@ -2025,7 +2025,7 @@ _safeRMR() {
 	[[ "$safeToDeleteGit" != "true" ]] && [[ -d "$1" ]] && [[ -e "$1" ]] && find "$1" 2>/dev/null | grep -i '\.git$' >/dev/null 2>&1 && return 1
 	
 	#Validate necessary tools were available for path building and checks.
-	#! type realpath > /dev/null 2>&1 && return 1
+	#  ! type realpath > /dev/null 2>&1 && return 1
 	! type readlink > /dev/null 2>&1 && return 1
 	! type dirname > /dev/null 2>&1 && return 1
 	! type basename > /dev/null 2>&1 && return 1
@@ -2122,7 +2122,7 @@ _safePath() {
 	[[ "$safeToDeleteGit" != "true" ]] && [[ -d "$1" ]] && [[ -e "$1" ]] && find "$1" 2>/dev/null | grep -i '\.git$' >/dev/null 2>&1 && return 1
 	
 	#Validate necessary tools were available for path building and checks.
-	#! type realpath > /dev/null 2>&1 && return 1
+	#  ! type realpath > /dev/null 2>&1 && return 1
 	! type readlink > /dev/null 2>&1 && return 1
 	! type dirname > /dev/null 2>&1 && return 1
 	! type basename > /dev/null 2>&1 && return 1
@@ -2215,7 +2215,7 @@ _command_safeBackup() {
 	[[ "$1" == "$HOME" ]] && return 1
 	[[ "$1" == "$HOME/" ]] && return 1
 	
-	#! type realpath > /dev/null 2>&1 && return 1
+	#  ! type realpath > /dev/null 2>&1 && return 1
 	! type readlink > /dev/null 2>&1 && return 1
 	! type dirname > /dev/null 2>&1 && return 1
 	! type basename > /dev/null 2>&1 && return 1
@@ -2498,7 +2498,7 @@ _permissions_ubiquitous_repo() {
 
 _test_permissions_ubiquitous-cygwin() {
 	! _if_cygwin && _stop 1
-	#! _if_cygwin && _stop "$1"
+	#  ! _if_cygwin && _stop "$1"
 	
 	_if_cygwin && echo 'warn: accepted: cygwin: permissions' && return 0
 }
@@ -5372,14 +5372,26 @@ CZXWXcRMTo8EmM8i4d
 		then
 			if [[ -e "$HOME"/core/installations/digimend-dkms/digimend-dkms_10_all.deb ]]
 			then
-				yes | sudo -n dpkg -i "$HOME"/core/installations/digimend-dkms/digimend-dkms_10_all.deb
+				if ! yes | sudo -n dpkg -i "$HOME"/core/installations/digimend-dkms/digimend-dkms_10_all.deb
+				then
+					sudo -n env DEBIAN_FRONTEND=noninteractive apt-get remove -y digimend-dkms
+				fi
 			fi
 			
-			sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y digimend-dkms
+			if ! sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y digimend-dkms
+			then
+				sudo -n env DEBIAN_FRONTEND=noninteractive apt-get remove -y digimend-dkms
+			fi
 			
 			curl -L "https://github.com/DIGImend/digimend-kernel-drivers/releases/download/v10/digimend-dkms_10_all.deb" -o "$safeTmp"/"digimend-dkms_10_all.deb"
-			yes | sudo -n dpkg -i "$safeTmp"/"digimend-dkms_10_all.deb"
-			sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y -f
+			if ! yes | sudo -n dpkg -i "$safeTmp"/"digimend-dkms_10_all.deb"
+			then
+				sudo -n env DEBIAN_FRONTEND=noninteractive apt-get remove -y digimend-dkms
+			fi
+			if ! sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y digimend-dkms
+			then
+				sudo -n env DEBIAN_FRONTEND=noninteractive apt-get remove -y digimend-dkms
+			fi
 			sudo rm -f "$safeTmp"/"digimend-dkms_10_all.deb"
 		fi
 		
@@ -6175,6 +6187,13 @@ _visualPrompt() {
 	export PS1='\[\033[01;40m\]\[\033[01;36m\]\[\033[01;34m\]|\[\033[01;31m\]${?}:${debian_chroot:+($debian_chroot)}\[\033[01;33m\]\u\[\033[01;32m\]@\h\[\033[01;36m\]\[\033[01;34m\])\[\033[01;36m\]\[\033[01;34m\]-'"$prompt_cloudNetName"'(\[\033[01;35m\]$(date +%H:%M:%S\.%d)\[\033[01;34m\])\[\033[01;36m\]|\[\033[00m\]\n\[\033[01;40m\]\[\033[01;36m\]\[\033[01;34m\]|\[\033[37m\][\w]\[\033[00m\]\n\[\033[01;36m\]\[\033[01;34m\]|$([[ "$PS1_lineNumber" == "1" ]] && echo -e -n '"'"'\[\033[01;36m\]'"'"'$PS1_lineNumber || echo -e -n $PS1_lineNumber)\[\033[01;34m\]) \[\033[36m\]'""'>\[\033[00m\] '
 }
 
+
+_request_visualPrompt() {
+	_messagePlain_request 'export profileScriptLocation="'"$scriptAbsoluteLocation"'"'
+	_messagePlain_request 'export profileScriptFolder="'"$scriptAbsoluteFolder"'"'
+	_messagePlain_request ". "'"'"$scriptAbsoluteLocation"'"' --profile _importShortcuts
+}
+
 #https://stackoverflow.com/questions/15432156/display-filename-before-matching-line-grep
 _grepFileLine() {
 	grep -n "$@" /dev/null
@@ -6928,7 +6947,6 @@ _dropCache() {
 
 # May transfer large files out of cloud CI services, or may copy files into cloud or CI services for installation.
 
-
 _set_rclone_limited_file() {
 	export rclone_limited_file="$scriptLocal"/rclone_limited/rclone.conf
 	! [[ -e "$rclone_limited_file" ]] && export rclone_limited_file=/rclone.conf
@@ -6954,7 +6972,16 @@ _prepare_rclone_limited_file() {
 		fi
 	fi
 	_set_rclone_limited_file
-	! [[ -e "$rclone_limited_file" ]] && _messageError 'FAIL: rclone_limited_file' && _stop 1
+	if ! [[ -e "$rclone_limited_file" ]]
+	then
+		_messageError 'FAIL: missing: rclone_limited_file'
+		_stop 1
+	fi
+	if ! [[ -s "$rclone_limited_file" ]]
+	then
+		_messageError 'FAIL: empty: rclone_limited_file'
+		_stop 1
+	fi
 	return 0
 }
 
@@ -7885,6 +7912,21 @@ CZXWXcRMTo8EmM8i4d
 
 
 
+_importShortcuts() {
+	_tryExec "_resetFakeHomeEnv"
+	
+	if ! [[ "$PATH" == *":""$HOME""/bin"* ]] && ! [[ "$PATH" == "$HOME""/bin"* ]] && [[ -e "$HOME"/bin ]] && [[ -d "$HOME"/bin ]]
+	then
+		export PATH="$PATH":"$HOME"/bin
+	fi
+	
+	_tryExec "_visualPrompt"
+	
+	_tryExec "_scopePrompt"
+	
+	return 0
+}
+
 
 # ATTENTION: Override with 'ops.sh' , 'core.sh' , or similar.
 _setupUbiquitous_accessories_here-gnuoctave() {
@@ -8369,21 +8411,6 @@ _resetOps() {
 	rm "$scriptAbsoluteFolder"/ops
 }
 
-_importShortcuts() {
-	_tryExec "_resetFakeHomeEnv"
-	
-	if ! [[ "$PATH" == *":""$HOME""/bin"* ]] && ! [[ "$PATH" == "$HOME""/bin"* ]] && [[ -e "$HOME"/bin ]] && [[ -d "$HOME"/bin ]]
-	then
-		export PATH="$PATH":"$HOME"/bin
-	fi
-	
-	_tryExec "_visualPrompt"
-	
-	_tryExec "_scopePrompt"
-	
-	return 0
-}
-
 _gitPull_ubiquitous() {
 	#git pull
 	_gitBest pull
@@ -8564,7 +8591,12 @@ _setupUbiquitous() {
 	fi
 	
 	_messagePlain_request "Now import new functionality into current shell if not in current shell."
-	_messagePlain_request ". "'"'"$scriptAbsoluteLocation"'"' --profile _importShortcuts
+	if [[ "$profileScriptLocation" != "" ]] && [[ "$profileScriptFolder" != "" ]]
+	then
+		_messagePlain_request ". "'"'"$scriptAbsoluteLocation"'"' --profile _importShortcuts
+	else
+		_request_visualPrompt
+	fi
 	
 	sleep 3
 	return 0
@@ -13300,8 +13332,8 @@ _variableLocalTest_sequence() {
 	currentBashBinLocation=$(type -p bash)
 	[[ "$sessionid" == '' ]] &&  _stop 1
 	! env -i sessionid="$sessionid" "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
-	env -i sessionid="" "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
-	env -i "$currentBashBinLocation" -c '[[ "$sessionid" != "" ]]' && _stop 1
+	env -i sessionid="" "$currentBashBinLocation" --norc -c '[[ "$sessionid" != "" ]]' && _stop 1
+	env -i "$currentBashBinLocation" --norc -c '[[ "$sessionid" != "" ]]' && _stop 1
 	
 	
 	
@@ -15993,7 +16025,7 @@ _sudo() {
 
 _true() {
 	#"$scriptAbsoluteLocation" _false && return 1
-	#! "$scriptAbsoluteLocation" _bin true && return 1
+	#  ! "$scriptAbsoluteLocation" _bin true && return 1
 	#"$scriptAbsoluteLocation" _bin false && return 1
 	true
 }
