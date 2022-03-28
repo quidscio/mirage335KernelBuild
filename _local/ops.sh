@@ -14,7 +14,6 @@ export ub_anchor_autoupgrade="true"
 
 
 _test_sanity() {
-	echo test1
 	if (exit 0)
 	then
 		true
@@ -69,7 +68,7 @@ _test_sanity() {
 	then
 		_messageFAIL && return 1
 	fi
-	echo test2
+	
 	local currentSubReturnStatus
 	(exit 0)
 	currentSubReturnStatus="$?"
@@ -84,7 +83,7 @@ _test_sanity() {
 	currentSubReturnStatus="$?"
 	[[ "$currentSubReturnStatus" != '3' ]] && _messageFAIL && return 1
 	
-	echo test3
+	
 	# Do NOT allow 'rm' to be a shell function alias to 'rm -i' or similar.
 	[[ $(type -p rm) == "" ]] && _messageFAIL && return 1
 	
@@ -121,11 +120,11 @@ _test_sanity() {
 	! [[ 0 -ge -0 ]] && _messageFAIL && return 1
 	! [[ -0 -ge 0 ]] && _messageFAIL && return 1
 	
-	echo test4
+	
 	
 	! "$scriptAbsoluteLocation" _true && _messageFAIL && return 1
 	"$scriptAbsoluteLocation" _false && _messageFAIL && return 1
-	echo test5
+	
 	# CAUTION: Profoundly unexpected to have called '_test' or similar functions after importing into a current shell in any way.
 	if ( [[ "$current_internal_CompressedScript" == "" ]] && [[ "$current_internal_CompressedScript_cksum" == "" ]] && [[ "$current_internal_CompressedScript_bytes" == "" ]] ) || ( ( [[ "$ub_import_param" != "--embed" ]] ) && [[ "$ub_import_param" != "--bypass" ]] && [[ "$ub_import_param" != "--call" ]] && [[ "$ub_import_param" != "--script" ]] && [[ "$ub_import_param" != "--compressed" ]] )
 	then
@@ -133,7 +132,7 @@ _test_sanity() {
 		[[ "$ub_import" != '' ]] && _messageFAIL && _stop 1
 		[[ "$ub_import_param" != '' ]] && _messageFAIL && _stop 1
 	fi
-	echo test6
+	
 	local santiySessionID_length
 	santiySessionID_length=$(echo -n "$sessionid" | wc -c | tr -dc '0-9')
 	
@@ -143,7 +142,7 @@ _test_sanity() {
 	[[ -e "$safeTmp" ]] && _messageFAIL && return 1
 	
 	_start scriptLocal_mkdir_disable
-	echo test7
+	
 	
 	[[ ! -e "$safeTmp" ]] && _messageFAIL && return 1
 	
@@ -158,7 +157,7 @@ _test_sanity() {
 	[[ $( cd "$safeTmp" 2>/dev/null ; ls -A *empty* 2>/dev/null | wc -c) == "0" ]] && _messageFAIL && return 1
 	
 	rm -f "$safeTmp"/empty > /dev/null 2>&1
-	echo test8
+	
 	
 	! _test_moveconfirm_procedure && _messageFAIL && return 1
 	
@@ -181,10 +180,10 @@ _test_sanity() {
 	[[ $(cat "$safeTmp"/shouldNotOverwrite) != "true" ]] && _messageFAIL && return 1
 	rm -f "$safeTmp"/replacement > /dev/null 2>&1
 	rm -f "$safeTmp"/shouldNotOverwrite > /dev/null 2>&1
-	echo test9
+	
 	
 	_uid_test
-	echo test10
+	
 	[[ $(_getUUID | wc -c) != '37' ]] && _messageFAIL && return 1
 	
 	[[ $(_getUUID | cut -f1 -d\- | wc -c) != '9' ]] &&  _messageFAIL && return 1
@@ -193,23 +192,26 @@ _test_sanity() {
 	! env | grep 'PATH' > /dev/null 2>&1 && _messageFAIL && return 1
 	! printenv | grep 'PATH' > /dev/null 2>&1 && _messageFAIL && return 1
 	
-	echo test11
+	echo test1
 	_define_function_test
-	
+	echo test2
 	! _variableLocalTest && _messageFAIL && return 1
-	
+	echo test3
 	
 	
 	mkdir -p "$safeTmp"/maydeletethisfolder
 	[[ ! -d "$safeTmp"/maydeletethisfolder ]] && return 1
 	echo > "$safeTmp"/maydeletethisfolder/maydeletethisfile
 	[[ ! -e "$safeTmp"/maydeletethisfolder/maydeletethisfile ]] && return 1
+	echo test4
 	_safeRMR "$safeTmp"/maydeletethisfolder
+	echo test5
 	[[ -e "$safeTmp"/maydeletethisfolder/maydeletethisfile ]] && return 1
 	[[ -e "$safeTmp"/maydeletethisfolder ]] && return 1
+	echo test6
 	
 	
-	echo test12
+	
 	# WARNING: Not tested by default, due to lack of use except where faults are tolerable, and slim possibility of useful embedded systems not able to pass.
 	#! echo \$123 | grep -E '^\$[0-9]|^\.[0-9]' > /dev/null 2>&1 && _messageFAIL && return 1
 	#! echo \.123 | grep -E '^\$[0-9]|^\.[0-9]' > /dev/null 2>&1 && _messageFAIL && return 1
@@ -230,7 +232,7 @@ _test_sanity() {
 	[[ "$currentJobsList" != "" ]] && return 1
 	
 	
-	echo test13
+	
 	
 	if ! _test_embed
 	then
@@ -240,7 +242,7 @@ _test_sanity() {
 	fi
 	
 	
-	echo test14
+	
 	
 	_getDep flock
 	
@@ -266,11 +268,11 @@ _test_sanity() {
 	rm -f "$safeTmp"/working
 	rm -f "$safeTmp"/broken
 	
-	echo test15
+	
 	
 	_tryExec _test_parallelFifo_procedure
 	
-	echo test16
+	
 	return 0
 }
 
