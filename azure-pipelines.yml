@@ -6,8 +6,8 @@ trigger: none
 #- main
 
 pool:
-  #vmImage: ubuntu-latest
-  name: Default
+  vmImage: ubuntu-latest
+  #name: Default
 
 
 jobs:
