@@ -15,20 +15,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    # runs-on: ubuntu-latest
-    # runs-on: ubuntu-20.04
-    # runs-on: buildjet-2vcpu-ubuntu-2004
-    # runs-on: buildjet-64vcpu-ubuntu-2004
   build_lts:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    #runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
+    #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
     - uses: actions/checkout@v2
     - name: write! secrets
       shell: bash
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
       run: |
-        echo "$RCLONE_CONF" | sudo -n tee /rclone.conf > /dev/null
+        ./ubiquitous_bash.sh _prepare_rclone_limited_file
+      env:
+        rclone_limited_conf_base64: ${{ secrets.rclone_limited_conf_base64 }}
       timeout-minutes: 5
     - name: _getMinimal_cloud
       shell: bash
@@ -47,22 +46,23 @@ jobs:
         ./ubiquitous_bash.sh _export_cloud_lts
       timeout-minutes: 90
     - name: rclone_lts
-      uses: wei/rclone@v1
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
-      with:
-        args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
+      shell: bash
       timeout-minutes: 90
+      run: |
+        rclone --progress --config /rclone.conf copy ./ distLLC_build_mirage335KernelBuild:
   build_mainline:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    #runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
+    #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
     - uses: actions/checkout@v2
     - name: write! secrets
       shell: bash
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
       run: |
-        echo "$RCLONE_CONF" | sudo -n tee /rclone.conf > /dev/null
+        ./ubiquitous_bash.sh _prepare_rclone_limited_file
+      env:
+        rclone_limited_conf_base64: ${{ secrets.rclone_limited_conf_base64 }}
       timeout-minutes: 5
     - name: _getMinimal_cloud
       shell: bash
@@ -94,14 +94,11 @@ jobs:
       with:
         limit-access-to-actor: true
       timeout-minutes: 5
-    # https://github.com/marketplace/actions/github-action-for-rclone
     - name: rclone_mainline
-      uses: wei/rclone@v1
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
-      with:
-        args: copy ./_local/_export/linux-mainline-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
+      shell: bash
       timeout-minutes: 90
+      run: |
+        rclone --progress --config /rclone.conf copy ./ distLLC_build_mirage335KernelBuild:
 
 
 

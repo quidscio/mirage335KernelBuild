@@ -32,7 +32,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='1891409836'
-export ub_setScriptChecksum_contents='3577639461'
+export ub_setScriptChecksum_contents='3548965457'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -622,6 +622,15 @@ _____special_live_dent_restore() {
 
 #Override, cygwin.
 
+# WARNING: Multiple reasons to instead consider direct detection by other commands -  ' uname -a | grep -i cygwin > /dev/null 2>&1 ' , ' [[ -e '/cygdrive' ]] ' , etc .
+_if_cygwin() {
+	if uname -a | grep -i cygwin > /dev/null 2>&1
+	then
+		return 0
+	fi
+	return 1
+}
+
 
 # WARNING: What is otherwise considered bad practice may be accepted to reduce substantial MSW/Cygwin inconvenience .
 #/usr/local/bin:/usr/bin:/cygdrive/c/WINDOWS/system32:/cygdrive/c/WINDOWS:/usr/bin:/usr/lib/lapack:/cygdrive/x:/cygdrive/x/_bin:/cygdrive/x/_bundle:/opt/ansible/bin:/opt/nodejs/current:/opt/testssl:/home/root/bin
@@ -639,15 +648,18 @@ then
 fi
 
 
-
-# WARNING: Multiple reasons to instead consider direct detection by other commands -  ' uname -a | grep -i cygwin > /dev/null 2>&1 ' , ' [[ -e '/cygdrive' ]] ' , etc .
-_if_cygwin() {
-	if uname -a | grep -i cygwin > /dev/null 2>&1
+# ATTENTION: Workaround - Cygwin Portable - append MSW PATH if reasonable.
+# NOTICE: Also see '_test-shell-cygwin' .
+if [[ "$MSWEXTPATH" != "" ]] && ( [[ "$PATH" == *"/cygdrive"* ]] || [[ "$PATH" == "/cygdrive"* ]] ) && [[ "$convertedMSWEXTPATH" == "" ]] && _if_cygwin
+then
+	if [[ $(echo "$MSWEXTPATH" | grep -o ';\|:' | wc -l | tr -dc '0-9') -le 32 ]] && [[ $(echo "$PATH" | grep -o ':' | wc -l | tr -dc '0-9') -le 32 ]]
 	then
-		return 0
+		export convertedMSWEXTPATH=$(cygpath -p "$MSWEXTPATH")
+		export PATH="$PATH":"$convertedMSWEXTPATH"
 	fi
-	return 1
-}
+fi
+
+
 
 # ATTENTION: Workaround - Cygwin Portable - change directory to current directory as detected by 'ubcp.cmd' .
 if [[ "$CWD" != "" ]] && [[ "$cygwin_CWD_onceOnly_done" != 'true' ]] && uname -a | grep -i cygwin > /dev/null 2>&1
@@ -655,6 +667,13 @@ then
 	! cd "$CWD" && exit 1
 	export cygwin_CWD_onceOnly_done='true'
 fi
+
+
+# Forces Cygwin symlinks to best compatibility. Should be set by default elsewhere. Use sparingly only if necessary (eg. _setup_ubcp) .
+_force_cygwin_symlinks() {
+	! _if_cygwin && return 0
+	[[ "$CYGWIN" != *"winsymlinks:lnk"* ]] && export CYGWIN="winsymlinks:lnk ""$CYGWIN"
+}
 
 
 # ATTENTION: User must launch "tmux" (no parameters) in a graphical Cygwin terminal.
@@ -772,7 +791,7 @@ _sudo_cygwin() {
 # CAUTION: BROKEN !
 if _if_cygwin && type cygstart > /dev/null 2>&1
 then
-	sudo() {
+	sudo_cygwin() {
 		[[ "$1" == "-n" ]] && shift
 		if type cygstart > /dev/null 2>&1
 		then
@@ -871,13 +890,16 @@ _discoverResource-cygwinNative-ProgramFiles() {
 	unset currentDriveLetter_cygwin_uk4uPhB663kVcygT0q
 	export currentDriveLetter_cygwin_uk4uPhB663kVcygT0q="$currentCygdriveC_equivalent"
 	_discoverResource-cygwinNative-ProgramFiles-declaration-ProgramFiles "$@"
-	
+	[[ "$3" != "true" ]] && type "$currentBinary_functionName" > /dev/null 2>&1 && return 0
 	
 	# ATTENTION: Configure: 'c..w' (aka. 'w..c') .
+	# WARNING: Program Files at drive letters other than 'c' may not be supported now or ever. Especially other than 'c,d,e'.
 	unset currentDriveLetter_cygwin_uk4uPhB663kVcygT0q
-	for currentDriveLetter_cygwin_uk4uPhB663kVcygT0q in {c..w}
+	#for currentDriveLetter_cygwin_uk4uPhB663kVcygT0q in {c..w}
+	for currentDriveLetter_cygwin_uk4uPhB663kVcygT0q in {c..f}
 	do
 		_discoverResource-cygwinNative-ProgramFiles-declaration-ProgramFiles "$@"
+		[[ "$3" != "true" ]] && type "$currentBinary_functionName" > /dev/null 2>&1 && return 0
 	done
 	
 	_discoverResource-cygwinNative-ProgramFiles-declaration-core "$@"
@@ -900,6 +922,8 @@ _ops_cygwinOverride_allDisks() {
 	unset currentDriveLetter_cygwin_uk4uPhB663kVcygT0q
 }
 
+# WARNING: What is otherwise considered bad practice may be accepted to reduce substantial MSW/Cygwin inconvenience .
+[[ "$profileScriptLocation_new" == 'true' ]] && echo -n '.'
 
 if [[ -e /cygdrive ]] && _if_cygwin
 then
@@ -915,9 +939,6 @@ then
 		
 		_discoverResource-cygwinNative-ProgramFiles 'nmap' 'Nmap' false
 		
-		# WARNING: Native 'vncviewer.exe' is a GUI app, and cannot be launched directly from Cygwin SSH server.
-		_discoverResource-cygwinNative-ProgramFiles 'vncviewer' 'TigerVNC' false '_workaround_cygwin_tmux '
-		
 		_discoverResource-cygwinNative-ProgramFiles 'qalc' 'Qalculate' false
 		
 		
@@ -932,10 +953,23 @@ then
 		#_ops_cygwinOverride_allDisks "$@"
 		
 		unset currentDriveLetter_cygwin_uk4uPhB663kVcygT0q
+		
+		
+		
+		# CAUTION: Performance - such '_discoverResource' functions are time consuming . If reasonable, instead call only from functions as necessary (eg. as part of '_userVBox') .
+		# ATTENTION: Expect 0.500s for any program which is not found at 'C:\Program Files' or similar, and 0.200s for any program which is found quickly.
+		# Other inefficiencies of Cygwin are usually more substantial if only a few entries are here.
+		
+		
+		# WARNING: Native 'vncviewer.exe' is a GUI app, and cannot be launched directly from Cygwin SSH server.
+		_discoverResource-cygwinNative-ProgramFiles 'vncviewer' 'TigerVNC' false '_workaround_cygwin_tmux '
+		
+		_discoverResource-cygwinNative-ProgramFiles 'kate' 'Kate/bin' false
 	fi
 fi
 
-
+# WARNING: What is otherwise considered bad practice may be accepted to reduce substantial MSW/Cygwin inconvenience .
+[[ "$profileScriptLocation_new" == 'true' ]] && echo -n '.'
 
 
 
@@ -975,7 +1009,9 @@ _setup_ubiquitousBash_cygwin_procedure() {
 	_messagePlain_nominal 'init: _setup_ubiquitousBash_cygwin'
 	
 	local currentCygdriveC_equivalent
-	currentCygdriveC_equivalent=$(cygpath -S | sed 's/\/Windows\/System32//g')
+	currentCygdriveC_equivalent="$1"
+	[[ "$currentCygdriveC_equivalent" == "" ]] && currentCygdriveC_equivalent=$(cygpath -S | sed 's/\/Windows\/System32//g')
+	[[ "$1" == "/" ]] && currentCygdriveC_equivalent=$(echo "$PWD" | sed 's/\(\/cygdrive\/[a-zA-Z]*\).*/\1/')
 	
 	mkdir -p "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash
 	cd "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash
@@ -1005,6 +1041,8 @@ _setup_ubiquitousBash_cygwin_procedure() {
 	cp "$scriptAbsoluteFolder"/_anchor.bat "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash/
 	cp "$scriptAbsoluteFolder"/_setup_ubcp.bat "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash/
 	
+	cp "$scriptAbsoluteFolder"/_setupUbiquitous.bat "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash/
+	
 	
 	cp "$scriptAbsoluteFolder"/package.tar.xz "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash/
 	
@@ -1030,6 +1068,8 @@ _setup_ubiquitousBash_cygwin_procedure() {
 	
 	cp "$scriptLocal"/ubcp/ubcp.cmd "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash/_local/ubcp/
 	cp "$scriptLocal"/ubcp/ubcp_rename-to-enable.cmd "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash/_local/ubcp/
+	
+	cp "$scriptLocal"/ubcp/cygwin-portable-installer-config.cmd  "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash/_local/ubcp/
 	cp "$scriptLocal"/ubcp/ubcp-cygwin-portable-installer.cmd "$currentCygdriveC_equivalent"/core/infrastructure/ubiquitous_bash/_local/ubcp/
 	
 	
@@ -1091,7 +1131,9 @@ _setup_ubcp_procedure() {
 	tskill ssh-pageant > /dev/null 2>&1
 	
 	local currentCygdriveC_equivalent
-	currentCygdriveC_equivalent=$(cygpath -S | sed 's/\/Windows\/System32//g')
+	currentCygdriveC_equivalent="$1"
+	[[ "$currentCygdriveC_equivalent" == "" ]] && currentCygdriveC_equivalent=$(cygpath -S | sed 's/\/Windows\/System32//g')
+	[[ "$1" == "/" ]] && currentCygdriveC_equivalent=$(echo "$PWD" | sed 's/\(\/cygdrive\/[a-zA-Z]*\).*/\1/')
 	
 	export safeToDeleteGit="true"
 	if [[ -e "$currentCygdriveC_equivalent"/core/infrastructure/ubcp ]]
@@ -1127,19 +1169,21 @@ _setup_ubcp_procedure() {
 
 
 # CAUTION: Do NOT hook to '_setup' .
-# No production use. Developer feature.
+# WARNING: ATTENTION: NOTICE: No production use. Developer feature.
 # Highly irregular accommodation for usage of 'ubiquitous_bash' through 'ubcp' (cygwin portable) compatibility layer through MSW network drive (especially '_userVBox' MSW guest network drive) .
 # WARNING: May require 'administrator' privileges under MSW. However, it may be better for this directory to be 'owned' by the 'primary' 'user' account. Particularly considering the VR/gaming/CAD software that remains 'exclusive' to MSW is 'legacy' software which for both licensing and technical reasons may be inherently incompatible with 'multi-user' access.
 # WARNING: MSW 'administrator' 'privileges' may break 'ubcp' .
 _setup_ubcp() {
+	_force_cygwin_symlinks
+	
 	# WARNING: May break if 'mitigation' has not been applied!
 	if ! [[ -e "$scriptLocal"/ubcp/package_ubcp-cygwinOnly.tar.gz ]] && ! [[ -e "$scriptLocal"/ubcp/package_ubcp-cygwinOnly.tar.xz ]] && [[ -e "$scriptLocal"/ubcp/cygwin ]]
 	then
-		"$scriptAbsoluteLocation" _package_procedure-cygwinOnly "$@"
+		"$scriptAbsoluteLocation" _package_procedure-cygwinOnly
 	fi
 	
-	"$scriptAbsoluteLocation" _setup_ubcp_procedure "$@"
-	"$scriptAbsoluteLocation" _setup_ubiquitousBash_cygwin_procedure "$@"
+	"$scriptAbsoluteLocation" _setup_ubcp_procedure "$1"
+	"$scriptAbsoluteLocation" _setup_ubiquitousBash_cygwin_procedure "$1"
 }
 
 
@@ -1149,6 +1193,7 @@ _setup_ubcp() {
 
 _mitigate-ubcp_rewrite_procedure() {
 	_messagePlain_nominal 'init: _mitigate-ubcp_rewrite_procedure'
+	[[ "$currentPWD" != "" ]] && cd "$currentPWD"
 	
 	local currentRoot=$(_getAbsoluteLocation "$PWD")
 	
@@ -1281,14 +1326,78 @@ _mitigate-ubcp_rewrite_procedure() {
 	return 0
 }
 
-_mitigate-ubcp_rewrite() {
+# WARNING: May be untested.
+_mitigate-ubcp_rewrite_parallel() {
+	local currentArg
+	for currentArg in "$@"
+	do
+		true
+		
+		_mitigate-ubcp_rewrite_procedure "$currentArg"
+		
+		# WARNING: May be untested.
+		#_mitigate-ubcp_rewrite_procedure "$currentArg" &
+		
+		#/bin/echo "$currentArg" > /dev/tty
+	done
+}
+
+_mitigate-ubcp_rewrite_sequence() {
 	export safeToDeleteGit="true"
 	! _safePath "$1" && _stop 1
 	cd "$1"
 	
-	find "$2" -type l -exec "$scriptAbsoluteLocation" _mitigate-ubcp_rewrite_procedure '{}' \;
+	
+	# WARNING: May be slow (multiple hours).
+	unset currentPWD
+	#find "$2" -type l -exec "$scriptAbsoluteLocation" _mitigate-ubcp_rewrite_procedure '{}' \;
+	
+	
+	# WARNING: May be untested.
+	# https://stackoverflow.com/questions/4321456/find-exec-a-shell-function-in-linux
+	# Since only the shell knows how to run shell functions, you have to run a shell to run a function.
+	# export -f dosomething
+	# find . -exec bash -c 'dosomething "$0"' {} \;
+	unset currentPWD
+	export currentPWD="$PWD"
+	#export currentPWD="$1"
+	unset currentFile
+	export -f "_mitigate-ubcp_rewrite_procedure"
+	export -f "_messagePlain_nominal"
+	export -f "_color_begin_nominal"
+	export -f "_color_end"
+	export -f "_getAbsoluteLocation"
+	export -f "_realpath_L_s"
+	export -f "_realpath_L"
+	export -f "_compat_realpath_run"
+	export -f "_compat_realpath"
+	export -f "_messagePlain_probe_var"
+	export -f "_color_begin_probe"
+	export -f "_messagePlain_probe"
+	#find "$2" -print0 | while IFS= read -r -d '' currentFile; do _mitigate-ubcp_rewrite_procedure "$currentFile"; done
+	
+	
+	
+	# WARNING: May be untested.
+	##find "$2" -type l -exec bash -c '_mitigate-ubcp_rewrite_procedure "$1"' _ {} \;
+	
+	
+	
+	# WARNING: Diagnostic output will be corrupted by parallelism.
+	# ATTENTION: Expect as much as 4x as many CPU threads may be saturated due to MSW (MSW, NOT Cygwin) inefficiencies.
+	# Or only 2x if CPU has leading single-thread (ie. per-thread) performance and MSW inefficiencies have been reduced.
+	# Expect done in as little as 15 minutes.
+	# https://serverfault.com/questions/193319/a-better-unix-find-with-parallel-processing
+	# https://stackoverflow.com/questions/11003418/calling-shell-functions-with-xargs
+	export -f "_mitigate-ubcp_rewrite_parallel"
+	#find "$2" -type l -print0 | xargs -0 -n 1 -P 4 -I {} bash -c '_mitigate-ubcp_rewrite_parallel "$@"' _ {}
+	find "$2" -type l -print0 | xargs -0 -n 1 -P 4 -I {} bash -c '_mitigate-ubcp_rewrite_procedure "$@"' _ {}
 	
 	return 0
+}
+
+_mitigate-ubcp_rewrite() {
+	"$scriptAbsoluteLocation" _mitigate-ubcp_rewrite_sequence "$@"
 }
 
 
@@ -4662,6 +4771,10 @@ _fetchDep_debianBullseye_sequence() {
 }
 
 _fetchDep_debianBullseye() {
+	# https://askubuntu.com/questions/104899/make-apt-get-or-aptitude-run-with-y-but-not-prompt-for-replacement-of-configu
+	echo 'Dpkg::Options {"--force-confdef"};' | sudo tee /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	echo 'Dpkg::Options {"--force-confold"};' | sudo tee -a /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	
 	export DEBIAN_FRONTEND=noninteractive
 	
 	#Run up to 2 times. On rare occasion, cache will become unusable again by apt-find before an installation can be completed. Overall, apt-find is the single weakest link in the system.
@@ -5036,6 +5149,10 @@ _fetchDep_debianBuster_sequence() {
 }
 
 _fetchDep_debianBuster() {
+	# https://askubuntu.com/questions/104899/make-apt-get-or-aptitude-run-with-y-but-not-prompt-for-replacement-of-configu
+	echo 'Dpkg::Options {"--force-confdef"};' | sudo tee /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	echo 'Dpkg::Options {"--force-confold"};' | sudo tee -a /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	
 	export DEBIAN_FRONTEND=noninteractive
 	
 	#Run up to 2 times. On rare occasion, cache will become unusable again by apt-find before an installation can be completed. Overall, apt-find is the single weakest link in the system.
@@ -5484,6 +5601,10 @@ _fetchDep_ubuntuFocalFossa_sequence() {
 }
 
 _fetchDep_ubuntuFocalFossa() {
+	# https://askubuntu.com/questions/104899/make-apt-get-or-aptitude-run-with-y-but-not-prompt-for-replacement-of-configu
+	echo 'Dpkg::Options {"--force-confdef"};' | sudo tee /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	echo 'Dpkg::Options {"--force-confold"};' | sudo tee -a /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	
 	export DEBIAN_FRONTEND=noninteractive
 	
 	#Run up to 2 times. On rare occasion, cache will become unusable again by apt-find before an installation can be completed. Overall, apt-find is the single weakest link in the system.
@@ -5530,7 +5651,8 @@ _install_debian11() {
 	"$scriptAbsoluteLocation" _getMost_debian11
 	"$scriptAbsoluteLocation" _test
 	
-	sudo -n env DEBIAN_FRONTEND=noninteractive apt-get --install-recommends -y upgrade
+	#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get --install-recommends -y upgrade
+	sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --install-recommends -y upgrade
 }
 
 
@@ -5575,9 +5697,17 @@ _getMost_debian11_aptSources() {
 	
 	
 	_getMost_backend mkdir -p /etc/apt/sources.list.d
-	echo 'deb http://deb.debian.org/debian bullseye-backports main contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_backports.list > /dev/null 2>&1
-	echo 'deb http://download.virtualbox.org/virtualbox/debian bullseye contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
-	echo 'deb [arch=amd64] https://download.docker.com/linux/debian bullseye stable' | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+	if !  [[ -e /etc/issue ]] && cat /etc/issue | grep 'Ubuntu' > /dev/null 2>&1
+	then
+		echo 'deb http://deb.debian.org/debian bullseye-backports main contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_backports.list > /dev/null 2>&1
+		echo 'deb http://download.virtualbox.org/virtualbox/debian bullseye contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
+		echo 'deb [arch=amd64] https://download.docker.com/linux/debian bullseye stable' | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+	elif [[ -e /etc/issue ]] && cat /etc/issue | grep 'Ubuntu' | grep '20.04' > /dev/null 2>&1
+	then
+		true
+		#echo 'deb http://download.virtualbox.org/virtualbox/debian focal contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
+		#sudo -n add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
+	fi
 	
 	_getMost_backend wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | _getMost_backend apt-key add -
 	_getMost_backend wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
@@ -5660,14 +5790,17 @@ _getMost_debian11_install() {
 	_getMost_backend_aptGetInstall net-tools wireless-tools rfkill
 	
 	
-	# WARNING: Untested. May be old version of VirtualBox. May conflict with guest additions.
-	#_getMost_backend_aptGetInstall virtualbox-6.1
-	_getMost_backend apt-get -d install -y virtualbox-6.1
-	
-	
-	# WARNING: Untested. May cause problems.
-	#_getMost_backend_aptGetInstall docker-ce
-	_getMost_backend apt-get -d install -y docker-ce
+	if !  [[ -e /etc/issue ]] && cat /etc/issue | grep 'Ubuntu' > /dev/null 2>&1
+	then
+		# WARNING: Untested. May be old version of VirtualBox. May conflict with guest additions.
+		#_getMost_backend_aptGetInstall virtualbox-6.1
+		_getMost_backend apt-get -d install -y virtualbox-6.1
+		
+		
+		# WARNING: Untested. May cause problems.
+		#_getMost_backend_aptGetInstall docker-ce
+		_getMost_backend apt-get -d install -y docker-ce
+	fi
 	
 	
 	# WARNING: Untested. May incorrectly remove supposedly 'old' kernel versions.
@@ -5808,6 +5941,10 @@ _getMost_debian11_install() {
 _getMost_debian11() {
 	_messagePlain_probe 'begin: _getMost_debian11'
 	
+	# https://askubuntu.com/questions/104899/make-apt-get-or-aptitude-run-with-y-but-not-prompt-for-replacement-of-configu
+	echo 'Dpkg::Options {"--force-confdef"};' | sudo tee /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	echo 'Dpkg::Options {"--force-confold"};' | sudo tee -a /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	
 	#https://askubuntu.com/questions/876240/how-to-automate-setting-up-of-keyboard-configuration-package
 	#apt-get install -y debconf-utils
 	export DEBIAN_FRONTEND=noninteractive
@@ -5844,6 +5981,15 @@ _getMost_ubuntu20_aptSources() {
 _getMost_ubuntu20_install() {
 	_getMost_debian11_install "$@"
 	
+	# WARNING: Untested. May be old version of VirtualBox. May conflict with guest additions.
+	#_getMost_backend_aptGetInstall virtualbox-6.1
+	_getMost_backend apt-get -d install -y virtualbox-6.1
+	
+	
+	# WARNING: Untested. May cause problems.
+	#_getMost_backend_aptGetInstall docker-ce
+	_getMost_backend apt-get -d install -y docker-ce
+	
 	_getMost_backend_aptGetInstall tasksel
 	_getMost_backend_aptGetInstall kde-plasma-desktop
 	
@@ -5855,6 +6001,11 @@ _getMost_ubuntu20_install() {
 # ATTENTION: End user function.
 _getMost_ubuntu20() {
 	_messagePlain_probe 'begin: _getMost_ubuntu20'
+	
+	# https://askubuntu.com/questions/104899/make-apt-get-or-aptitude-run-with-y-but-not-prompt-for-replacement-of-configu
+	echo 'Dpkg::Options {"--force-confdef"};' | sudo tee /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	echo 'Dpkg::Options {"--force-confold"};' | sudo tee -a /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
+	
 	
 	#https://askubuntu.com/questions/876240/how-to-automate-setting-up-of-keyboard-configuration-package
 	#apt-get install -y debconf-utils
@@ -5877,12 +6028,23 @@ _getMost_ubuntu20() {
 
 
 # ATTENTION: Override with 'ops.sh' or similar .
+# https://askubuntu.com/questions/104899/make-apt-get-or-aptitude-run-with-y-but-not-prompt-for-replacement-of-configu
 _set_getMost_backend_debian() {
 	_getMost_backend_aptGetInstall() {
 		# --no-upgrade
-		_messagePlain_probe _getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y "$@"
-		_getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y "$@"
+		_messagePlain_probe _getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install --install-recommends -y "$@"
+		_getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install --install-recommends -y "$@"
 	}
+	
+	#if [[ -e /etc/issue ]] && cat /etc/issue | grep 'Ubuntu' > /dev/null 2>&1
+	#then
+		#_getMost_backend_aptGetInstall() {
+		## --no-upgrade
+			#_messagePlain_probe _getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install --install-recommends -y "$@"
+			#_getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install --install-recommends -y "$@"
+		#}
+	#fi
+	
 	export -f _getMost_backend_aptGetInstall
 }
 _set_getMost_backend_command() {
@@ -6603,6 +6765,7 @@ _gitBare() {
 
 
 _gitBest_detect_github_procedure() {
+	[[ "$current_gitBest_source_GitHub" == "FAIL" ]] && export current_gitBest_source_GitHub=""
 	[[ "$current_gitBest_source_GitHub" != "" ]] && return
 	
 	_messagePlain_nominal 'init: _gitBest_detect_github_procedure'
@@ -6968,7 +7131,7 @@ _prepare_rclone_limited_file() {
 		if ! [[ -e "$scriptLocal"/rclone_limited/rclone.conf ]]
 		then
 			mkdir -p "$scriptLocal"/rclone_limited
-			echo "$rclone_limited_conf_base64" | base64 -d > "$scriptLocal"/rclone_limited/rclone.conf > /dev/null
+			echo "$rclone_limited_conf_base64" | base64 -d > "$scriptLocal"/rclone_limited/rclone.conf
 		fi
 	fi
 	_set_rclone_limited_file
@@ -8325,7 +8488,7 @@ CZXWXcRMTo8EmM8i4d
 	# WARNING: What is otherwise considered bad practice may be accepted to reduce substantial MSW/Cygwin inconvenience .
 	_if_cygwin && cat << CZXWXcRMTo8EmM8i4d
 
-[[ -e '/cygdrive' ]] && uname -a | grep -i cygwin > /dev/null 2>&1 && echo -n '.'
+[[ -e '/cygdrive' ]] && uname -a | grep -i cygwin > /dev/null 2>&1 && echo -n '_'
 
 [[ "\$profileScriptLocation" == "" ]] && export profileScriptLocation_new='true'
 
@@ -8380,11 +8543,16 @@ then
 		export profileScriptLocation_new=''
 		unset profileScriptLocation_new
 		
-		sleep 0.1
-		echo '.'
-		sleep 0.1
-		echo '.'
-		sleep 0.1
+		# May have prevented issues from services (eg. ssh-pageant) that now do not continue to cause such issues, have been disabled, or have been removed, etc. Uncomment 'sleep 0.1' commands, replacing the other true/noop/sleep, if necessary or desired.
+		#sleep 0.1
+		true
+		echo '_'
+		#sleep 0.1
+		true
+		echo '_'
+		#sleep 0.1
+		true
+		
 		clear
 	fi
 fi
@@ -8393,6 +8561,18 @@ true
 
 CZXWXcRMTo8EmM8i4d
 
+}
+
+
+_setupUbiquitous_bashProfile_here() {
+	! uname -a | grep -i cygwin > /dev/null 2>&1 && cat << CZXWXcRMTo8EmM8i4d
+
+if [[ -e "$HOME"/.bashrc ]] && [[ "\$ubiquitousBashID" == "" ]]
+then
+	source "$HOME"/.bashrc
+fi
+
+CZXWXcRMTo8EmM8i4d
 }
 
 _configureLocal() {
@@ -8507,6 +8687,14 @@ _installUbiquitous() {
 _setupUbiquitous() {
 	_messageNormal "init: setupUbiquitous"
 	
+	if _if_cygwin
+	then
+		echo 'detected: cygwin'
+		_messagePlain_probe_cmd git config --global core.autocrlf input
+		_messagePlain_probe_cmd git config --global core.eol lf
+	fi
+	
+	_force_cygwin_symlinks
 	_if_cygwin && _setup_ubiquitousBash_cygwin_procedure
 	
 	
@@ -8567,6 +8755,12 @@ _setupUbiquitous() {
 	
 	! grep ubcore "$ubHome"/.bashrc > /dev/null 2>&1 && _messagePlain_probe "$ubcoreFile"' >> '"$ubHome"/.bashrc && echo ". ""$ubcoreFile" >> "$ubHome"/.bashrc
 	! grep ubcore "$ubHome"/.bashrc > /dev/null 2>&1 && _messagePlain_bad 'missing: bashrc hook' && _messageFAIL && return 1
+	
+	
+	if [[ ! -e "$HOME"/.bash_profile ]] || ! grep '\.bashrc' "$HOME"/.bash_profile > /dev/null 2>&1
+	then
+		_setupUbiquitous_bashProfile_here >> "$HOME"/.bash_profile
+	fi
 	
 	
 	
@@ -12268,6 +12462,13 @@ _prepare_abstract() {
 	chmod 0700 "$abstractfs_root" > /dev/null 2>&1
 	! chmod 700 "$abstractfs_root" && exit 1
 	
+	if [[ "$CI" != "" ]] && ! type chown > /dev/null 2>&1
+	then
+		chown() {
+			true
+		}
+	fi
+	
 	if _if_cygwin
 	then
 		if ! chown "$USER":None "$abstractfs_root" > /dev/null 2>&1
@@ -13833,6 +14034,81 @@ _test_sanity() {
 
 
 
+_test-shell-cygwin() {
+	_messageNormal "Cygwin detected... MSW configuration issues..."
+	
+	
+	local currentScriptTime
+	if type _stopwatch > /dev/null 2>&1
+	then
+		if [[ -e "$scriptAbsoluteFolder"/ubiquitous_bash.sh ]]
+		then
+			currentScriptTime=$(_timeout 45 _stopwatch "$scriptAbsoluteFolder"/ubiquitous_bash.sh _true 2>/dev/null | tr -dc '0-9')
+		else
+			currentScriptTime=$(_timeout 45 _stopwatch "$scriptAbsoluteLocation" _true 2>/dev/null | tr -dc '0-9')
+		fi
+	else
+		# If '_stopwatch' is not available, assume this is not an issue.
+		currentScriptTime="2000"
+	fi
+	
+	# Unusual, broken, non-desktop, etc user/login/account/etc configuration in MSW, might cause prohibitively long Cygwin delays.
+	# MSW has a fragile track record, and cannot be used for combining complex applications (eg. flight sim) with 'enterprise' user/login/account/etc and/or deployment. Unless extensive testing conclusively shows a long track record otherwise, or unless MS has a direct commitment under a valuable contract to specifically ensure compatibility with such a use case, it would be obviously gross negligence to put a business at risk of unacceptable downtime from such a fragile stack. Any 'bonus' compensation so earned should incur liability for the disproportionate risk.
+	# Enterprise must either use GNU/Linux, or similar, or maybe swap single-user preinstalled physical laptops/desktops.
+	if [[ "$currentScriptTime" == "" ]]
+	then
+		echo 'fail: blank: currentScriptTime'
+		_messageFAIL
+	fi
+	if [[ "$currentScriptTime" -gt '9500' ]]
+	then
+		echo 'fail: slow: currentScriptTime: '"$currentScriptTime"
+		_messageFAIL
+	fi
+	if [[ "$currentScriptTime" -gt '3500' ]]
+	then
+		echo 'warn: slow: currentScriptTime: '"$currentScriptTime"
+		_messagePlain_request 'request: obtain a CPU with better single-thread performance, disable HyperThreading, disable EfficiencyCores, and/or reduce MSW OS installed functionality'
+	fi
+	
+	
+	local currentPathCount
+	currentPathCount=$(echo "$PATH" | grep -o ':' | wc -l | tr -dc '0-9')
+	if [[ "$currentPathCount" -gt 50 ]]
+	then
+		echo 'fail: count: PATH: '"$currentPathCount"
+		_messageFAIL
+	fi
+	if [[ "$currentPathCount" -gt 32 ]]
+	then
+		echo 'warn: count: PATH: '"$currentPathCount"
+		echo 'warn: MSWEXTPATH may be ignored'
+		_messagePlain_request 'request: reduce the length of PATH variable'
+	fi
+	
+	
+	local currentPathCount
+	currentPathCount=$(echo "$MSWEXTPATH" | grep -o ';\|:' | wc -l | tr -dc '0-9')
+	if [[ "$currentPathCount" -gt 50 ]] && [[ "$CI" == "" ]]
+	then
+		echo 'fail: count: MSWEXTPATH: '"$currentPathCount"
+		_messageFAIL
+	fi
+	if [[ "$currentPathCount" -gt 32 ]]
+	then
+		echo 'warn: count: MSWEXTPATH: '"$currentPathCount"
+		echo 'warn: MSWEXTPATH may be ignored by default'
+		_messagePlain_request 'request: reduce the length of PATH variable'
+	fi
+	
+	
+	# Before stating 'PASS' for Cygwin/MSW, use case specific (eg. flight sim with usual desktop applications installed) test cases may be necessary. Self-hosted 'runners' may be able to implement these test cases, with the resulting fragility reduced somewhat by another computer pulling frequent backups and artifacts.
+	# Unusually, MSW may have use case specific issues due to a track record for configuration changes to the MSW OS causing prohibitive performance issues (eg. Cygwin being delayed more than tens of seconds possibly due to a program adding some kind of user account, some programs known to drastically increase frame dropping in intense applications, etc).
+	#_messagePASS
+	
+	
+	return 0
+}
 _test-shell() {
 	_installation_nonet_default
 	
@@ -13859,6 +14135,14 @@ _test-shell() {
 	#fi
 	_messagePASS
 	
+	
+	if _if_cygwin
+	then
+		! _test-shell-cygwin && _messageFAIL
+	fi
+	
+	
+	return 0
 }
 
 _test() {
@@ -14019,6 +14303,9 @@ _test() {
 	_getDep od
 	
 	_getDep yes
+	
+	
+	_getDep xargs
 	
 	
 	
@@ -14447,6 +14734,9 @@ _package_subdir() {
 _package_procedure() {
 	_start scriptLocal_mkdir_disable
 	mkdir -p "$safeTmp"/package
+	
+	# May not have any effect - Cygwin symlinks should be transparent to 'tar' and similar.
+	_force_cygwin_symlinks
 	
 	# WARNING: Largely due to presence of '.gitignore' files in 'ubcp' .
 	export safeToDeleteGit="true"
