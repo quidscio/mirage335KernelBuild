@@ -1,11 +1,13 @@
 
-name: build-buildJet
+name: build
 on:
   workflow_dispatch:
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
-  #schedule:
+  schedule:
     #- cron: '5 1 * * 6'
     #- cron: '5 1 * * 2,4'
+    #- cron: '5 1 * * 2'
+    - cron: '5 1 * * 4'
 
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
@@ -13,71 +15,71 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-    # runs-on: ubuntu-latest
-    # runs-on: ubuntu-20.04
-    # runs-on: buildjet-2vcpu-ubuntu-2004
-    # runs-on: buildjet-64vcpu-ubuntu-2004
   build_lts:
+    #runs-on: ubuntu-latest
+    #runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
     runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
     - uses: actions/checkout@v2
     - name: write! secrets
       shell: bash
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
       run: |
-        echo "$RCLONE_CONF" | sudo -n tee /rclone.conf > /dev/null
+        ./ubiquitous_bash.sh _prepare_rclone_limited_file
+      env:
+        rclone_limited_conf_base64: ${{ secrets.rclone_limited_conf_base64 }}
       timeout-minutes: 5
     - name: _getMinimal_cloud
       shell: bash
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
-      timeout-minutes: 10
+      timeout-minutes: 90
     - name: _build_cloud_lts
       shell: bash
       run: |
         ./ubiquitous_bash.sh _build_cloud_prepare
         ./ubiquitous_bash.sh _build_cloud_lts
-      timeout-minutes: 20
+      timeout-minutes: 180
     - name: _export_cloud_lts
       shell: bash
       run: |
         ./ubiquitous_bash.sh _export_cloud_lts
-      timeout-minutes: 10
+      timeout-minutes: 90
     - name: rclone_lts
-      uses: wei/rclone@v1
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
-      with:
-        args: copy ./_local/_export/linux-lts-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
-      timeout-minutes: 10
+      shell: bash
+      timeout-minutes: 90
+      run: |
+        rclone --progress --config /rclone.conf copy ./_local/_export/linux-lts-amd64-debian.tar.gz distLLC_build_mirage335KernelBuild:
   build_mainline:
+    #runs-on: ubuntu-latest
+    #runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
     runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
     - uses: actions/checkout@v2
     - name: write! secrets
       shell: bash
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
       run: |
-        echo "$RCLONE_CONF" | sudo -n tee /rclone.conf > /dev/null
+        ./ubiquitous_bash.sh _prepare_rclone_limited_file
+      env:
+        rclone_limited_conf_base64: ${{ secrets.rclone_limited_conf_base64 }}
       timeout-minutes: 5
     - name: _getMinimal_cloud
       shell: bash
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
-      timeout-minutes: 10
+      timeout-minutes: 90
     - name: _build_cloud_mainline
       shell: bash
       run: |
         ./ubiquitous_bash.sh _build_cloud_prepare
         ./ubiquitous_bash.sh _build_cloud_mainline
-      timeout-minutes: 20
+      timeout-minutes: 180
     - name: _export_cloud_mainline
       shell: bash
       run: |
         ./ubiquitous_bash.sh _export_cloud_mainline
-      timeout-minutes: 10
+      timeout-minutes: 90
     # https://github.com/marketplace/actions/debugging-with-tmate
     # $RUNNER_WORKSPACE
     # rclone config --config="/rclone.conf"
@@ -92,14 +94,11 @@ jobs:
       with:
         limit-access-to-actor: true
       timeout-minutes: 5
-    # https://github.com/marketplace/actions/github-action-for-rclone
     - name: rclone_mainline
-      uses: wei/rclone@v1
-      env:
-        RCLONE_CONF: ${{ secrets.RCLONE_CONF }}
-      with:
-        args: copy ./_local/_export/linux-mainline-amd64-debian.tar.gz mega:/Public/mirage335KernelBuild/
-      timeout-minutes: 10
+      shell: bash
+      timeout-minutes: 90
+      run: |
+        rclone --progress --config /rclone.conf copy ./_local/_export/linux-mainline-amd64-debian.tar.gz distLLC_build_mirage335KernelBuild:
 
 
 

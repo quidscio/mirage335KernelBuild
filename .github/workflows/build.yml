@@ -49,7 +49,7 @@ jobs:
       shell: bash
       timeout-minutes: 90
       run: |
-        rclone --progress --config /rclone.conf copy ./ distLLC_build_mirage335KernelBuild:
+        rclone --progress --config /rclone.conf copy ./_local/_export/linux-lts-amd64-debian.tar.gz distLLC_build_mirage335KernelBuild:
   build_mainline:
     runs-on: ubuntu-latest
     #runs-on: ubuntu-20.04
@@ -98,7 +98,7 @@ jobs:
       shell: bash
       timeout-minutes: 90
       run: |
-        rclone --progress --config /rclone.conf copy ./ distLLC_build_mirage335KernelBuild:
+        rclone --progress --config /rclone.conf copy ./_local/_export/linux-mainline-amd64-debian.tar.gz distLLC_build_mirage335KernelBuild:
 
 
 
