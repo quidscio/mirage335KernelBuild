@@ -44,7 +44,7 @@ jobs:
         tag_name: build-${{ github.run_id }}-${{ github.run_attempt }}
         name: build
         files: |
-          /linux-lts-amd64-debian.tar.gz
+          ./_local/_export/linux-lts-amd64-debian.tar.gz
       timeout-minutes: 45
   build_mainline:
     runs-on: ubuntu-latest
@@ -83,13 +83,13 @@ jobs:
       with:
         limit-access-to-actor: true
       timeout-minutes: 5
-    - name: release! linux-lts-amd64-debian
+    - name: release! linux-mainline-amd64-debian
       uses: softprops/action-gh-release@v1
       with:
         tag_name: build-${{ github.run_id }}-${{ github.run_attempt }}
         name: build
         files: |
-          /linux-lts-amd64-debian.tar.gz
+         ./_local/_export/linux-mainline-amd64-debian.tar.gz
       timeout-minutes: 45
 
 
