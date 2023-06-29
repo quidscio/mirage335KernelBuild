@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3814829486'
+export ub_setScriptChecksum_contents='198097531'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -16513,7 +16513,7 @@ _test_build_kernel() {
 
 
 
-_fetchKernel-lts() {
+_fetchKernel-lts-legacyHTTPS() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	rm -f "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
 	_safeRMR "$scriptLocal"/lts
@@ -16538,7 +16538,7 @@ _fetchKernel-lts() {
 	cp "$scriptLib"/linux/lts/.config "$scriptLocal"/lts/"$currentKernelName"/
 }
 
-_fetchKernel-mainline() {
+_fetchKernel-mainline-legacyHTTPS() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	rm -f "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
 	_safeRMR "$scriptLocal"/mainline
@@ -16562,6 +16562,70 @@ _fetchKernel-mainline() {
 	mkdir -p "$scriptLib"/linux/mainline/
 	cp "$scriptLib"/linux/mainline/.config "$scriptLocal"/mainline/"$currentKernelName"/
 }
+
+
+
+
+
+
+_fetchKernel-lts() {
+	# DANGER: NOTICE: Do NOT export without corresponding source code!
+	rm -f "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
+	_safeRMR "$scriptLocal"/lts
+
+	mkdir -p "$scriptLocal"/lts
+	cd "$scriptLocal"/lts
+
+
+	export currentKernel_MajorMinor='5.10.'
+	export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
+
+	# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.
+	#git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+	#cd "$scriptLocal"/lts/linux
+	#export currentKernel_patchLevel=$(git tag | grep '^v'"$currentKernel_MajorMinor_regex" | sed 's/v'"$currentKernel_MajorMinor_regex"'//g' | tr -dc '0-9\.\n' | sort -n | tail -n1)
+	#export currentKernelName=linux-"$currentKernel_MajorMinor""$currentKernel_patchLevel"
+	#cd "$scriptLocal"/lts
+
+
+	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep "$currentKernel_MajorMinor_regex" | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
+	export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
+	export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
+
+	_messagePlain_probe_var currentKernelURL
+	_messagePlain_probe_var currentKernelName
+	_messagePlain_probe_var currentKernelPath
+
+	
+	cd "$scriptLocal"/lts
+
+
+	if ! ls -1 "$currentKernelName"* > /dev/null 2>&1
+	then
+		if ! [[ -e "$scriptLocal"/lts/linux/ ]]
+		then
+			! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
+		fi
+		
+		cd "$scriptLocal"/lts/linux
+		! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
+
+		cd "$scriptLocal"/lts
+
+		#wget "$currentKernelURL"
+		#tar xf "$currentKernelName"*
+
+		mv "$scriptLocal"/lts/linux "$scriptLocal"/lts/"$currentKernelName"
+	fi
+	cd "$currentKernelName"
+	
+	
+	mkdir -p "$scriptLib"/linux/lts/
+	cp "$scriptLib"/linux/lts/.config "$scriptLocal"/lts/"$currentKernelName"/
+
+}
+
+
 
 
 _test_fetchKernel_updateInterval-setupUbiquitous() {
