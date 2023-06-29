@@ -287,6 +287,8 @@ _fetchKernel-lts() {
 	export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
 	export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
 
+	export export currentKernel_patchLevel=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 3 -d '.')
+
 	_messagePlain_probe_var currentKernelURL
 	_messagePlain_probe_var currentKernelName
 	_messagePlain_probe_var currentKernelPath
