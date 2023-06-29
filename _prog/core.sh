@@ -296,9 +296,13 @@ _fetchKernel-lts() {
 	
 	cd "$scriptLocal"/lts
 
-
+	
 	if ! ls -1 "$currentKernelName"* > /dev/null 2>&1
 	then
+		# DANGER: Do NOT obtain archive of source code from elsehwere (ie. kernel.org instead of git repository). Although officially should be identical, mismatch is theoretically possible.
+		## ##wget "$currentKernelURL"
+		## ##tar xf "$currentKernelName"*
+		
 		if ! [[ -e "$scriptLocal"/lts/linux/ ]]
 		then
 			! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
@@ -307,12 +311,15 @@ _fetchKernel-lts() {
 		cd "$scriptLocal"/lts/linux
 		! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
 
+
+
 		cd "$scriptLocal"/lts
 
-		#wget "$currentKernelURL"
-		#tar xf "$currentKernelName"*
-
 		mv "$scriptLocal"/lts/linux "$scriptLocal"/lts/"$currentKernelName"
+
+		mv "$scriptLocal"/lts/"$currentKernelName"/.git "$scriptLocal"/lts/"$currentKernelName".git
+		env XZ_OPT=-e9 tar -cJvf "$scriptLocal"/lts/"$currentKernelName".tar.xz ./"$currentKernelName"
+		mv "$scriptLocal"/lts/"$currentKernelName".git "$scriptLocal"/lts/"$currentKernelName"/.git
 	fi
 	cd "$currentKernelName"
 	
@@ -502,6 +509,8 @@ _export_cloud_lts() {
 		_safeRMR "$scriptLocal"/_tmp/lts
 		
 		du -sh "$scriptLocal"/_export/linux-lts*
+	else
+		_messageError 'bad: missing: "$scriptLocal"/lts/*.tar.xz' && _messageFAIL && _stop 1
 	fi
 }
 
