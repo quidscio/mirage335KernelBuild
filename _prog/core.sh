@@ -303,6 +303,8 @@ _fetchKernel-lts() {
 		## ##wget "$currentKernelURL"
 		## ##tar xf "$currentKernelName"*
 		
+		git config checkout.workers -1
+
 		if ! [[ -e "$scriptLocal"/lts/linux/ ]]
 		then
 			! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
