@@ -272,7 +272,10 @@ _fetchKernel-lts() {
 	cd "$scriptLocal"/lts
 
 
-	export currentKernel_MajorMinor='5.10.'
+	# ATTENTION: Omit the trailing '.' if patchlevel is "" . Usually though, for a preferable well established LTS kernel, the patchlevel will not be empty.
+	# WARNING: May not be tested with an empty patchlevel.
+	#export currentKernel_MajorMinor='5.10.'
+	export currentKernel_MajorMinor='6.1.'
 	export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
 
 	# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.
@@ -331,6 +334,73 @@ _fetchKernel-lts() {
 
 }
 
+
+_fetchKernel-mainline() {
+	# DANGER: NOTICE: Do NOT export without corresponding source code!
+	rm -f "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
+	_safeRMR "$scriptLocal"/mainline
+
+	mkdir -p "$scriptLocal"/mainline
+	cd "$scriptLocal"/mainline
+
+
+	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
+	export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
+	export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
+
+	export currentKernel_Major=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 1 -d '.')
+	export currentKernel_Minor=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 2 -d '.')
+	export currentKernel_patchLevel=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 3 -d '.')
+
+	export currentKernel_MajorMinor="$currentKernel_Major"
+	[[ "$currentKernel_Minor" != "" ]] && export currentKernel_MajorMinor="$currentKernel_Major"".""$currentKernel_Minor"
+	[[ "$currentKernel_patchLevel" != "" ]] && export currentKernel_MajorMinor="$currentKernel_MajorMinor""."
+	export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
+
+	_messagePlain_probe_var currentKernelURL
+	_messagePlain_probe_var currentKernelName
+	_messagePlain_probe_var currentKernelPath
+
+	_messagePlain_probe_var currentKernel_MajorMinor
+
+	_messagePlain_probe v"$currentKernel_MajorMinor""$currentKernel_patchLevel"
+	
+	cd "$scriptLocal"/mainline
+
+	
+	if ! ls -1 "$currentKernelName"* > /dev/null 2>&1
+	then
+		# DANGER: Do NOT obtain archive of source code from elsehwere (ie. kernel.org instead of git repository). Although officially should be identical, mismatch is theoretically possible.
+		## ##wget "$currentKernelURL"
+		## ##tar xf "$currentKernelName"*
+		
+		git config checkout.workers -1
+
+		if ! [[ -e "$scriptLocal"/mainline/linux/ ]]
+		then
+			! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
+		fi
+		
+		cd "$scriptLocal"/mainline/linux
+		! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
+
+
+
+		cd "$scriptLocal"/mainline
+
+		mv "$scriptLocal"/mainline/linux "$scriptLocal"/mainline/"$currentKernelName"
+
+		mv "$scriptLocal"/mainline/"$currentKernelName"/.git "$scriptLocal"/mainline/"$currentKernelName".git
+		env XZ_OPT=-e9 tar -cJvf "$scriptLocal"/mainline/"$currentKernelName".tar.xz ./"$currentKernelName"
+		mv "$scriptLocal"/mainline/"$currentKernelName".git "$scriptLocal"/mainline/"$currentKernelName"/.git
+	fi
+	cd "$currentKernelName"
+	
+	
+	mkdir -p "$scriptLib"/linux/mainline/
+	cp "$scriptLib"/linux/mainline/.config "$scriptLocal"/mainline/"$currentKernelName"/
+
+}
 
 
 
