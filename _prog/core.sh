@@ -455,6 +455,10 @@ _buildKernel-lts() {
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
 	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
 	
+	
+	export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
 	
@@ -469,6 +473,10 @@ _buildKernel-mainline() {
 	make olddefconfig
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
 	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
+	
+	
+	export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL

@@ -63,7 +63,7 @@ if false; then true; # -->
 <!-- # --><h1>Statement</h1>
 <!--
 fi
- '_o_' '_kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
+ '_o_' '"$scriptAbsoluteFolder"/../../../ubiquitous_bash.sh _kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
 if false; then true; # -->
 <!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
 <!-- # --><span style="color:#54ff54;background-color:#18b2b2;"> kernelConfig: desktop</span>
@@ -71,7 +71,9 @@ if false; then true; # -->
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-legacy' for specific use cases.</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: tradeoff-harden</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-harden' for specific use cases.</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_X86_INTEL_TSX_MODE_OFF</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_INTEL_TDX_GUEST</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_X86_SGX_kVM</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualization-accessory</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualbox</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: boot</span>
@@ -86,7 +88,6 @@ if false; then true; # -->
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CPU_FREQ_DEFAULT_GOV_ONDEMAND</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT: CONFIG_PREEMPT=y</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT_RT: </span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: Set 'bfq' as default IO scheduler (strongly recommended).</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: memory</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: integration</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_NTFS_RW: </span>
@@ -98,7 +99,7 @@ if false; then true; # -->
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation</span>
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: ACPI_HMAT</span>
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: CONFIG_UCLAMP_TASK</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    N: CPU_IDLE_GOV_TEO</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: CPU_IDLE_GOV_TEO</span>
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: LOCK_EVENT_COUNTS</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation: docker</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation: prog</span>

@@ -58,7 +58,7 @@ _document_main() {
 
 _heading1 'Statement'
 
-_o_ '_kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
+_o_ '"$scriptAbsoluteFolder"/../../../ubiquitous_bash.sh _kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
 
 
 
