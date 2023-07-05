@@ -34,7 +34,7 @@ jobs:
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 512
-        root-reserve-mb: 1024
+        root-reserve-mb: 2048
         #temp-reserve-mb: 100
         temp-reserve-mb: 300
         #swap-size-mb: 128
@@ -92,7 +92,7 @@ jobs:
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 512
-        root-reserve-mb: 1024
+        root-reserve-mb: 2048
         #temp-reserve-mb: 100
         temp-reserve-mb: 300
         #swap-size-mb: 128
