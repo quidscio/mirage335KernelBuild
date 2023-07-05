@@ -310,6 +310,7 @@ _fetchKernel-lts() {
 
 		if ! [[ -e "$scriptLocal"/lts/linux/ ]]
 		then
+			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 			! git clone --branch v"$currentKernel_MajorMinor""$currentKernel_patchLevel" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
@@ -379,6 +380,7 @@ _fetchKernel-mainline() {
 
 		if ! [[ -e "$scriptLocal"/mainline/linux/ ]]
 		then
+			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 			! git clone --branch v"$currentKernel_MajorMinor""$currentKernel_patchLevel" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
