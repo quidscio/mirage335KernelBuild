@@ -475,7 +475,8 @@ _buildKernel-lts() {
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
 	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
 	
-	
+	# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+	# MCORE2
 	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	
@@ -498,7 +499,8 @@ _buildKernel-mainline() {
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
 	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
 	
-	
+	# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+	# MCORE2
 	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	
