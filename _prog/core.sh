@@ -449,8 +449,18 @@ _fetchKernel() {
 }
 
 
-
-
+# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
+_kernelScripts-disableDebug() {
+	#scripts/config --disable DEBUG_INFO
+	
+	scripts/config --undefine GDB_SCRIPTS
+	scripts/config --undefine DEBUG_INFO
+	scripts/config --undefine DEBUG_INFO_SPLIT
+	scripts/config --undefine DEBUG_INFO_REDUCED
+	scripts/config --undefine DEBUG_INFO_COMPRESSED
+	scripts/config --set-val  DEBUG_INFO_NONE       y
+	scripts/config --set-val  DEBUG_INFO_DWARF5     n
+}
 
 
 _buildKernel-lts() {
@@ -458,7 +468,7 @@ _buildKernel-lts() {
 	make olddefconfig
 
 	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
-	scripts/config --disable DEBUG_INFO
+	_kernelScripts-disableDebu
 
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
 	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
@@ -481,7 +491,7 @@ _buildKernel-mainline() {
 	make olddefconfig
 
 	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
-	scripts/config --disable DEBUG_INFO
+	_kernelScripts-disableDebu
 
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
 	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
