@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='673032576'
+export ub_setScriptChecksum_contents='2848730523'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -16824,6 +16824,8 @@ _fetchKernel() {
 # https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
 _kernelScripts-disableDebug() {
 	#scripts/config --disable DEBUG_INFO
+
+	scripts/config --disable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
 	
 	scripts/config --undefine GDB_SCRIPTS
 	scripts/config --undefine DEBUG_INFO
@@ -16832,8 +16834,6 @@ _kernelScripts-disableDebug() {
 	scripts/config --undefine DEBUG_INFO_COMPRESSED
 	scripts/config --set-val  DEBUG_INFO_NONE       y
 	scripts/config --set-val  DEBUG_INFO_DWARF5     n
-
-	scripts/config --disable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
 }
 
 
