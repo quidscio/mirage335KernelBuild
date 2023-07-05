@@ -460,6 +460,8 @@ _kernelScripts-disableDebug() {
 	scripts/config --undefine DEBUG_INFO_COMPRESSED
 	scripts/config --set-val  DEBUG_INFO_NONE       y
 	scripts/config --set-val  DEBUG_INFO_DWARF5     n
+
+	scripts/config --disable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
 }
 
 
@@ -468,14 +470,14 @@ _buildKernel-lts() {
 	make olddefconfig
 
 	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
-	_kernelScripts-disableDebu
+	_kernelScripts-disableDebug
 
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
 	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
 	
 	
-	export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
-	export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
@@ -491,14 +493,14 @@ _buildKernel-mainline() {
 	make olddefconfig
 
 	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
-	_kernelScripts-disableDebu
+	_kernelScripts-disableDebug
 
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
 	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
 	
 	
-	export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
-	export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL

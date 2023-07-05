@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3509131419'
+export ub_setScriptChecksum_contents='673032576'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -16832,6 +16832,8 @@ _kernelScripts-disableDebug() {
 	scripts/config --undefine DEBUG_INFO_COMPRESSED
 	scripts/config --set-val  DEBUG_INFO_NONE       y
 	scripts/config --set-val  DEBUG_INFO_DWARF5     n
+
+	scripts/config --disable DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT
 }
 
 
@@ -16840,14 +16842,14 @@ _buildKernel-lts() {
 	make olddefconfig
 
 	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
-	_kernelScripts-disableDebu
+	_kernelScripts-disableDebug
 
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
 	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
 	
 	
-	export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
-	export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
@@ -16863,14 +16865,14 @@ _buildKernel-mainline() {
 	make olddefconfig
 
 	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
-	_kernelScripts-disableDebu
+	_kernelScripts-disableDebug
 
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
 	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
 	
 	
-	export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
-	export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
 	
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
