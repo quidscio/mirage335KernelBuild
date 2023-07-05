@@ -456,6 +456,10 @@ _fetchKernel() {
 _buildKernel-lts() {
 	_messageNormal "init: buildKernel-lts: ""$currentKernelPath"
 	make olddefconfig
+
+	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
+	scripts/config --disable DEBUG_INFO
+
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
 	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
 	
@@ -475,6 +479,10 @@ _buildKernel-lts() {
 _buildKernel-mainline() {
 	_messageNormal "init: buildKernel-mainline: ""$currentKernelPath"
 	make olddefconfig
+
+	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
+	scripts/config --disable DEBUG_INFO
+
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
 	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
 	

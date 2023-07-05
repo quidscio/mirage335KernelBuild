@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3906807686'
+export ub_setScriptChecksum_contents='3075757016'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -16682,6 +16682,7 @@ _fetchKernel-lts() {
 
 		if ! [[ -e "$scriptLocal"/lts/linux/ ]]
 		then
+			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 			! git clone --branch v"$currentKernel_MajorMinor""$currentKernel_patchLevel" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
@@ -16751,6 +16752,7 @@ _fetchKernel-mainline() {
 
 		if ! [[ -e "$scriptLocal"/mainline/linux/ ]]
 		then
+			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 			! git clone --branch v"$currentKernel_MajorMinor""$currentKernel_patchLevel" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
@@ -16826,6 +16828,10 @@ _fetchKernel() {
 _buildKernel-lts() {
 	_messageNormal "init: buildKernel-lts: ""$currentKernelPath"
 	make olddefconfig
+
+	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
+	scripts/config --disable DEBUG_INFO
+
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
 	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
 	
@@ -16845,6 +16851,10 @@ _buildKernel-lts() {
 _buildKernel-mainline() {
 	_messageNormal "init: buildKernel-mainline: ""$currentKernelPath"
 	make olddefconfig
+
+	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
+	scripts/config --disable DEBUG_INFO
+
 	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
 	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
 	
