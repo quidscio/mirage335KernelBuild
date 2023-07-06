@@ -518,6 +518,7 @@ _buildKernel-mainline() {
 
 _menuconfigKernel-lts() {
 	export currentKernelPath=$(ls -d -1 "$scriptLocal"/lts/linux-* | sort -n | head -n 1)
+	cd "$currentKernelPath"
 
 	_messageNormal "init: menuconfigKernel-lts: ""$currentKernelPath"
 	make olddefconfig
@@ -532,6 +533,7 @@ _menuconfigKernel-lts() {
 
 _menuconfigKernel-mainline() {
 	export currentKernelPath=$(ls -d -1 "$scriptLocal"/mainline/linux-* | sort -n | head -n 1)
+	cd "$currentKernelPath"
 
 	_messageNormal "init: menuconfigKernel-mainline: ""$currentKernelPath"
 	make olddefconfig

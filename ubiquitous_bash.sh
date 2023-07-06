@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2066579052'
+export ub_setScriptChecksum_contents='1281683186'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -16887,6 +16887,39 @@ _buildKernel-mainline() {
 
 
 
+
+_menuconfigKernel-lts() {
+	export currentKernelPath=$(ls -d -1 "$scriptLocal"/lts/linux-* | sort -n | head -n 1)
+	cd "$currentKernelPath"
+
+	_messageNormal "init: menuconfigKernel-lts: ""$currentKernelPath"
+	make olddefconfig
+
+	make menuconfig
+
+	_kernelConfig_desktop ./.config | tee "$scriptLocal"/lts/statement.sh.out.txt
+	cp "$scriptLocal"/lts/*/.config "$scriptLocal"/lts/
+	
+	return 0
+}
+
+_menuconfigKernel-mainline() {
+	export currentKernelPath=$(ls -d -1 "$scriptLocal"/mainline/linux-* | sort -n | head -n 1)
+	cd "$currentKernelPath"
+
+	_messageNormal "init: menuconfigKernel-mainline: ""$currentKernelPath"
+	make olddefconfig
+
+	make menuconfig
+	
+	_kernelConfig_desktop ./.config | tee "$scriptLocal"/mainline/statement.sh.out.txt
+	cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/mainline/
+	
+	return 0
+}
+
+
+
 _build_cloud_prepare() {
 	if _test_fetchKernel_updateInterval-setupUbiquitous
 	then
@@ -17129,6 +17162,10 @@ _refresh_anchors() {
 	
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_getMinimal_cloud
 	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_fetchKernel
+
+
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_menuconfigKernel-lts
+	cp -a "$scriptAbsoluteFolder"/_anchor "$scriptAbsoluteFolder"/_menuconfigKernel-mainline
 }
 
 

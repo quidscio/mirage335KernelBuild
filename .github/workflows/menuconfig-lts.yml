@@ -3,11 +3,11 @@ name: menuconfig_lts
 on:
   workflow_dispatch:
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
-  schedule:
+  #schedule:
     #- cron: '5 1 * * 6'
     #- cron: '5 1 * * 2,4'
     #- cron: '5 1 * * 2'
-    - cron: '5 1 * * 4'
+    #- cron: '5 1 * * 4'
 
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
@@ -51,7 +51,7 @@ jobs:
     - name: _fetchKernel_lts
       shell: bash
       run: |
-        ./ubiquitous_bash.sh _fetchKernel_lts
+        ./ubiquitous_bash.sh _fetchKernel-lts
       timeout-minutes: 180
     #- name: Setup tmate session
       #uses: mxschmitt/action-tmate@v3
@@ -65,13 +65,17 @@ jobs:
         ## limits ssh access and adds the ssh public key for the user which triggered the workflow
         limit-access-to-actor: true
         ## limits ssh access and adds the ssh public keys of the listed GitHub users
+        # DANGER: Discouraged. Prefer 'limit-access-to-actor' instead.
         #limit-access-to-users: githubuser1,githubuser2
+      timeout-minutes: 320
     - name: artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: build-lts
+        name: menuconfig
         path: |
-          ./
+          ./_local/lts/.config
+          ./_prog
+          ./_local/ops.sh
       timeout-minutes: 45
 
 
