@@ -51,6 +51,7 @@ jobs:
     - name: _fetchKernel_lts
       shell: bash
       run: |
+        export current_XZ_OPT_kernelSource="-2"
         ./ubiquitous_bash.sh _fetchKernel-lts
       timeout-minutes: 180
     #- name: Setup tmate session

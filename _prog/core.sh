@@ -325,7 +325,8 @@ _fetchKernel-lts() {
 		mv "$scriptLocal"/lts/linux "$scriptLocal"/lts/"$currentKernelName"
 
 		mv "$scriptLocal"/lts/"$currentKernelName"/.git "$scriptLocal"/lts/"$currentKernelName".git
-		env XZ_OPT=-e9 tar -cJvf "$scriptLocal"/lts/"$currentKernelName".tar.xz ./"$currentKernelName"
+		[[ "$current_XZ_OPT_kernelSource" == "" ]] && export current_XZ_OPT_kernelSource="-e9"
+		env XZ_OPT="$current_XZ_OPT_kernelSource" tar -cJvf "$scriptLocal"/lts/"$currentKernelName".tar.xz ./"$currentKernelName"
 		mv "$scriptLocal"/lts/"$currentKernelName".git "$scriptLocal"/lts/"$currentKernelName"/.git
 	fi
 	cd "$currentKernelName"
@@ -395,7 +396,8 @@ _fetchKernel-mainline() {
 		mv "$scriptLocal"/mainline/linux "$scriptLocal"/mainline/"$currentKernelName"
 
 		mv "$scriptLocal"/mainline/"$currentKernelName"/.git "$scriptLocal"/mainline/"$currentKernelName".git
-		env XZ_OPT=-e9 tar -cJvf "$scriptLocal"/mainline/"$currentKernelName".tar.xz ./"$currentKernelName"
+		[[ "$current_XZ_OPT_kernelSource" == "" ]] && export current_XZ_OPT_kernelSource="-e9"
+		env XZ_OPT="$current_XZ_OPT_kernelSource" tar -cJvf "$scriptLocal"/mainline/"$currentKernelName".tar.xz ./"$currentKernelName"
 		mv "$scriptLocal"/mainline/"$currentKernelName".git "$scriptLocal"/mainline/"$currentKernelName"/.git
 	fi
 	cd "$currentKernelName"
