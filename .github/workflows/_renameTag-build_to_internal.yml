@@ -70,22 +70,31 @@ jobs:
 
 
           # Find the tag name for the release by its name
-          tag_name=$(echo "$releases" | jq -r '.[] | select(.name == "internal") | .tag_name' | cat)
-          
-          # Edit the release using its tag name
-          if [[ "$tag_name" != "" ]]
-          then
-            gh release delete "$tag_name" --yes
-          fi
+          tag_name=$(echo "$releases" | jq -r '.[] | select(.name == "build") | .tag_name' | sed 's/\\n//g' | sort -n -r | head -n 1)
 
           
           # Find the tag name for the release by its name
-          tag_name=$(echo "$releases" | jq -r '.[] | select(.name == "build") | .tag_name')
-          body=$(echo "$releases" | jq -r '.[] | select(.name == "build") | .body' | tr -dc 'a-zA-Z0-9.:\=\_\-/%+\ \n')
+          body=$(echo "$releases" | jq -r '.[] | select(.tag_name == "$tag_name") | .body' | tr -dc 'a-zA-Z0-9.:\=\_\-/%+\ \n')
           
           # Edit the release using its tag name
           _safeEcho "$body" | gh release edit "$tag_name" --title "internal" --notes -
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      #- name: Setup upterm session
+        #if: ${{ failure() }}
+        #uses: lhotari/action-upterm@v1
+        #with:
+          ### limits ssh access and adds the ssh public key for the user which triggered the workflow
+          #limit-access-to-actor: true
+          ### limits ssh access and adds the ssh public keys of the listed GitHub users
+          ## DANGER: Discouraged. Prefer 'limit-access-to-actor' instead.
+          ##limit-access-to-users: githubuser1,githubuser2
+        #timeout-minutes: 320
+        #env:
+          #GH_TOKEN: ${{ github.token }}
+
+
+
 
 
