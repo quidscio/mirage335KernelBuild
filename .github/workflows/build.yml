@@ -141,13 +141,13 @@ jobs:
     # bash -i
     # source ~/.bashrc
     # Type 'q' at the 'Web shell' or use SSH .
-    - name: Setup tmate session
-      if: ${{ failure() }}
-      uses: mxschmitt/action-tmate@v3
-      # ssh -i <path-to-key> <tmate-connection-string>
-      with:
-        limit-access-to-actor: true
-      timeout-minutes: 5
+    #- name: Setup tmate session
+      #if: ${{ failure() }}
+      #uses: mxschmitt/action-tmate@v3
+      ## ssh -i <path-to-key> <tmate-connection-string>
+      #with:
+        #limit-access-to-actor: true
+      #timeout-minutes: 5
     #- name: artifacts
       #uses: actions/upload-artifact@v3
       #with:
