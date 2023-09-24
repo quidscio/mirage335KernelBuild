@@ -39,6 +39,8 @@ _check_nv_sequence() {
 
     export SYSSRC="$currentKernelPath"
     export IGNORE_CC_MISMATCH=1
+    
+    export IGNORE_MISSING_MODULE_SYMVERS=1
 
     
     cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
