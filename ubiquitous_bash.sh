@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3598538075'
+export ub_setScriptChecksum_contents='3620409594'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -19154,8 +19154,8 @@ _check_nv_sequence() {
 
     cd "$currentKernelPath"
 
-    make olddefconfig
-    make prepare
+    #make olddefconfig
+    #make prepare
 
 
     _messagePlain_nominal 'wget'
@@ -19219,14 +19219,41 @@ _check_nv-mainline-series535p() {
 
 
 _check_vbox-mainline() {
+    local functionEntryPWD="$PWD"
+    
+    _messagePlain_nominal 'kernel'
+
+    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+    _messagePlain_probe_var currentKernelPath
+
+    cd "$currentKernelPath"
+
+    #make olddefconfig
+    #make prepare
+
+
+    _messagePlain_nominal 'dist-get'
+
     export getMost_backend="direct"
 	_set_getMost_backend "$@"
 	_set_getMost_backend_debian "$@"
 	_test_getMost_backend "$@"
 	
 	_getMost_backend apt-get update
-    
+
     ! _getMost_ubuntu22-VBoxManage && exit 1
+
+
+
+    _messagePlain_nominal 'make'
+
+    if [[ -e /usr/share/virtualbox/src/vboxhost ]]
+    then
+        cd /usr/share/virtualbox/src/vboxhost
+        make clean
+        make -C "$currentKernelPath" M=`pwd` -j $(nproc)
+        return "$?"
+    fi
 
 
 

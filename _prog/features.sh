@@ -11,8 +11,8 @@ _check_nv_sequence() {
 
     cd "$currentKernelPath"
 
-    make olddefconfig
-    make prepare
+    #make olddefconfig
+    #make prepare
 
 
     _messagePlain_nominal 'wget'
@@ -76,14 +76,41 @@ _check_nv-mainline-series535p() {
 
 
 _check_vbox-mainline() {
+    local functionEntryPWD="$PWD"
+    
+    _messagePlain_nominal 'kernel'
+
+    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+    _messagePlain_probe_var currentKernelPath
+
+    cd "$currentKernelPath"
+
+    #make olddefconfig
+    #make prepare
+
+
+    _messagePlain_nominal 'dist-get'
+
     export getMost_backend="direct"
 	_set_getMost_backend "$@"
 	_set_getMost_backend_debian "$@"
 	_test_getMost_backend "$@"
 	
 	_getMost_backend apt-get update
-    
+
     ! _getMost_ubuntu22-VBoxManage && exit 1
+
+
+
+    _messagePlain_nominal 'make'
+
+    if [[ -e /usr/share/virtualbox/src/vboxhost ]]
+    then
+        cd /usr/share/virtualbox/src/vboxhost
+        make clean
+        make -C "$currentKernelPath" M=`pwd` -j $(nproc)
+        return "$?"
+    fi
 
 
 
