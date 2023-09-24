@@ -4,6 +4,18 @@ _check_nv_sequence() {
     local currentExitStatus
     local functionEntryPWD="$PWD"
 
+    _messagePlain_nominal 'kernel'
+
+    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+    _messagePlain_probe_var currentKernelPath
+
+    cd "$currentKernelPath"
+
+    make olddefconfig
+    make prepare
+
+
+    _messagePlain_nominal 'wget'
 
     cd "$safeTmp"
     wget https://raw.githubusercontent.com/soaringDistributions/ubDistBuild/main/_lib/setup/nvidia/_get_nvidia.sh
@@ -17,23 +29,23 @@ _check_nv_sequence() {
     ! [[ -e "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run ]] && _messagePlain_bad 'bad: missing: NVIDIA-Linux-x86_64-"$currentVersion".run' && return 1
 
 
+    _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
     "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only
     cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
 
 
-    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+    _messagePlain_nominal 'make'
 
     export SYSSRC="$currentKernelPath"
     export IGNORE_CC_MISMATCH=1
 
-    _messagePlain_probe_var currentKernelPath
-
-
+    
     cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
     make clean
 
+    _messagePlain_probe 'make -j $(nproc)'
     make -j $(nproc)
     currentExitStatus="$?"
 

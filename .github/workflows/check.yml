@@ -64,45 +64,7 @@ jobs:
       # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
       # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
     - name: Maximize build space
-      if: ( ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' ||  github.event.inputs.runnerName != 'ubuntu-latest-l' ||  github.event.inputs.runnerName != 'ubuntu-latest-h' }} )
-      uses: easimon/maximize-build-space@master
-      with:
-        root-reserve-mb: 1625
-        temp-reserve-mb: 50
-        swap-size-mb: 2
-        #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
-        remove-dotnet: 'true'
-        #remove-android: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
-        remove-android: 'true'
-        #remove-haskell: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
-        remove-haskell: 'true'
-        #remove-codeql: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
-        remove-codeql: 'true'
-        #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
-        remove-docker-images: 'true'
-    #- uses: actions/checkout@v2
-    #- name: _getMinimal_cloud
-      #shell: bash
-      #run: |
-        #./ubiquitous_bash.sh _getMinimal_cloud
-      #timeout-minutes: 90
-  check_mainline:
-    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
-    #runs-on: ubuntu-20.04
-    #runs-on: buildjet-2vcpu-ubuntu-2004
-    #runs-on: buildjet-64vcpu-ubuntu-2004
-    steps:
-    - name: users
-      shell: bash
-      run: |
-        sudo -u ubuntu -n bash -c 'sudo -n useradd runner --non-unique -u $UID -g $UID' || true
-        sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
-        sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
-        true
-      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
-      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
-    - name: Maximize build space
-      if: ( ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' ||  github.event.inputs.runnerName != 'ubuntu-latest-l' ||  github.event.inputs.runnerName != 'ubuntu-latest-h' }} )
+      if: ( ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' && github.event.inputs.runnerName != 'ubuntu-latest-l' && github.event.inputs.runnerName != 'ubuntu-latest-h' }} )
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 1625
@@ -124,6 +86,44 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
+  check_mainline:
+    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
+    #runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
+    #runs-on: buildjet-64vcpu-ubuntu-2004
+    steps:
+    - name: users
+      shell: bash
+      run: |
+        sudo -u ubuntu -n bash -c 'sudo -n useradd runner --non-unique -u $UID -g $UID' || true
+        sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
+        sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
+        true
+      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
+      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
+    - name: Maximize build space
+      if: ( ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' && github.event.inputs.runnerName != 'ubuntu-latest-l' && github.event.inputs.runnerName != 'ubuntu-latest-h' }} )
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 1625
+        temp-reserve-mb: 50
+        swap-size-mb: 2
+        #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-dotnet: 'true'
+        #remove-android: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-android: 'true'
+        #remove-haskell: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-haskell: 'true'
+        #remove-codeql: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-codeql: 'true'
+        #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-docker-images: 'true'
+    - uses: actions/checkout@v2
+    #- name: _getMinimal_cloud
+      #shell: bash
+      #run: |
+        #./ubiquitous_bash.sh _getMinimal_cloud
+      #timeout-minutes: 90
     - name: _fetchKernel-mainline
       shell: bash
       run: |

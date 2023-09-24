@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3567479407'
+export ub_setScriptChecksum_contents='1301815086'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -18623,6 +18623,18 @@ _check_nv_sequence() {
     local currentExitStatus
     local functionEntryPWD="$PWD"
 
+    _messagePlain_nominal 'kernel'
+
+    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+    _messagePlain_probe_var currentKernelPath
+
+    cd "$currentKernelPath"
+
+    make olddefconfig
+    make prepare
+
+
+    _messagePlain_nominal 'wget'
 
     cd "$safeTmp"
     wget https://raw.githubusercontent.com/soaringDistributions/ubDistBuild/main/_lib/setup/nvidia/_get_nvidia.sh
@@ -18636,23 +18648,23 @@ _check_nv_sequence() {
     ! [[ -e "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run ]] && _messagePlain_bad 'bad: missing: NVIDIA-Linux-x86_64-"$currentVersion".run' && return 1
 
 
+    _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
     "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only
     cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
 
 
-    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+    _messagePlain_nominal 'make'
 
     export SYSSRC="$currentKernelPath"
     export IGNORE_CC_MISMATCH=1
 
-    _messagePlain_probe_var currentKernelPath
-
-
+    
     cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
     make clean
 
+    _messagePlain_probe 'make -j $(nproc)'
     make -j $(nproc)
     currentExitStatus="$?"
 
