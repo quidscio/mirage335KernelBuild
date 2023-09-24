@@ -25,8 +25,10 @@ _check_nv_sequence() {
 
     export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
 
-    export SYSRC="$currentKernelPath"
+    export SYSSRC="$currentKernelPath"
     export IGNORE_CC_MISMATCH=1
+
+    _messagePlain_probe_var currentKernelPath
 
 
     cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel

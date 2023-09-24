@@ -26,6 +26,7 @@ on:
         type: choice
         options:
         - ubuntu-latest
+        - ubuntu-latest-m
         - ubuntu-latest-h
       forceKernel_mainline:
         required: false
