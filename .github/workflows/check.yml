@@ -1,0 +1,177 @@
+
+name: check
+
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
+permissions:
+  actions: none
+  checks: none
+  contents: read
+  deployments: none
+  issues: none
+  packages: none
+  pull-requests: none
+  repository-projects: none
+  security-events: none
+  statuses: none
+
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      runnerName:
+        required: false
+        default: ubuntu-latest-h
+        type: choice
+        options:
+        - ubuntu-latest
+        - ubuntu-latest-h
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
+  schedule:
+    #- cron: '5 1 * * 6'
+    #- cron: '5 1 * * 2,4'
+    #- cron: '5 1 * * 2'
+    - cron: '5 1 * * 4'
+
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check_lts:
+    runs-on: ubuntu-latest
+    #runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
+    #runs-on: buildjet-64vcpu-ubuntu-2004
+    steps:
+    - name: users
+      shell: bash
+      run: |
+        sudo -u ubuntu -n bash -c 'sudo -n useradd runner --non-unique -u $UID -g $UID' || true
+        sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
+        sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
+        true
+      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
+      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        #root-reserve-mb: 512
+        root-reserve-mb: 2048
+        #temp-reserve-mb: 100
+        temp-reserve-mb: 300
+        #swap-size-mb: 128
+        swap-size-mb: 192
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+    - uses: actions/checkout@v2
+    - name: _getMinimal_cloud
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _getMinimal_cloud
+      timeout-minutes: 90
+    - name: _build_cloud_lts
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _build_cloud_prepare
+        ./ubiquitous_bash.sh _build_cloud_lts
+      timeout-minutes: 300
+    - name: _export_cloud_lts
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _export_cloud_lts
+      timeout-minutes: 90
+    #- name: artifacts
+      #uses: actions/upload-artifact@v3
+      #with:
+        #name: build-lts
+        #path: |
+          #./_local/_export/linux-lts-amd64-debian.tar.gz
+  check_mainline:
+    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
+    #runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
+    #runs-on: buildjet-64vcpu-ubuntu-2004
+    steps:
+    - name: users
+      shell: bash
+      run: |
+        sudo -u ubuntu -n bash -c 'sudo -n useradd runner --non-unique -u $UID -g $UID' || true
+        sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
+        sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
+        true
+      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
+      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
+    - name: Maximize build space
+      if: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 1625
+        temp-reserve-mb: 50
+        swap-size-mb: 2
+        #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-dotnet: 'true'
+        #remove-android: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-android: 'true'
+        #remove-haskell: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-haskell: 'true'
+        #remove-codeql: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-codeql: 'true'
+        #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-docker-images: 'true'
+    - uses: actions/checkout@v2
+    - name: _getMinimal_cloud
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _getMinimal_cloud
+      timeout-minutes: 90
+    #- name: _build_cloud_mainline
+      #shell: bash
+      #run: |
+        #./ubiquitous_bash.sh _build_cloud_prepare
+        #./ubiquitous_bash.sh _build_cloud_mainline
+      #timeout-minutes: 300
+    #- name: _export_cloud_mainline
+      #shell: bash
+      #run: |
+        #./ubiquitous_bash.sh _export_cloud_mainline
+      #timeout-minutes: 90
+    # https://github.com/marketplace/actions/debugging-with-tmate
+    # $RUNNER_WORKSPACE
+    # rclone config --config="/rclone.conf"
+    # sudo touch /continue
+    # bash -i
+    # source ~/.bashrc
+    # Type 'q' at the 'Web shell' or use SSH .
+    #- name: Setup tmate session
+      #if: ${{ failure() }}
+      #uses: mxschmitt/action-tmate@v3
+      ## ssh -i <path-to-key> <tmate-connection-string>
+      #with:
+        #limit-access-to-actor: true
+      #timeout-minutes: 5
+    #- name: artifacts
+      #uses: actions/upload-artifact@v3
+      #with:
+        #name: build-mainline
+        #path: |
+          #./_local/_export/linux-mainline-amd64-debian.tar.gz
+    - name: _fetchKernel-mainline
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _fetchKernel-mainline
+      timeout-minutes: 90
+    - name: _check_nv-mainline-series535p
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_nv-mainline-series535p
+      timeout-minutes: 300
+
+
+
+
+
+
