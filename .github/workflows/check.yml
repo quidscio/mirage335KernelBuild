@@ -27,6 +27,13 @@ on:
         options:
         - ubuntu-latest
         - ubuntu-latest-h
+      forceKernel_mainline:
+        required: false
+        default: latest
+        type: choice
+        options:
+        - latest
+        - 6.5.
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
     #- cron: '5 1 * * 6'
@@ -56,7 +63,7 @@ jobs:
       # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
       # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+      if: ( ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' ||  github.event.inputs.runnerName != 'ubuntu-latest-l' ||  github.event.inputs.runnerName != 'ubuntu-latest-h' }} )
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 1625
@@ -94,7 +101,7 @@ jobs:
       # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
       # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+      if: ( ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' ||  github.event.inputs.runnerName != 'ubuntu-latest-l' ||  github.event.inputs.runnerName != 'ubuntu-latest-h' }} )
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 1625
@@ -119,11 +126,13 @@ jobs:
     - name: _fetchKernel-mainline
       shell: bash
       run: |
+        export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
         #./ubiquitous_bash.sh _fetchKernel-mainline
         ./ubiquitous_bash.sh _fetchKernel-mainline-legacyHTTPS
     #- name: _build_cloud_mainline
       #shell: bash
       #run: |
+        #export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
         #./ubiquitous_bash.sh _build_cloud_prepare
         #./ubiquitous_bash.sh _build_cloud_mainline
       #timeout-minutes: 300
