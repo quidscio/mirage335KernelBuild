@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3142765432'
+export ub_setScriptChecksum_contents='3598538075'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -224,6 +224,9 @@ then
 	}
 fi
 
+
+
+# ATTENTION: NOTICE: https://nixos.wiki/wiki/Locales
 
 # WARNING: May conflict with 'export LANG=C' or similar.
 # Workaround for very minor OS misconfiguration. Setting this variable at all may be undesirable however. Consider enabling and generating all locales with 'sudo dpkg-reconfigure locales' or similar .
@@ -1400,7 +1403,14 @@ _setup_ubiquitousBash_cygwin() {
 }
 
 
+_report_setup_ubcp() {
+	local currentCygdriveC_equivalent
+	currentCygdriveC_equivalent="$1"
+	[[ "$currentCygdriveC_equivalent" == "" ]] && currentCygdriveC_equivalent=$(cygpath -S | sed 's/\/Windows\/System32//g')
+	[[ "$1" == "/" ]] && currentCygdriveC_equivalent=$(echo "$PWD" | sed 's/\(\/cygdrive\/[a-zA-Z]*\).*/\1/')
 
+	find /bin/ /usr/bin/ /sbin/ /usr/sbin/ | tee "$currentCygdriveC_equivalent"/core/infrastructure/ubcp-binReport > /dev/null
+}
 
 
 _setup_ubcp_procedure() {
@@ -1474,6 +1484,8 @@ _setup_ubcp() {
 	
 	"$scriptAbsoluteLocation" _setup_ubcp_procedure "$1"
 	"$scriptAbsoluteLocation" _setup_ubiquitousBash_cygwin_procedure "$1"
+
+	"$scriptAbsoluteLocation" _report_setup_ubcp "$1"
 }
 
 
@@ -1689,7 +1701,7 @@ _mitigate-ubcp_rewrite_sequence() {
 	# https://serverfault.com/questions/193319/a-better-unix-find-with-parallel-processing
 	# https://stackoverflow.com/questions/11003418/calling-shell-functions-with-xargs
 	export -f "_mitigate-ubcp_rewrite_parallel"
-	find "$2" -type l -print0 | xargs -0 -x -s 4096 -L 12 -P $(nproc) bash -c '_mitigate-ubcp_rewrite_parallel "$@"' _
+	find "$2" -type l -print0 | xargs -0 -x -s 4096 -L 6 -P $(nproc) bash -c '_mitigate-ubcp_rewrite_parallel "$@"' _
 	#find "$2" -type l -print0 | xargs -0 -n 1 -P 4 -I {} bash -c '_mitigate-ubcp_rewrite_parallel "$@"' _ {}
 	#find "$2" -type l -print0 | xargs -0 -n 1 -P 4 -I {} bash -c '_mitigate-ubcp_rewrite_procedure "$@"' _ {}
 	
@@ -1698,6 +1710,17 @@ _mitigate-ubcp_rewrite_sequence() {
 
 _mitigate-ubcp_rewrite() {
 	"$scriptAbsoluteLocation" _mitigate-ubcp_rewrite_sequence "$@"
+
+	# CAUTION: This may not catch mitigate failure . The actual issue with 'getconf' was removal of the 'ARG_MAX' value , which was not caused by mitigate failure .
+	if [[ ! -e /usr/bin/getconf ]]
+	then
+		_messagePlain_bad 'missing: bad: /usr/bin/getconf'
+		echo 'Usually, this is a symlink, if missing, indicative of failed symlink mitigation due to xargs parameter length or parallelism failure.'
+		_messageFAIL
+		_stop 1
+		return 1
+	fi
+	return 0
 }
 
 
@@ -6533,6 +6556,7 @@ _getMost_debian11_install() {
 	_getMost_backend_aptGetInstall netcat-openbsd
 	_getMost_backend_aptGetInstall iperf
 	_getMost_backend_aptGetInstall axel
+	_getMost_backend_aptGetInstall aria2
 	_getMost_backend_aptGetInstall unionfs-fuse
 	_getMost_backend_aptGetInstall samba
 
@@ -6633,6 +6657,15 @@ _getMost_debian11_install() {
 	_getMost_backend_aptGetInstall libusb-1.0
 
 
+
+	_getMost_backend_aptGetInstall ddd
+	_getMost_backend_aptGetInstall gdb
+	_getMost_backend_aptGetInstall libbabeltrace1
+	_getMost_backend_aptGetInstall libc6-dbg
+	_getMost_backend_aptGetInstall libsource-highlight-common
+	_getMost_backend_aptGetInstall libsource-highlight4v5
+
+
 	
 	# ATTENTION: ONLY change (eg. to 'remove') if needed to ensure a kernel is installed AND custom kernel is not in use.
 	_getMost_backend_aptGetInstall linux-image-amd64
@@ -6651,6 +6684,9 @@ _getMost_debian11_install() {
 	
 	_getMost_backend_aptGetInstall p7zip
 	_getMost_backend_aptGetInstall p7zip-full
+
+	
+	_getMost_backend_aptGetInstall jp2a
 	
 	
 	
@@ -7050,10 +7086,18 @@ _getMost_debian11_install() {
 
 
 
-
+	_getMost_backend_aptGetInstall fldigi
 	
 	
 	_getMost_backend apt-get remove --autoremove -y plasma-discover
+
+
+	_getMost_backend_aptGetInstall tboot
+
+	_getMost_backend_aptGetInstall trousers
+	_getMost_backend_aptGetInstall tpm-tools
+	_getMost_backend_aptGetInstall trousers-dbg
+	
 	
 	
 	_getMost_debian11_special_late
@@ -7539,6 +7583,7 @@ _getMinimal_cloud() {
 	
 	
 	_getMost_backend_aptGetInstall axel
+	_getMost_backend_aptGetInstall aria2
 	
 	_getMost_backend_aptGetInstall dwarves
 	_getMost_backend_aptGetInstall pahole
@@ -7583,6 +7628,9 @@ _getMinimal_cloud() {
 	
 	_getMost_backend_aptGetInstall p7zip
 	_getMost_backend_aptGetInstall nsis
+
+	
+	_getMost_backend_aptGetInstall jp2a
 
 	
 	_getMost_backend_aptGetInstall iputils-ping
@@ -7689,6 +7737,15 @@ _getMinimal_cloud() {
 	
 	
 	_getMost_backend apt-get remove --autoremove -y plasma-discover
+
+
+	
+	_getMost_backend_aptGetInstall tboot
+
+	_getMost_backend_aptGetInstall trousers
+	_getMost_backend_aptGetInstall tpm-tools
+	_getMost_backend_aptGetInstall trousers-dbg
+
 	
 	_getMost_backend apt-get -y clean
 	
@@ -7742,6 +7799,13 @@ _get_from_nix-user() {
 	# . "$HOME"/.nix-profile/etc/profile.d/nix.sh
 
 
+	#_nix_fetch_alternatives
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c '[[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c '[[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://web.archive.org/web/20230413214011/http://ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c '[[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://web.archive.org/web/http://ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c '[[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://github.com/soaringDistributions/ubDistBuild_bundle/raw/main/geda-gaf/geda-gaf-1.10.2.tar.gz'
+
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'nix-prefetch-url file://"$(~/.ubcore/ubiquitous_bash/ubiquitous_bash.sh _getAbsoluteLocation ./geda-gaf-1.10.2.tar.gz)"'
 
 	#_nix_update
 	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'nix-channel --list'
@@ -7798,11 +7862,11 @@ _get_from_nix-user() {
 	currentDerivationPath_gsch2pcb=$(_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'readlink -f "$(type -p gsch2pcb)"')
 	currentDerivationPath_gsch2pcb=$(echo "$currentDerivationPath_gsch2pcb" | sed 's/\(.*\)\/bin\/gsch2pcb.*/\1/')
 
-	_getMost_backend cp -a "$currentDerivationPath_pcb"/share/pcb "$currentDerivationPath_gsch2pcb"/share/
-	_getMost_backend cp -a "$currentDerivationPath_pcb"/share/gEDA "$currentDerivationPath_gsch2pcb"/share/
+	_getMost_backend sudo -n cp -a "$currentDerivationPath_pcb"/share/pcb "$currentDerivationPath_gsch2pcb"/share/
+	_getMost_backend sudo -n cp -a "$currentDerivationPath_pcb"/share/gEDA "$currentDerivationPath_gsch2pcb"/share/
 
 	# ATTENTION: Unusual .
-	_getMost_backend sed -i 's/import errno, os, stat, tempfile$/& , sys/' "$currentDerivationPath_gsch2pcb"/lib/python2.7/site-packages/xorn/fileutils.py
+	_getMost_backend sudo -n sed -i 's/import errno, os, stat, tempfile$/& , sys/' "$currentDerivationPath_gsch2pcb"/lib/python2.7/site-packages/xorn/fileutils.py
 
 	# DOCUMENTATION - interesting copilot suggestions that may or may not be relevant
 	# --option allow-substitutes false --option allow-unsafe-native-code-during-evaluation true --option substituters 'https://cache.nixos.org https://hydra.iohk.io' --option trusted-public-keys 'cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ='
@@ -8107,6 +8171,8 @@ _mustHave_nixos() {
 	if ! type nix-env > /dev/null 2>&1
 	then
 		_test_nix-env_upstream > /dev/null 2>&1
+		[[ -e "$HOME"/.nix-profile/etc/profile.d/nix.sh ]] && . "$HOME"/.nix-profile/etc/profile.d/nix.sh
+		! type nix-env > /dev/null 2>&1 && _stop 1
 	fi
 	
 	! type nix-env > /dev/null 2>&1 && _stop 1
@@ -8333,6 +8399,18 @@ _setup_wsl2_procedure() {
 
     _messagePlain_probe wsl --set-default-version 2
     wsl --set-default-version 2
+
+    _messagePlain_probe wsl --update
+    wsl --update
+
+    sleep 45
+    wsl --update
+
+    sleep 5
+    wsl --update
+
+    sleep 5
+    wsl --update
 }
 _setup_wsl2() {
     "$scriptAbsoluteLocation" _setup_wsl2_procedure "$@"
@@ -8463,6 +8541,15 @@ _write_msw_LANG() {
 }
 
 
+# KDE Plasma, FreeCAD, etc, may not be usable without usable OpenGL .
+# https://github.com/microsoft/wslg/wiki/GPU-selection-in-WSLg
+_write_msw_discreteGPU() {
+    #glxinfo -B | grep -i intel > /dev/null 2>&1 && setx MESA_D3D12_DEFAULT_ADAPTER_NAME NVIDIA /m
+    
+    "$(cygpath -S)"/wbem/wmic.exe path win32_VideoController get name | grep -i 'intel' > /dev/null 2>&1 && "$(cygpath -S)"/wbem/wmic.exe path win32_VideoController get name | grep -i 'nvidia' > /dev/null 2>&1 && setx MESA_D3D12_DEFAULT_ADAPTER_NAME NVIDIA /m
+}
+
+
 _write_msw_WSLENV() {
     _messagePlain_request 'request: If the value of system variable WSLENV is important to you, the previous value is noted here.'
     _messagePlain_probe_var WSLENV
@@ -8473,7 +8560,10 @@ _write_msw_WSLENV() {
     _write_msw_LANG
     #setx WSLENV LANG /m
 
-    setx WSLENV LANG:QT_QPA_PLATFORMTHEME /m
+    _write_msw_discreteGPU
+    #setx MESA_D3D12_DEFAULT_ADAPTER_NAME NVIDIA /m
+
+    setx WSLENV LANG:QT_QPA_PLATFORMTHEME:MESA_D3D12_DEFAULT_ADAPTER_NAME /m
 }
 
 
@@ -9296,10 +9386,15 @@ _wget_githubRelease-stdout() {
 
 
 _wget_githubRelease_join-stdout() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	cd "$scriptAbsoluteFolder"
+	
 	local currentURL
 	local currentURL_array
 
-	local currentIterationcurrentIteration=0
+	local currentIteration
+	currentIteration=0
 	for currentIteration in $(seq -f "%02g" 0 32)
 	do
 		currentURL=$(_wget_githubRelease-URL "$1" "$2" "$3"".part""$currentIteration")
@@ -9314,15 +9409,287 @@ _wget_githubRelease_join-stdout() {
 		currentURL_array_reversed=("$currentValue" "${currentURL_array_reversed[@]}")
 	done
 	
-	_messagePlain_probe curl -L "${currentURL_array_reversed[@]}" >&2
+	# DANGER: Requires   ' "$MANDATORY_HASH" == true '   to indicate use of a hash obtained more securely to check download integrity. Do NOT set 'MANDATORY_HASH' explicitly, safe functions which already include appropriate checks for integrity will set this safety flag automatically.
+	# CAUTION: Do NOT use unless reasonable to degrade network traffic collision backoff algorithms. Unusual defaults, very aggressive, intended for load-balanced multi-WAN with at least 3 WANs .
+	if [[ "$FORCE_AXEL" != "" ]] && ( [[ "$MANDATORY_HASH" == "true" ]] )
+	then
+		#local currentAxelTmpFile
+		#currentAxelTmpFile="$scriptAbsoluteFolder"/.m_axelTmp_$(_uid 14)
+		export currentAxelTmpFileRelative=.m_axelTmp_$(_uid 14)
+		export currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
 
-	curl -L "${currentURL_array_reversed[@]}"
+		#local currentAxelPID
+
+		local currentForceAxel
+		currentForceAxel="$FORCE_AXEL"
+
+		( [[ "$currentForceAxel" == "true" ]] || [[ "$currentForceAxel" == "" ]] ) && currentForceAxel="48"
+		[[ "$currentForceAxel" -lt 2 ]] && currentForceAxel="2"
+
+		currentForceAxel=$(bc <<< "$currentForceAxel""*0.5" | cut -f1 -d\. )
+		[[ "$currentForceAxel" -lt 2 ]] && currentForceAxel="2"
+
+		#_messagePlain_probe axel -a -n "$FORCE_AXEL" -o "$currentAxelTmpFile" "${currentURL_array_reversed[@]}" >&2
+		#axel -a -n "$FORCE_AXEL" -o "$currentAxelTmpFile" "${currentURL_array_reversed[@]}" >&2 &
+		#currentAxelPID="$!"
+
+
+		local current_usable_ipv4
+		current_usable_ipv4="false"
+		#if _timeout 8 aria2c -o "$currentAxelTmpFile" --disable-ipv6 --allow-overwrite=true --auto-file-renaming=false --file-allocation=none --timeout=6 "${currentURL_array_reversed[0]}" >&2
+		#then
+			#current_usable_ipv4="true"
+		#fi
+		if [[ "$GH_TOKEN" == "" ]]
+		then
+			if _timeout 5 wget -4 -O - "${currentURL_array_reversed[0]}" > /dev/null
+			then
+				current_usable_ipv4="true"
+			fi
+		else
+			if _timeout 5 wget -4 -O - --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[0]}" > /dev/null
+			then
+				current_usable_ipv4="true"
+			fi
+		fi
+
+		local current_usable_ipv6
+		current_usable_ipv6="false"
+		if [[ "$GH_TOKEN" == "" ]]
+		then
+			if _timeout 5 wget -6 -O - "${currentURL_array_reversed[0]}" > /dev/null
+			then
+				current_usable_ipv6="true"
+			fi
+		else
+			if _timeout 5 wget -6 -O - --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[0]}" > /dev/null
+			then
+				current_usable_ipv6="true"
+			fi
+		fi
+
+		local currentPID_1
+		local currentPID_2
+		currentIteration=0
+		local currentIterationNext1
+		let currentIterationNext1=currentIteration+1
+		while [[ "${currentURL_array_reversed[$currentIteration]}" != "" ]] || [[ "${currentURL_array_reversed[$currentIterationNext1]}" != "" ]]
+		do
+			#rm -f "$currentAxelTmpFile"
+			rm -f "$currentAxelTmpFile".aria2
+			rm -f "$currentAxelTmpFile".tmp
+			rm -f "$currentAxelTmpFile".tmp.st
+			rm -f "$currentAxelTmpFile".tmp.aria2
+			rm -f "$currentAxelTmpFile".tmp1
+			rm -f "$currentAxelTmpFile".tmp1.st
+			rm -f "$currentAxelTmpFile".tmp1.aria2
+			rm -f "$currentAxelTmpFile".tmp2
+			rm -f "$currentAxelTmpFile".tmp2.st
+			rm -f "$currentAxelTmpFile".tmp2.aria2
+			
+			rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+
+			# https://github.com/aria2/aria2/issues/1108
+
+			# Download preferring from IPv6 address .
+			if [[ "$current_usable_ipv6" == "true" ]]
+			then
+				if [[ "$GH_TOKEN" == "" ]]
+				then
+					#--file-allocation=falloc
+					_messagePlain_probe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false "${currentURL_array_reversed[$currentIteration]}" >&2
+					aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
+					currentPID_1="$!"
+				else
+					_messagePlain_probe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIteration]}" >&2
+					aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
+					currentPID_1="$!"
+				fi
+			else
+				if [[ "$GH_TOKEN" == "" ]]
+				then
+					_messagePlain_probe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=true "${currentURL_array_reversed[$currentIteration]}" >&2
+					aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=true "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
+					currentPID_1="$!"
+				else
+					_messagePlain_probe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=true --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIteration]}" >&2
+					aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=true --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
+					currentPID_1="$!"
+				fi
+			fi
+
+			# ATTENTION: Staggered.
+			#sleep 8 > /dev/null 2>&1
+
+			# Download preferring from IPv4 address.
+			#--disable-ipv6
+			if [[ "$current_usable_ipv4" == "true" ]]
+			then
+				if [[ "$GH_TOKEN" == "" ]]
+				then
+					_messagePlain_probe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true "${currentURL_array_reversed[$currentIterationNext1]}" >&2
+					aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
+					currentPID_2="$!"
+				else
+					_messagePlain_probe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIterationNext1]}" >&2
+					aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
+					currentPID_2="$!"
+				fi
+			else
+				if [[ "$GH_TOKEN" == "" ]]
+				then
+					_messagePlain_probe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false "${currentURL_array_reversed[$currentIterationNext1]}" >&2
+					aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
+					currentPID_2="$!"
+				else
+					_messagePlainProbe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIterationNext1]}" >&2
+					aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
+					currentPID_2="$!"
+				fi
+			fi
+			
+
+			# ATTENTION: NOT staggered.
+			wait "$currentPID_1" >&2
+			#wait "$currentPID_2" >&2
+			wait >&2
+
+			wait "$currentPID_1" >&2
+			sleep 0.2 > /dev/null 2>&1
+			if [[ -e "$currentAxelTmpFile".tmp1 ]]
+			then
+				_messagePlain_probe dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
+				
+				if [[ ! -e "$currentAxelTmpFile" ]]
+				then
+					mv -f "$currentAxelTmpFile".tmp1 "$currentAxelTmpFile"
+				else
+					# ATTENTION: Staggered.
+					#dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress >> "$currentAxelTmpFile" &
+				
+					# ATTENTION: NOT staggered.
+					dd if="$currentAxelTmpFile".tmp1 bs=5M status=progress >> "$currentAxelTmpFile"
+				
+					#cat "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
+				fi
+			fi
+
+			# ATTENTION: Staggered.
+			#sleep 10 > /dev/null 2>&1
+			##wait "$currentPID_2" >&2
+			#wait >&2
+
+			sleep 0.2 > /dev/null 2>&1
+			if [[ -e "$currentAxelTmpFile".tmp2 ]]
+			then
+				_messagePlain_probe dd if="$currentAxelTmpFile".tmp2 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
+				dd if="$currentAxelTmpFile".tmp2 bs=5M status=progress >> "$currentAxelTmpFile"
+				#cat "$currentAxelTmpFile".tmp2 >> "$currentAxelTmpFile"
+			fi
+
+			let currentIteration=currentIteration+2
+			let currentIterationNext1=currentIteration+1
+		done
+		
+
+		#for currentValue in "${currentURL_array_reversed[@]}"
+		#do
+			#rm -f "$currentAxelTmpFile".tmp
+			
+			
+			##_messagePlain_probe axel -a -n "$currentForceAxel" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
+			##axel -a -n "$currentForceAxel" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
+			#if [[ "$GH_TOKEN" == "" ]]
+			#then
+				#_messagePlain_probe axel -a -n "$currentForceAxel" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
+				#axel -a -n "$currentForceAxel" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
+			#else
+				#_messagePlain_probe axel -a -n "$currentForceAxel" -H '"Authorization: Bearer $GH_TOKEN"' -o "$currentAxelTmpFile".tmp "$currentValue" >&2
+				#axel -a -n "$currentForceAxel" -H "Authorization: Bearer $GH_TOKEN" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
+			#fi
+			
+			
+			#_messagePlain_probe dd if="$currentAxelTmpFile".tmp bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
+			#dd if="$currentAxelTmpFile".tmp bs=1M status=progress >> "$currentAxelTmpFile"
+			#let currentIteration=currentIteration+1
+		#done
+
+		#while [[ "$currentIteration" -le 16 ]] && [[ ! -e "$currentAxelTmpFile" ]]
+		#do
+			#sleep 2 > /dev/null 2>&1
+			#let currentIteration="$currentIteration"+1
+		#done
+
+		#if [[ -e "$currentAxelTmpFile" ]]
+		#then
+			#tail --pid="$currentAxelPID" -c 100000000000 -f "$currentAxelTmpFile"
+			#wait "$currentAxelPID"
+		#else
+			#_messagePlain_bad 'missing: "$currentAxelTmpFile"' >&2
+			#kill -TERM "$currentAxelPID" > /dev/null 2>&1
+			#kill -TERM "$currentAxelPID" > /dev/null 2>&1
+			#sleep 3
+			#kill -TERM "$currentAxelPID" > /dev/null 2>&1
+			#sleep 3
+			#kill -TERM "$currentAxelPID" > /dev/null 2>&1
+			#kill -KILL "$currentAxelPID" > /dev/null 2>&1
+			#return 1
+		#fi
+
+		if ! [[ -e "$currentAxelTmpFile" ]]
+		then
+			return 1
+		fi
+
+		cat "$currentAxelTmpFile"
+
+		rm -f "$currentAxelTmpFile"
+		rm -f "$currentAxelTmpFile".aria2
+		rm -f "$currentAxelTmpFile".tmp
+		rm -f "$currentAxelTmpFile".tmp.st
+		rm -f "$currentAxelTmpFile".tmp.aria2
+		rm -f "$currentAxelTmpFile".tmp1
+		rm -f "$currentAxelTmpFile".tmp1.st
+		rm -f "$currentAxelTmpFile".tmp1.aria2
+		rm -f "$currentAxelTmpFile".tmp2
+		rm -f "$currentAxelTmpFile".tmp2.st
+		rm -f "$currentAxelTmpFile".tmp2.aria2
+			
+		rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+		
+		return 0
+	else
+		if [[ "$GH_TOKEN" == "" ]]
+		then
+			_messagePlain_probe curl -L "${currentURL_array_reversed[@]}" >&2
+			curl -L "${currentURL_array_reversed[@]}"
+		else
+			_messagePlain_probe curl -H '"Authorization: Bearer $GH_TOKEN"' -L "${currentURL_array_reversed[@]}" >&2
+			curl -H "Authorization: Bearer $GH_TOKEN" -L "${currentURL_array_reversed[@]}"
+		fi
+		return
+	fi
+
+
+	cd "$functionEntryPWD"
 }
 
 _wget_githubRelease_join() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+
 	_messagePlain_probe _wget_githubRelease_join-stdout "$@" '>' "$3" >&2
-	_wget_githubRelease_join-stdout "$@" > "$3"
+	if [[ "$FORCE_AXEL" != "" ]]
+	then
+		_wget_githubRelease_join-stdout "$@" > "$3"
+	else
+		_wget_githubRelease_join-stdout "$@" > "$3"
+	fi
+
+	cd "$functionEntryPWD"
 	[[ ! -e "$3" ]] && _messagePlain_bad 'missing: '"$1"' '"$2"' '"$3" && return 1
+
+	cd "$functionEntryPWD"
 	return 0
 }
 
@@ -9693,14 +10060,18 @@ _kernelConfig_require-tradeoff-perform() {
 	_kernelConfig__bad-n__ CONFIG_SLAB_FREELIST_HARDENED
 	
 	# Uncertain.
-	_kernelConfig__bad-__n CONFIG_X86_SGX
-	_kernelConfig__bad-__n CONFIG_INTEL_TDX_GUEST
-	_kernelConfig__bad-__n CONFIG_X86_SGX_kVM
-	_kernelConfig__bad-__n CONFIG_KVM_AMD_SEV
+	_kernelConfig__bad-__n CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
 	
 	
 	_kernelConfig__bad-__n CONFIG_RANDOMIZE_BASE
 	_kernelConfig__bad-__n CONFIG_RANDOMIZE_MEMORY
+
+
+	# Special.
+	#_kernelConfig_warn-n__ CONFIG_HAVE_INTEL_TXT
+	_kernelConfig_warn-n__ CONFIG_INTEL_TXT
+	#_kernelConfig_warn-n__ CONFIG_IOMMU_DMA
+	#_kernelConfig_warn-n__ CONFIG_INTEL_IOMMU
 }
 
 # May become increasing tolerable and preferable for the vast majority of use cases.
@@ -9731,10 +10102,6 @@ _kernelConfig_require-tradeoff-harden() {
 	# May have been removed from upstream.
 	#_kernelConfig__bad-y__ CONFIG_X86_SMAP
 	
-	# Uncertain. VM guest should be tested.
-	_kernelConfig_warn-y__ AMD_MEM_ENCRYPT
-	_kernelConfig_warn-y__ CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
-	
 	_kernelConfig_warn-n__ CONFIG_X86_INTEL_TSX_MODE_ON
 	_kernelConfig_warn-n__ CONFIG_X86_INTEL_TSX_MODE_AUTO
 	_kernelConfig__bad-y__ CONFIG_X86_INTEL_TSX_MODE_OFF
@@ -9742,15 +10109,55 @@ _kernelConfig_require-tradeoff-harden() {
 	
 	_kernelConfig_warn-y__ CONFIG_SLAB_FREELIST_HARDENED
 	
-	# Uncertain.
-	_kernelConfig_warn-y__ CONFIG_X86_SGX
-	_kernelConfig_warn-y__ CONFIG_INTEL_TDX_GUEST
-	_kernelConfig_warn-y__ CONFIG_X86_SGX_kVM
-	_kernelConfig_warn-y__ CONFIG_KVM_AMD_SEV
-	
 	
 	_kernelConfig__bad-y__ CONFIG_RANDOMIZE_BASE
 	_kernelConfig__bad-y__ CONFIG_RANDOMIZE_MEMORY
+
+
+
+
+
+
+
+	# Special.
+	# VM guest should be tested.
+
+	# https://wiki.gentoo.org/wiki/Trusted_Boot
+	_kernelConfig__bad-y__ CONFIG_HAVE_INTEL_TXT
+	_kernelConfig__bad-y__ CONFIG_INTEL_TXT
+	_kernelConfig__bad-y__ CONFIG_IOMMU_DMA
+	_kernelConfig__bad-y__ CONFIG_INTEL_IOMMU
+
+
+	# https://www.qemu.org/docs/master/system/i386/sgx.html
+	#grep sgx /proc/cpuinfo
+	#dmesg | grep sgx
+	# Apparently normal: ' sgx: [Firmware Bug]: Unable to map EPC section to online node. Fallback to the NUMA node 0. '
+
+	# https://www.qemu.org/docs/master/system/i386/sgx.html
+	#qemuArgs+=(-cpu host,+sgx-provisionkey -machine accel=kvm -object memory-backend-epc,id=mem1,size=64M,prealloc=on -M sgx-epc.0.memdev=mem1,sgx-epc.0.node=0 )
+	#qemuArgs+=(-cpu host,-sgx-provisionkey,-sgx-tokenkey)
+
+	_kernelConfig__bad-y__ CONFIG_X86_SGX
+	_kernelConfig__bad-y__ CONFIG_X86_SGX_kVM
+	_kernelConfig__bad-y__ CONFIG_INTEL_TDX_GUEST
+	_kernelConfig__bad-y__ TDX_GUEST_DRIVER
+
+
+	# https://libvirt.org/kbase/launch_security_sev.html
+	#cat /sys/module/kvm_amd/parameters/sev
+	#dmesg | grep -i sev
+
+	# https://www.qemu.org/docs/master/system/i386/amd-memory-encryption.html
+	#qemuArgs+=(-machine accel=kvm,confidential-guest-support=sev0 -object sev-guest,id=sev0,cbitpos=47,reduced-phys-bits=1 )
+	# #,policy=0x5
+
+	# https://libvirt.org/kbase/launch_security_sev.html
+	_kernelConfig__bad-y__ CONFIG_KVM_AMD_SEV
+	_kernelConfig__bad-y__ AMD_MEM_ENCRYPT
+	_kernelConfig__bad-y__ CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
+
+
 }
 
 # ATTENTION: Override with 'ops.sh' or similar.
@@ -10448,6 +10855,7 @@ _kernelConfig_mobile() {
 }
 
 # NOTICE: Recommended! Most 'mobile' and 'panel' use cases will not benefit enough from power efficiency, reduced CPU cycles, or performance.
+# WARNING: Security should be favored by tradeoff, as this may be shipped as the 'default' kernel (eg. for 'ubdist') .
 # ATTENTION: As desired, ignore, or override with 'ops.sh' or similar.
 _kernelConfig_desktop() {
 	_messageNormal 'kernelConfig: desktop'
@@ -10484,6 +10892,14 @@ _kernelConfig_desktop() {
 	
 	
 	_kernelConfig_request_build
+}
+
+# Forces 'kernelConfig_tradeoff_perform == false' .
+_kernelConfig_server() {
+	_messageNormal 'kernelConfig: server'
+
+	export kernelConfig_tradeoff_perform='false'
+	_kernelConfig_desktop "$@"
 }
 
 
@@ -10538,6 +10954,27 @@ _importShortcuts() {
 	
 	return 0
 }
+
+
+# CAUTION: Compatibility with shells other than bash is apparently important .
+# CAUTION: Compatibility with bash shell is important (eg. for '_dropBootdisc' ) .
+_setupUbiquitous_accessories_here-plasma_hook() {
+	cat << CZXWXcRMTo8EmM8i4d
+
+# sourced by /usr/lib/x86_64-linux-gnu/libexec/plasma-sourceenv.sh
+
+LANG=C
+export LANG
+
+CZXWXcRMTo8EmM8i4d
+
+	_setupUbiquitous_accessories_here-nixenv-bashrc
+
+	
+}
+
+
+
 
 
 # ATTENTION: Override with 'ops.sh' , 'core.sh' , or similar.
@@ -10805,6 +11242,21 @@ _setupUbiquitous_accessories_here-nixenv-bashrc() {
 
 [[ -e "$HOME"/.nix-profile/etc/profile.d/nix.sh ]] && . "$HOME"/.nix-profile/etc/profile.d/nix.sh
 
+# WARNING: Binaries from Nix should not be prepended to Debian PATH, as they may be incompatible with other Debian software (eg. incorrect Python version).
+# Scripts that need to rely preferentially on Nix binaries should detect this situation, defining and calling an appropriate wrapper function.
+# CAUTION: SEVERE - Issue unresolved. PATH written out to log file matches ' [[ "\$PATH" == *"nix-profile/bin"* ]] ' when run through interactive shell, but, with the exact same PATH value, not when called through some script contexts (eg. 'plasma-workspace/env' ) . Yet grep does match .
+#  Hidden or invalid characters in "\$PATH" would seem a sensible cause, but how grep would disregard this while bash would not, seems difficult to explain.
+#  Expected cause is interpretation by a shell other than bash .
+#   CAUTION: Compatability with shells other than bash may be important .
+# CAUTION: Compatibility with bash shell is important (eg. for '_dropBootdisc' ) .
+if echo "\$PATH" | grep 'nix-profile/bin' > /dev/null 2>&1 || [[ "\$PATH" == *"nix-profile/bin"* ]]
+then
+	PATH=\$(echo "\$PATH" | sed 's|:'"$HOME"'/.nix-profile/bin||g;s|'"$HOME"'/.nix-profile/bin:||g')
+	export PATH
+	PATH="\$PATH":"$HOME"/.nix-profile/bin
+	export PATH
+fi
+
 CZXWXcRMTo8EmM8i4d
 }
 
@@ -10824,6 +11276,19 @@ CZXWXcRMTo8EmM8i4d
 
 
 
+
+
+_setupUbiquitous_accessories-plasma() {
+	_messagePlain_nominal 'init: _setupUbiquitous_accessories-plasma'
+	
+	mkdir -p "$HOME"/.config/plasma-workspace/env
+
+	_setupUbiquitous_accessories_here-plasma_hook > "$HOME"/.config/plasma-workspace/env/profile.sh
+	chmod u+x "$HOME"/.config/plasma-workspace/env/profile.sh
+	
+	
+	return 0
+}
 
 _setupUbiquitous_accessories-gnuoctave() {
 	_messagePlain_nominal 'init: _setupUbiquitous_accessories-gnuoctave'
@@ -10906,6 +11371,9 @@ _setupUbiquitous_accessories-git() {
 
 
 _setupUbiquitous_accessories() {
+
+	_setupUbiquitous_accessories-plasma "$@"
+
 	
 	_setupUbiquitous_accessories-gnuoctave "$@"
 	
@@ -10983,6 +11451,10 @@ CZXWXcRMTo8EmM8i4d
 [[ "\$profileScriptLocation" == "" ]] && export profileScriptLocation_new='true'
 
 CZXWXcRMTo8EmM8i4d
+
+	# WARNING: CAUTION: Precautionary. No known issues, may be unnecessary. Unusual.
+	#However, theoretically nix package manager could otherwise override default programs (eg. python , gschem , pcb) before 'ubiquitous_bash' , causing severely incompatible shell environment configuration .
+	_setupUbiquitous_accessories_here-nixenv-bashrc
 
 
 	cat << CZXWXcRMTo8EmM8i4d
@@ -11983,6 +12455,7 @@ then
 	if [[ "$tmpSelf" == "" ]]
 	then
 		export tmpWSL="$HOME"/.ubtmp
+		[[ "$realHome" != "" ]] && export tmpWSL="$realHome"/.ubtmp
 		[[ ! -e "$tmpWSL" ]] && mkdir -p "$tmpWSL"
 		
 		if [[ "$tmpWSL" != "" ]]
@@ -12233,7 +12706,12 @@ _set_lang-forWSL() {
 }
 
 
-
+_set_discreteGPU-forWSL() {
+    [[ "$MESA_D3D12_DEFAULT_ADAPTER_NAME" != "" ]] && return 0
+    
+    # https://github.com/microsoft/wslg/wiki/GPU-selection-in-WSLg
+    glxinfo -B | grep -i intel > /dev/null 2>&1 && export MESA_D3D12_DEFAULT_ADAPTER_NAME=NVIDIA
+}
 
 
 _set_msw_wsl() {
@@ -12253,6 +12731,8 @@ _set_wsl() {
     _set_qt5ct
 
     [[ "$LIBVA_DRIVER_NAME" != "d3d12" ]] && export LIBVA_DRIVER_NAME=d3d12
+
+    _set_discreteGPU-forWSL
 
     return 0
 }
@@ -15092,7 +15572,12 @@ _prepare_abstract() {
 	else
 		if ! chown "$USER":"$USER" "$abstractfs_root" > /dev/null 2>&1
 		then
-			! /sbin/chown "$USER" "$abstractfs_root" && exit 1
+			if [[ -e /sbin/chown ]]
+			then
+				! /sbin/chown "$USER" "$abstractfs_root" && exit 1
+			else
+				! /usr/bin/chown "$USER" "$abstractfs_root" && exit 1
+			fi
 		fi
 	fi
 	
@@ -15112,7 +15597,12 @@ _prepare_abstract() {
 	else
 		if ! chown "$USER":"$USER" "$abstractfs_lock" > /dev/null 2>&1
 		then
-			! /sbin/chown "$USER" "$abstractfs_lock" && exit 1
+			if [[ -e /sbin/chown ]]
+			then
+				! /sbin/chown "$USER" "$abstractfs_lock" && exit 1
+			else
+				! /usr/bin/chown "$USER" "$abstractfs_lock" && exit 1
+			fi
 		fi
 	fi
 }
@@ -15264,6 +15754,30 @@ _stop() {
 	
 	[[ "$tmpSelf" != "$scriptAbsoluteFolder" ]] && [[ "$tmpSelf" != "/" ]] && [[ -e "$tmpSelf" ]] && rmdir "$tmpSelf" > /dev/null 2>&1
 	rm -f "$scriptAbsoluteFolder"/__d_$(echo "$sessionid" | head -c 16) > /dev/null 2>&1
+
+	#currentAxelTmpFile="$scriptAbsoluteFolder"/.m_axelTmp_$(_uid 14)
+	if [[ "$currentAxelTmpFile" != "" ]]
+	then
+		rm -f "$currentAxelTmpFile" > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".st > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp.st > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp.aria2 > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp1 > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp1.st > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp1.aria2 > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp2 > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp2.st > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp2.aria2 > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp3 > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp3.st > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp3.aria2 > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp4 > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp4.st > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".tmp4.aria2 > /dev/null 2>&1
+			
+		rm -f "$currentAxelTmpFile"* > /dev/null 2>&1
+	fi
 	
 	_stop_stty_echo
 	if [[ "$1" != "" ]]
@@ -16008,10 +16522,20 @@ _testarglength() {
 	
 	
 	# Typical UNIX.
-	if [[ "$testArgLength" -lt 131071 ]]
+	# && [[ "$testArgLength" != "" ]]
+	if [[ "$testArgLength" -lt 131071 ]] && [[ "$testArgLength" != "-1" ]] && [[ "$testArgLength" != "undefined" ]]
 	then
+
 		# Typical Cygwin. Marginal result at best.
 		[[ "$testArgLength" -ge 32000 ]] && uname -a | grep -i 'cygwin' > /dev/null 2>&1 && _messagePASS && return 0
+		if _if_cygwin
+		then
+			# Fortunately, as of 2023-09-08 , from questions to the Cygwin mailing list, reportedly the undefined 'ARG_MAX' is a standards compliant delimiter of no limit except system resource limit.
+			# Unfortunately, as of 2023-09-07 , apparently Cygwin has removed the 'ARG_MAX' definition from the provided 'getconf' .
+			# Due to the narrower use case of Cygwin/MSW (as opposed to GNU/Linux) - not expecting to compile gEDA for Cygwin anytime soon - it will be more of a concern if other binaries in 'ubcp' cease to exist because newer versions of Cygwin packages upstream were failing to compile as a result. Hopefully, Cygwin itself has adequate testing to prevent release of such breakage.
+			#echo "$testArgLength"
+			return 0
+		fi
 		
 		_messageFAIL && _stop 1
 	fi
@@ -18688,6 +19212,31 @@ _check_nv-mainline-series535p() {
 #legacy470
 
 #lts
+
+
+
+
+
+
+_check_vbox-mainline() {
+    export getMost_backend="direct"
+	_set_getMost_backend "$@"
+	_set_getMost_backend_debian "$@"
+	_test_getMost_backend "$@"
+	
+	_getMost_backend apt-get update
+    
+    ! _getMost_ubuntu22-VBoxManage && exit 1
+
+
+
+    _messageFAIL
+    _stop 1
+    return 1
+}
+
+
+
 
 
 #currentReversePort=""

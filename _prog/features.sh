@@ -70,3 +70,28 @@ _check_nv-mainline-series535p() {
 
 #lts
 
+
+
+
+
+
+_check_vbox-mainline() {
+    export getMost_backend="direct"
+	_set_getMost_backend "$@"
+	_set_getMost_backend_debian "$@"
+	_test_getMost_backend "$@"
+	
+	_getMost_backend apt-get update
+    
+    ! _getMost_ubuntu22-VBoxManage && exit 1
+
+
+
+    _messageFAIL
+    _stop 1
+    return 1
+}
+
+
+
+

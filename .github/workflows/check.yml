@@ -86,6 +86,9 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
+
+
+
   check_mainline:
     runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
     #runs-on: ubuntu-20.04
@@ -119,24 +122,24 @@ jobs:
         #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-docker-images: 'true'
     - uses: actions/checkout@v2
-    #- name: _getMinimal_cloud
-      #shell: bash
-      #run: |
-        #./ubiquitous_bash.sh _getMinimal_cloud
-      #timeout-minutes: 90
+    - name: _getMinimal_cloud
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _getMinimal_cloud
+      timeout-minutes: 90
     - name: _fetchKernel-mainline
       shell: bash
       run: |
         export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
         #./ubiquitous_bash.sh _fetchKernel-mainline
         ./ubiquitous_bash.sh _fetchKernel-mainline-legacyHTTPS
-    #- name: _build_cloud_mainline
-      #shell: bash
-      #run: |
-        #export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
-        #./ubiquitous_bash.sh _build_cloud_prepare
-        #./ubiquitous_bash.sh _build_cloud_mainline
-      #timeout-minutes: 300
+    - name: _build_cloud_mainline
+      shell: bash
+      run: |
+        export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
+        ./ubiquitous_bash.sh _build_cloud_prepare
+        ./ubiquitous_bash.sh _build_cloud_mainline
+      timeout-minutes: 300
     #- name: _export_cloud_mainline
       #shell: bash
       #run: |
@@ -162,7 +165,7 @@ jobs:
         #name: build-mainline
         #path: |
           #./_local/_export/linux-mainline-amd64-debian.tar.gz
-      timeout-minutes: 90
+      #timeout-minutes: 90
     - name: _check_nv-mainline-series535p
       shell: bash
       run: |
@@ -170,6 +173,26 @@ jobs:
       timeout-minutes: 300
 
 
+    # For vbox kernel module make .
+    - name: _getMost_ubuntu22-VBoxManage
+      shell: bash
+      run: |
+        #! ./ubiquitous_bash.sh _getMost && exit 1
+        #true
+        #! sudo -n apt-get -y clean && exit 1
+        #! ./ubiquitous_bash.sh _getMost_debian11_aptSources && exit 1
+        #sudo -n apt-get update
+        #! sudo -n apt-get -d install -y virtualbox-7.0 && exit 1
+        ! sudo -n ./ubiquitous_bash.sh _getMost_ubuntu22-VBoxManage && exit 1
+        df -h
+        df -h /
+
+
+    - name: _check_vbox-mainline
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_vbox-mainline
+      timeout-minutes: 300
 
 
 
