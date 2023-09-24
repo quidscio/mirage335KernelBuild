@@ -22,7 +22,7 @@ on:
     inputs:
       runnerName:
         required: false
-        default: ubuntu-latest-h
+        default: ubuntu-latest
         type: choice
         options:
         - ubuntu-latest
@@ -128,6 +128,11 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
+    - name: _fetchKernel-mainline
+      shell: bash
+      run: |
+        #./ubiquitous_bash.sh _fetchKernel-mainline
+        ./ubiquitous_bash.sh _fetchKernel-mainline-legacyHTTPS
     #- name: _build_cloud_mainline
       #shell: bash
       #run: |
@@ -159,10 +164,6 @@ jobs:
         #name: build-mainline
         #path: |
           #./_local/_export/linux-mainline-amd64-debian.tar.gz
-    - name: _fetchKernel-mainline
-      shell: bash
-      run: |
-        ./ubiquitous_bash.sh _fetchKernel-mainline
       timeout-minutes: 90
     - name: _check_nv-mainline-series535p
       shell: bash

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3711142836'
+export ub_setScriptChecksum_contents='2682100930'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -18592,6 +18592,64 @@ _main() {
 	
 	_stop
 }
+
+
+_check_nv_sequence() {
+    _start
+    local currentExitStatus
+    local functionEntryPWD="$PWD"
+
+    local currentVersion=$("$safeTmp"/_get_nvidia.sh _write_nvidia-"$1")
+    _messagePlain_probe_var currentVersion
+
+
+    cd "$safeTmp"
+    wget https://raw.githubusercontent.com/soaringDistributions/ubDistBuild/main/_lib/setup/nvidia/_get_nvidia.sh
+    ! [[ -e "$safeTmp"/_get_nvidia.sh ]] && _messagePlain_bad 'bad: missing: _get_nvidia.sh' && return 1
+    chmod u+x "$safeTmp"/_get_nvidia.sh
+
+    ! "$safeTmp"/_get_nvidia.sh _fetch_nvidia-wget "$currentVersion" && return 1
+    ! [[ -e "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run ]] && _messagePlain_bad 'bad: missing: NVIDIA-Linux-x86_64-"$currentVersion".run' && return 1
+	return 0
+
+
+    "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only
+    cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
+
+
+
+    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+
+    export SYSRC="$currentKernelPath"
+    export IGNORE_CC_MISMATCH=1
+
+
+    cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
+
+    make clean
+
+    make -j $(nproc)
+    currentExitStatus="$?"
+
+    
+
+    cd "$localFunctionEntryPWD"
+    if [[ "$currentExitStatus" != "0" ]]
+    then
+        _messageFAIL
+        _stop 1
+        return 1
+    fi
+    _stop "$currentExitStatus"
+}
+_check_nv-mainline-series535p() {
+    "$scriptAbsoluteLocation" _check_nv_sequence "series535p" "mainline" "$@"
+}
+
+#legacy470
+
+#lts
+
 
 #currentReversePort=""
 #currentMatchingReversePorts=""
