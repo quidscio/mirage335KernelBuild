@@ -80,12 +80,12 @@ jobs:
         remove-codeql: 'true'
         #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-docker-images: 'true'
-    - uses: actions/checkout@v2
-    - name: _getMinimal_cloud
-      shell: bash
-      run: |
-        ./ubiquitous_bash.sh _getMinimal_cloud
-      timeout-minutes: 90
+    #- uses: actions/checkout@v2
+    #- name: _getMinimal_cloud
+      #shell: bash
+      #run: |
+        #./ubiquitous_bash.sh _getMinimal_cloud
+      #timeout-minutes: 90
   check_mainline:
     runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
     #runs-on: ubuntu-20.04

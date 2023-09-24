@@ -15,7 +15,6 @@ _check_nv_sequence() {
 
     ! "$safeTmp"/_get_nvidia.sh _fetch_nvidia-wget "$currentVersion" && return 1
     ! [[ -e "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run ]] && _messagePlain_bad 'bad: missing: NVIDIA-Linux-x86_64-"$currentVersion".run' && return 1
-	return 0
 
 
     "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only
