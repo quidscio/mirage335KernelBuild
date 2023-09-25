@@ -343,7 +343,15 @@ _buildKernel-lts() {
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
 	
-	make deb-pkg -j $(nproc)
+	if [[ "$current_force_bindepOnly" != true ]]
+	then
+		make deb-pkg -j $(nproc)
+	else
+		_messageError 'bad: current_force_bindepOnly'
+		export current_force_bindepOnly=""
+		unset current_force_bindepOnly
+		make bindeb-pkg -j $(nproc)
+	fi
 	[[ "$?" != "0" ]] && _messageFAIL
 	
 	return 0
@@ -369,7 +377,15 @@ _buildKernel-mainline() {
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
 	
-	make deb-pkg -j $(nproc)
+	if [[ "$current_force_bindepOnly" != true ]]
+	then
+		make deb-pkg -j $(nproc)
+	else
+		_messageError 'bad: current_force_bindepOnly'
+		export current_force_bindepOnly=""
+		unset current_force_bindepOnly
+		make bindeb-pkg -j $(nproc)
+	fi
 	[[ "$?" != "0" ]] && _messageFAIL
 	
 	return 0

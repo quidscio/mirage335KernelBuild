@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='864496610'
+export ub_setScriptChecksum_contents='28801096'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -18798,7 +18798,15 @@ _buildKernel-lts() {
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
 	
-	make deb-pkg -j $(nproc)
+	if [[ "$current_force_bindepOnly" != true ]]
+	then
+		make deb-pkg -j $(nproc)
+	else
+		_messageError 'bad: current_force_bindepOnly'
+		export current_force_bindepOnly=""
+		unset current_force_bindepOnly
+		make bindeb-pkg -j $(nproc)
+	fi
 	[[ "$?" != "0" ]] && _messageFAIL
 	
 	return 0
@@ -18824,7 +18832,15 @@ _buildKernel-mainline() {
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
 	
-	make deb-pkg -j $(nproc)
+	if [[ "$current_force_bindepOnly" != true ]]
+	then
+		make deb-pkg -j $(nproc)
+	else
+		_messageError 'bad: current_force_bindepOnly'
+		export current_force_bindepOnly=""
+		unset current_force_bindepOnly
+		make bindeb-pkg -j $(nproc)
+	fi
 	[[ "$?" != "0" ]] && _messageFAIL
 	
 	return 0
