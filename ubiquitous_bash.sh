@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3833207745'
+export ub_setScriptChecksum_contents='4117121815'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -18504,7 +18504,7 @@ _fetchKernel-lts-legacyHTTPS() {
 	cd "$scriptLocal"/lts
 	
 	#currentKernelURL="https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.10.61.tar.xz"
-	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep '5\.10' | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
+	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep '6\.1\.' | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
 	export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
 	export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
 	
@@ -18559,29 +18559,49 @@ _fetchKernel-lts() {
 	cd "$scriptLocal"/lts
 
 
-	# ATTENTION: Omit the trailing '.' if patchlevel is "" . Usually though, for a preferable well established LTS kernel, the patchlevel will not be empty.
-	# WARNING: May not be tested with an empty patchlevel.
-	#export currentKernel_MajorMinor='5.10.'
-	export currentKernel_MajorMinor='6.1.'
-	export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
+	if [[ "$forceKernel_lts" == "" ]]
+	then
+		# ATTENTION: Omit the trailing '.' if patchlevel is "" . Usually though, for a preferable well established LTS kernel, the patchlevel will not be empty.
+		# WARNING: May not be tested with an empty patchlevel.
+		#export currentKernel_MajorMinor='5.10.'
+		export currentKernel_MajorMinor='6.1.'
+		export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
 
-	# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.
-	#git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
-	#cd "$scriptLocal"/lts/linux
-	#export currentKernel_patchLevel=$(git tag | grep '^v'"$currentKernel_MajorMinor_regex" | sed 's/v'"$currentKernel_MajorMinor_regex"'//g' | tr -dc '0-9\.\n' | sort -n | tail -n1)
-	#export currentKernelName=linux-"$currentKernel_MajorMinor""$currentKernel_patchLevel"
-	#cd "$scriptLocal"/lts
+		# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.
+		#git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
+		#cd "$scriptLocal"/lts/linux
+		#export currentKernel_patchLevel=$(git tag | grep '^v'"$currentKernel_MajorMinor_regex" | sed 's/v'"$currentKernel_MajorMinor_regex"'//g' | tr -dc '0-9\.\n' | sort -n | tail -n1)
+		#export currentKernelName=linux-"$currentKernel_MajorMinor""$currentKernel_patchLevel"
+		#cd "$scriptLocal"/lts
 
 
-	export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep "$currentKernel_MajorMinor_regex" | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
-	export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
-	export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
+		export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep "$currentKernel_MajorMinor_regex" | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
+		export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
+		export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
 
-	export export currentKernel_patchLevel=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 3 -d '.')
+		export currentKernel_patchLevel=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 3 -d '.')
+
+		export currentKernel_version="$currentKernel_MajorMinor""$currentKernel_patchLevel"
+	else
+		export forceKernel_lts_regex=$(echo "$forceKernel_lts" | sed 's/\./\\./g')
+
+		export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep "$forceKernel_lts_regex" | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
+		export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
+		export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
+
+		export currentKernel_version=$(echo "$currentKernelName" | tr -dc '0-9\.\n')
+	fi
+
 
 	_messagePlain_probe_var currentKernelURL
 	_messagePlain_probe_var currentKernelName
 	_messagePlain_probe_var currentKernelPath
+
+	_messagePlain_probe_var currentKernel_MajorMinor
+
+	_messagePlain_prove_var currentKernel_version
+
+	_messagePlain_probe v"$currentKernel_MajorMinor""$currentKernel_patchLevel"
 
 	
 	cd "$scriptLocal"/lts
@@ -18599,11 +18619,13 @@ _fetchKernel-lts() {
 		then
 			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
-			! git clone --branch v"$currentKernel_MajorMinor""$currentKernel_patchLevel" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
+			#! git clone --branch v"$currentKernel_MajorMinor""$currentKernel_patchLevel" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
+			! git clone --branch v"$currentKernel_version" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
 		
 		cd "$scriptLocal"/lts/linux
-		! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
+		#! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
+		! git checkout v"$currentKernel_version" && _messageError 'fail: git: checkout: 'v"$currentKernel_version" && _messageFAIL && _stop 1
 
 
 
@@ -18647,29 +18669,20 @@ _fetchKernel-mainline() {
 		[[ "$currentKernel_Minor" != "" ]] && export currentKernel_MajorMinor="$currentKernel_Major"".""$currentKernel_Minor"
 		[[ "$currentKernel_patchLevel" != "" ]] && export currentKernel_MajorMinor="$currentKernel_MajorMinor""."
 		export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
+
+		export currentKernel_version="$currentKernel_MajorMinor""$currentKernel_patchLevel"	
 	else
-		export currentKernel_MajorMinor="$forceKernel_mainline"
-		
-		# ATTENTION: Omit the trailing '.' if patchlevel is "" . Usually though, for a preferable well established LTS kernel, the patchlevel will not be empty.
-		# WARNING: May not be tested with an empty patchlevel.
-		#export currentKernel_MajorMinor='5.10.'
-		#export currentKernel_MajorMinor='6.1.'
-		export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
+		export forceKernel_mainline_regex=$(echo "$forceKernel_mainline" | sed 's/\./\\./g')
 
 		# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.
-		#git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
-		#cd "$scriptLocal"/lts/linux
-		#export currentKernel_patchLevel=$(git tag | grep '^v'"$currentKernel_MajorMinor_regex" | sed 's/v'"$currentKernel_MajorMinor_regex"'//g' | tr -dc '0-9\.\n' | sort -n | tail -n1)
-		#export currentKernelName=linux-"$currentKernel_MajorMinor""$currentKernel_patchLevel"
-		#cd "$scriptLocal"/lts
-
-
-		export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep "$currentKernel_MajorMinor_regex" | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
-		export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
-		export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
-
-		export export currentKernel_patchLevel=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 3 -d '.')
+		# Specific, not latest, versions are expected always available from git tags . Robust for that usage.
+		git config --global checkout.workers -1
+		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | grep '^v'"$forceKernel_mainline_regex" | sed 's/^.*refs\/tags\/v//g' | sort -n | tail -n1)
+		export currentKernelName=linux-"$currentKernel_version"
+		export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
 	fi
+
+	
 
 	_messagePlain_probe_var currentKernelURL
 	_messagePlain_probe_var currentKernelName
@@ -18677,7 +18690,7 @@ _fetchKernel-mainline() {
 
 	_messagePlain_probe_var currentKernel_MajorMinor
 
-	_messagePlain_probe v"$currentKernel_MajorMinor""$currentKernel_patchLevel"
+	_messagePlain_prove_var currentKernel_version
 	
 	cd "$scriptLocal"/mainline
 
@@ -18694,11 +18707,13 @@ _fetchKernel-mainline() {
 		then
 			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
-			! git clone --branch v"$currentKernel_MajorMinor""$currentKernel_patchLevel" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
+			#! git clone --branch v"$currentKernel_MajorMinor""$currentKernel_patchLevel" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
+			! git clone --branch v"$currentKernel_version" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
 		
 		cd "$scriptLocal"/mainline/linux
-		! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
+		#! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
+		! git checkout v"$currentKernel_version" && _messageError 'fail: git: checkout: 'v"$currentKernel_version" && _messageFAIL && _stop 1
 
 
 

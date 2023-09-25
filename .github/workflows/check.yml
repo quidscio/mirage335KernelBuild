@@ -34,7 +34,18 @@ on:
         type: choice
         options:
         - latest
+        - 6.5.4
         - 6.5.
+        - 6.4.16
+        - 6.4.
+      forceKernel_lts:
+        required: false
+        default: latest
+        type: choice
+        options:
+        - latest
+        - 6.1.55
+        - 6.1.
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
     #- cron: '5 1 * * 6'
@@ -89,11 +100,13 @@ jobs:
     - name: _fetchKernel-lts
       shell: bash
       run: |
+        [[ "${{ github.event.inputs.forceKernel_lts }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_lts }}" != "latest" ]] && export forceKernel_lts="${{ github.event.inputs.forceKernel_lts }}"
         #./ubiquitous_bash.sh _fetchKernel-lts
         ./ubiquitous_bash.sh _fetchKernel-lts-legacyHTTPS
     - name: _build_cloud_lts
       shell: bash
       run: |
+        [[ "${{ github.event.inputs.forceKernel_lts }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_lts }}" != "latest" ]] && export forceKernel_lts="${{ github.event.inputs.forceKernel_lts }}"
         export current_keepFetch="true"
         export current_force_bindepOnly="true"
         ./ubiquitous_bash.sh _build_cloud_prepare
@@ -167,6 +180,10 @@ jobs:
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
+    - name: forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline }}
+      shell: bash
+      run: |
+        true
     - name: users
       shell: bash
       run: |
