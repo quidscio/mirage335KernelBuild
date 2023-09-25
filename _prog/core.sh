@@ -144,7 +144,7 @@ _fetchKernel-lts() {
 
 	_messagePlain_probe_var currentKernel_MajorMinor
 
-	_messagePlain_prove_var currentKernel_version
+	_messagePlain_probe_var currentKernel_version
 
 	_messagePlain_probe v"$currentKernel_MajorMinor""$currentKernel_patchLevel"
 
@@ -222,7 +222,7 @@ _fetchKernel-mainline() {
 		# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.
 		# Specific, not latest, versions are expected always available from git tags . Robust for that usage.
 		git config --global checkout.workers -1
-		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | grep '^v'"$forceKernel_mainline_regex" | sed 's/^.*refs\/tags\/v//g' | sort -n | tail -n1)
+		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | sed 's/^.*refs\/tags\/v//g' | grep '^v'"$forceKernel_mainline_regex" | tr -dc '0-9\.\n' | sort -n | tail -n1)
 		export currentKernelName=linux-"$currentKernel_version"
 		export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
 	fi
@@ -235,7 +235,7 @@ _fetchKernel-mainline() {
 
 	_messagePlain_probe_var currentKernel_MajorMinor
 
-	_messagePlain_prove_var currentKernel_version
+	_messagePlain_probe_var currentKernel_version
 	
 	cd "$scriptLocal"/mainline
 

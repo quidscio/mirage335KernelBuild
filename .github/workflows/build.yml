@@ -34,6 +34,13 @@ on:
         options:
         - latest
         - 6.5.
+      forceKernel_lts:
+        required: false
+        default: latest
+        type: choice
+        options:
+        - latest
+        - 6.1.
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
     #- cron: '5 1 * * 6'

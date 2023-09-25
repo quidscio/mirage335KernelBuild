@@ -44,7 +44,6 @@ on:
         type: choice
         options:
         - latest
-        - 6.1.55
         - 6.1.
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
@@ -101,8 +100,7 @@ jobs:
       shell: bash
       run: |
         [[ "${{ github.event.inputs.forceKernel_lts }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_lts }}" != "latest" ]] && export forceKernel_lts="${{ github.event.inputs.forceKernel_lts }}"
-        #./ubiquitous_bash.sh _fetchKernel-lts
-        ./ubiquitous_bash.sh _fetchKernel-lts-legacyHTTPS
+        ./ubiquitous_bash.sh _fetchKernel-lts
     - name: _build_cloud_lts
       shell: bash
       run: |
@@ -220,8 +218,7 @@ jobs:
       shell: bash
       run: |
         [[ "${{ github.event.inputs.forceKernel_mainline }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_mainline }}" != "latest" ]] && export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
-        #./ubiquitous_bash.sh _fetchKernel-mainline
-        ./ubiquitous_bash.sh _fetchKernel-mainline-legacyHTTPS
+        ./ubiquitous_bash.sh _fetchKernel-mainline
     - name: _build_cloud_mainline
       shell: bash
       run: |
