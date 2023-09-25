@@ -34,10 +34,10 @@ on:
         type: choice
         options:
         - latest
-        - 6.5.4
         - 6.5.
-        - 6.4.16
+        - 6.5.4
         - 6.4.
+        - 6.4.16
       forceKernel_lts:
         required: false
         default: latest
@@ -45,6 +45,9 @@ on:
         options:
         - latest
         - 6.1.
+      skimfast:
+        type: boolean
+        default: true
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
     #- cron: '5 1 * * 6'
@@ -64,6 +67,10 @@ jobs:
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
+    - name: ______________________________ forceKernel_lts-${{ github.event.inputs.forceKernel_lts }}
+      shell: bash
+      run: |
+        true
     - name: users
       shell: bash
       run: |
@@ -99,11 +106,15 @@ jobs:
     - name: _fetchKernel-lts
       shell: bash
       run: |
+        export skimfast=${{ inputs.skimfast }}
+        echo skimfast $skimfast
         [[ "${{ github.event.inputs.forceKernel_lts }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_lts }}" != "latest" ]] && export forceKernel_lts="${{ github.event.inputs.forceKernel_lts }}"
         ./ubiquitous_bash.sh _fetchKernel-lts
     - name: _build_cloud_lts
       shell: bash
       run: |
+        export skimfast=${{ inputs.skimfast }}
+        echo skimfast $skimfast
         [[ "${{ github.event.inputs.forceKernel_lts }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_lts }}" != "latest" ]] && export forceKernel_lts="${{ github.event.inputs.forceKernel_lts }}"
         export current_keepFetch="true"
         export current_force_bindepOnly="true"
@@ -178,7 +189,7 @@ jobs:
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
-    - name: forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline }}
+    - name: ______________________________ forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline }}
       shell: bash
       run: |
         true
@@ -217,11 +228,15 @@ jobs:
     - name: _fetchKernel-mainline
       shell: bash
       run: |
+        export skimfast=${{ inputs.skimfast }}
+        echo skimfast $skimfast
         [[ "${{ github.event.inputs.forceKernel_mainline }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_mainline }}" != "latest" ]] && export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
         ./ubiquitous_bash.sh _fetchKernel-mainline
     - name: _build_cloud_mainline
       shell: bash
       run: |
+        export skimfast=${{ inputs.skimfast }}
+        echo skimfast $skimfast
         [[ "${{ github.event.inputs.forceKernel_mainline }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_mainline }}" != "latest" ]] && export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
         export current_keepFetch="true"
         export current_force_bindepOnly="true"
