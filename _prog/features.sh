@@ -65,22 +65,27 @@ _check_nv_sequence() {
 _check_nv-mainline-series535p() {
     "$scriptAbsoluteLocation" _check_nv_sequence "series535p" "mainline" "$@"
 }
+_check_nv-mainline-legacy470() {
+    "$scriptAbsoluteLocation" _check_nv_sequence "legacy470" "mainline" "$@"
+}
+_check_nv-lts-series535p() {
+    "$scriptAbsoluteLocation" _check_nv_sequence "series535p" "lts" "$@"
+}
+_check_nv-lts-legacy470() {
+    "$scriptAbsoluteLocation" _check_nv_sequence "legacy470" "lts" "$@"
+}
 
-#legacy470
-
-#lts
 
 
 
 
 
-
-_check_vbox-mainline() {
+_check_vbox_procedure() {
     local functionEntryPWD="$PWD"
     
     _messagePlain_nominal 'kernel'
 
-    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$1"/linux-* | sort -n | head -n 1)
     _messagePlain_probe_var currentKernelPath
 
     cd "$currentKernelPath"
@@ -118,7 +123,12 @@ _check_vbox-mainline() {
     _stop 1
     return 1
 }
-
+_check_vbox-mainline() {
+    "$scriptAbsoluteLocation" _check_vbox_procedure "mainline" "$@"
+}
+_check_vbox-lts() {
+    "$scriptAbsoluteLocation" _check_vbox_procedure "lts" "$@"
+}
 
 
 

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='28801096'
+export ub_setScriptChecksum_contents='3833207745'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -19228,22 +19228,27 @@ _check_nv_sequence() {
 _check_nv-mainline-series535p() {
     "$scriptAbsoluteLocation" _check_nv_sequence "series535p" "mainline" "$@"
 }
+_check_nv-mainline-legacy470() {
+    "$scriptAbsoluteLocation" _check_nv_sequence "legacy470" "mainline" "$@"
+}
+_check_nv-lts-series535p() {
+    "$scriptAbsoluteLocation" _check_nv_sequence "series535p" "lts" "$@"
+}
+_check_nv-lts-legacy470() {
+    "$scriptAbsoluteLocation" _check_nv_sequence "legacy470" "lts" "$@"
+}
 
-#legacy470
-
-#lts
 
 
 
 
 
-
-_check_vbox-mainline() {
+_check_vbox_procedure() {
     local functionEntryPWD="$PWD"
     
     _messagePlain_nominal 'kernel'
 
-    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
+    export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$1"/linux-* | sort -n | head -n 1)
     _messagePlain_probe_var currentKernelPath
 
     cd "$currentKernelPath"
@@ -19281,7 +19286,12 @@ _check_vbox-mainline() {
     _stop 1
     return 1
 }
-
+_check_vbox-mainline() {
+    "$scriptAbsoluteLocation" _check_vbox_procedure "mainline" "$@"
+}
+_check_vbox-lts() {
+    "$scriptAbsoluteLocation" _check_vbox_procedure "lts" "$@"
+}
 
 
 

@@ -64,7 +64,7 @@ jobs:
       # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
       # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
+      #if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 1625
@@ -86,11 +86,83 @@ jobs:
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
+    - name: _fetchKernel-lts
+      shell: bash
+      run: |
+        #./ubiquitous_bash.sh _fetchKernel-lts
+        ./ubiquitous_bash.sh _fetchKernel-lts-legacyHTTPS
+    - name: _build_cloud_lts
+      shell: bash
+      run: |
+        export current_keepFetch="true"
+        export current_force_bindepOnly="true"
+        ./ubiquitous_bash.sh _build_cloud_prepare
+        ./ubiquitous_bash.sh _build_cloud_lts
+      timeout-minutes: 300
+    #- name: _export_cloud_lts
+      #shell: bash
+      #run: |
+        #./ubiquitous_bash.sh _export_cloud_lts
+      #timeout-minutes: 90
+    # https://github.com/marketplace/actions/debugging-with-tmate
+    # $RUNNER_WORKSPACE
+    # rclone config --config="/rclone.conf"
+    # sudo touch /continue
+    # bash -i
+    # source ~/.bashrc
+    # Type 'q' at the 'Web shell' or use SSH .
+    #- name: Setup tmate session
+      #if: ${{ failure() }}
+      #uses: mxschmitt/action-tmate@v3
+      ## ssh -i <path-to-key> <tmate-connection-string>
+      #with:
+        #limit-access-to-actor: true
+      #timeout-minutes: 5
+    #- name: artifacts
+      #uses: actions/upload-artifact@v3
+      #with:
+        #name: build-lts
+        #path: |
+          #./_local/_export/linux-lts-amd64-debian.tar.gz
+      #timeout-minutes: 90
+    - name: _check_nv-lts-series535p
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_nv-lts-series535p
+      timeout-minutes: 300
+    - name: _check_nv-lts-legacy470
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_nv-lts-legacy470
+      timeout-minutes: 300
+
+
+    # For vbox kernel module make .
+    - name: _getMost_ubuntu22-VBoxManage
+      shell: bash
+      run: |
+        #! ./ubiquitous_bash.sh _getMost && exit 1
+        #true
+        #! sudo -n apt-get -y clean && exit 1
+        #! ./ubiquitous_bash.sh _getMost_debian11_aptSources && exit 1
+        #sudo -n apt-get update
+        #! sudo -n apt-get -d install -y virtualbox-7.0 && exit 1
+        ! sudo -n ./ubiquitous_bash.sh _getMost_ubuntu22-VBoxManage && exit 1
+        df -h
+        df -h /
+
+
+    - name: _check_vbox-lts
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_vbox-lts
+      timeout-minutes: 300
 
 
 
   check_mainline:
     runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
+    #runs-on: ubuntu-latest
     #runs-on: ubuntu-20.04
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
@@ -172,6 +244,11 @@ jobs:
       shell: bash
       run: |
         ./ubiquitous_bash.sh _check_nv-mainline-series535p
+      timeout-minutes: 300
+    - name: _check_nv-mainline-legacy470
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_nv-mainline-legacy470
       timeout-minutes: 300
 
 
