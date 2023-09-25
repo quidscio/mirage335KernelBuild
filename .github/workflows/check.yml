@@ -84,7 +84,7 @@ jobs:
       # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
       # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
     - name: Maximize build space
-      #if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
       uses: easimon/maximize-build-space@master
       with:
         root-reserve-mb: 1625
