@@ -47,7 +47,7 @@ on:
         - 6.1.
       skimfast:
         type: boolean
-        default: true
+        default: false
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
     #- cron: '5 1 * * 6'
@@ -137,6 +137,10 @@ jobs:
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
+    - name: ______________________________ forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline }}
+      shell: bash
+      run: |
+        true
     - name: users
       shell: bash
       run: |
