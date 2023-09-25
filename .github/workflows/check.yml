@@ -64,12 +64,13 @@ concurrency:
 
 jobs:
   check_lts:
-    runs-on: ubuntu-latest
+    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
+    #runs-on: ubuntu-latest
     #runs-on: ubuntu-20.04
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
-    - name: ______________________________ forceKernel_lts-${{ github.event.inputs.forceKernel_lts }}
+    - name: forceKernel_lts-${{ github.event.inputs.forceKernel_lts }} ______________________________
       shell: bash
       run: |
         true
@@ -191,7 +192,7 @@ jobs:
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
-    - name: ______________________________ forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline }}
+    - name: forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline }} ______________________________
       shell: bash
       run: |
         true

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2296605113'
+export ub_setScriptChecksum_contents='2121177826'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -19265,15 +19265,17 @@ _check_nv-lts-legacy470() {
 
 
 
-_check_vbox_procedure() {
+_check_vbox_sequence() {
     local functionEntryPWD="$PWD"
-    
+    _start
+
     _messagePlain_nominal 'kernel'
 
     export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$1"/linux-* | sort -n | head -n 1)
     _messagePlain_probe_var currentKernelPath
 
-    cd "$currentKernelPath"
+
+    #cd "$currentKernelPath"
 
     #make olddefconfig
     #make prepare
@@ -19296,10 +19298,11 @@ _check_vbox_procedure() {
 
     if [[ -e /usr/share/virtualbox/src/vboxhost ]]
     then
-        cd /usr/share/virtualbox/src/vboxhost
+        cp -r /usr/share/virtualbox/src/vboxhost "$safeTmp"/vboxhost
+        cd "$safeTmp"/vboxhost
         make clean
         make -C "$currentKernelPath" M=`pwd` -j $(nproc)
-        return "$?"
+        _stop "$?"
     fi
 
 
@@ -19309,10 +19312,10 @@ _check_vbox_procedure() {
     return 1
 }
 _check_vbox-mainline() {
-    "$scriptAbsoluteLocation" _check_vbox_procedure "mainline" "$@"
+    "$scriptAbsoluteLocation" _check_vbox_sequence "mainline" "$@"
 }
 _check_vbox-lts() {
-    "$scriptAbsoluteLocation" _check_vbox_procedure "lts" "$@"
+    "$scriptAbsoluteLocation" _check_vbox_sequence "lts" "$@"
 }
 
 

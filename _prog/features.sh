@@ -80,15 +80,17 @@ _check_nv-lts-legacy470() {
 
 
 
-_check_vbox_procedure() {
+_check_vbox_sequence() {
     local functionEntryPWD="$PWD"
-    
+    _start
+
     _messagePlain_nominal 'kernel'
 
     export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$1"/linux-* | sort -n | head -n 1)
     _messagePlain_probe_var currentKernelPath
 
-    cd "$currentKernelPath"
+
+    #cd "$currentKernelPath"
 
     #make olddefconfig
     #make prepare
@@ -111,10 +113,11 @@ _check_vbox_procedure() {
 
     if [[ -e /usr/share/virtualbox/src/vboxhost ]]
     then
-        cd /usr/share/virtualbox/src/vboxhost
+        cp -r /usr/share/virtualbox/src/vboxhost "$safeTmp"/vboxhost
+        cd "$safeTmp"/vboxhost
         make clean
         make -C "$currentKernelPath" M=`pwd` -j $(nproc)
-        return "$?"
+        _stop "$?"
     fi
 
 
@@ -124,10 +127,10 @@ _check_vbox_procedure() {
     return 1
 }
 _check_vbox-mainline() {
-    "$scriptAbsoluteLocation" _check_vbox_procedure "mainline" "$@"
+    "$scriptAbsoluteLocation" _check_vbox_sequence "mainline" "$@"
 }
 _check_vbox-lts() {
-    "$scriptAbsoluteLocation" _check_vbox_procedure "lts" "$@"
+    "$scriptAbsoluteLocation" _check_vbox_sequence "lts" "$@"
 }
 
 
