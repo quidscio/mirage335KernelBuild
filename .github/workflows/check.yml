@@ -137,6 +137,7 @@ jobs:
       shell: bash
       run: |
         [[ "${{ github.event.inputs.forceKernel_mainline }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_mainline }}" != "latest" ]] && export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
+        export current_keepFetch="true"
         ./ubiquitous_bash.sh _build_cloud_prepare
         ./ubiquitous_bash.sh _build_cloud_mainline
       timeout-minutes: 300

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3620409594'
+export ub_setScriptChecksum_contents='864496610'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -18553,7 +18553,7 @@ _fetchKernel-mainline-legacyHTTPS() {
 _fetchKernel-lts() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	rm -f "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
-	_safeRMR "$scriptLocal"/lts
+	! [[ "$current_keepFetch" == "true" ]] && _safeRMR "$scriptLocal"/lts
 
 	mkdir -p "$scriptLocal"/lts
 	cd "$scriptLocal"/lts
@@ -18620,7 +18620,7 @@ _fetchKernel-lts() {
 	
 	
 	mkdir -p "$scriptLib"/linux/lts/
-	cp "$scriptLib"/linux/lts/.config "$scriptLocal"/lts/"$currentKernelName"/
+	cp -f "$scriptLib"/linux/lts/.config "$scriptLocal"/lts/"$currentKernelName"/
 
 }
 
@@ -18628,7 +18628,7 @@ _fetchKernel-lts() {
 _fetchKernel-mainline() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
 	rm -f "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
-	_safeRMR "$scriptLocal"/mainline
+	! [[ "$current_keepFetch" == "true" ]] && _safeRMR "$scriptLocal"/mainline
 
 	mkdir -p "$scriptLocal"/mainline
 	cd "$scriptLocal"/mainline
@@ -18715,7 +18715,7 @@ _fetchKernel-mainline() {
 	
 	
 	mkdir -p "$scriptLib"/linux/mainline/
-	cp "$scriptLib"/linux/mainline/.config "$scriptLocal"/mainline/"$currentKernelName"/
+	cp -f "$scriptLib"/linux/mainline/.config "$scriptLocal"/mainline/"$currentKernelName"/
 
 }
 
@@ -18780,6 +18780,8 @@ _kernelScripts-disableDebug() {
 
 _buildKernel-lts() {
 	_messageNormal "init: buildKernel-lts: ""$currentKernelPath"
+	make clean
+
 	make olddefconfig
 
 	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
@@ -18804,6 +18806,8 @@ _buildKernel-lts() {
 
 _buildKernel-mainline() {
 	_messageNormal "init: buildKernel-mainline: ""$currentKernelPath"
+	make clean
+
 	make olddefconfig
 
 	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
