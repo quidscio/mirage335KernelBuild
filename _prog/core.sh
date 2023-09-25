@@ -372,7 +372,8 @@ _buildKernel-lts() {
 		_messageError 'bad: current_force_bindepOnly'
 		export current_force_bindepOnly=""
 		unset current_force_bindepOnly
-		make bindeb-pkg -j $(nproc)
+		#make bindeb-pkg -j $(nproc)
+		make -j $(nproc)
 	fi
 	[[ "$?" != "0" ]] && _messageFAIL
 	
@@ -406,7 +407,8 @@ _buildKernel-mainline() {
 		_messageError 'bad: current_force_bindepOnly'
 		export current_force_bindepOnly=""
 		unset current_force_bindepOnly
-		make bindeb-pkg -j $(nproc)
+		#make bindeb-pkg -j $(nproc)
+		make -j $(nproc)
 	fi
 	[[ "$?" != "0" ]] && _messageFAIL
 	
