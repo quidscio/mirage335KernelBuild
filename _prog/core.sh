@@ -226,7 +226,7 @@ _fetchKernel-mainline() {
 		# Specific, not latest, versions are expected always available from git tags . Robust for that usage.
 		git config --global checkout.workers -1
 		git config --global fetch.parallel 10
-		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | sed 's/^.*refs\/tags\///g' | grep '^v'"$forceKernel_mainline_regex" | sed 's/^v//g' | sed 's/\^{}//g' | sort -n | tail -n1)
+		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | sed 's/^.*refs\/tags\///g' | grep '^v'"$forceKernel_mainline_regex" | sed 's/^v//g' | sed 's/\^{}//g' | sort -V | tail -n1)
 		export currentKernelName=linux-"$currentKernel_version"
 		export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
 	fi
@@ -419,7 +419,7 @@ _buildKernel-mainline() {
 
 
 _menuconfigKernel-lts() {
-	export currentKernelPath=$(ls -d -1 "$scriptLocal"/lts/linux-* | sort -n | head -n 1)
+	export currentKernelPath=$(ls -d -1 "$scriptLocal"/lts/linux-* | sort -V | head -n 1)
 	cd "$currentKernelPath"
 
 	_messageNormal "init: menuconfigKernel-lts: ""$currentKernelPath"
@@ -434,7 +434,7 @@ _menuconfigKernel-lts() {
 }
 
 _menuconfigKernel-mainline() {
-	export currentKernelPath=$(ls -d -1 "$scriptLocal"/mainline/linux-* | sort -n | head -n 1)
+	export currentKernelPath=$(ls -d -1 "$scriptLocal"/mainline/linux-* | sort -V | head -n 1)
 	cd "$currentKernelPath"
 
 	_messageNormal "init: menuconfigKernel-mainline: ""$currentKernelPath"

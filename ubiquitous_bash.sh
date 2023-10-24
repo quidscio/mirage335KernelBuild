@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2968348224'
+export ub_setScriptChecksum_contents='2956135850'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -18858,7 +18858,7 @@ _fetchKernel-mainline() {
 		# Specific, not latest, versions are expected always available from git tags . Robust for that usage.
 		git config --global checkout.workers -1
 		git config --global fetch.parallel 10
-		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | sed 's/^.*refs\/tags\///g' | grep '^v'"$forceKernel_mainline_regex" | sed 's/^v//g' | sed 's/\^{}//g' | sort -n | tail -n1)
+		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | sed 's/^.*refs\/tags\///g' | grep '^v'"$forceKernel_mainline_regex" | sed 's/^v//g' | sed 's/\^{}//g' | sort -V | tail -n1)
 		export currentKernelName=linux-"$currentKernel_version"
 		export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
 	fi
@@ -19051,7 +19051,7 @@ _buildKernel-mainline() {
 
 
 _menuconfigKernel-lts() {
-	export currentKernelPath=$(ls -d -1 "$scriptLocal"/lts/linux-* | sort -n | head -n 1)
+	export currentKernelPath=$(ls -d -1 "$scriptLocal"/lts/linux-* | sort -V | head -n 1)
 	cd "$currentKernelPath"
 
 	_messageNormal "init: menuconfigKernel-lts: ""$currentKernelPath"
@@ -19066,7 +19066,7 @@ _menuconfigKernel-lts() {
 }
 
 _menuconfigKernel-mainline() {
-	export currentKernelPath=$(ls -d -1 "$scriptLocal"/mainline/linux-* | sort -n | head -n 1)
+	export currentKernelPath=$(ls -d -1 "$scriptLocal"/mainline/linux-* | sort -V | head -n 1)
 	cd "$currentKernelPath"
 
 	_messageNormal "init: menuconfigKernel-mainline: ""$currentKernelPath"
