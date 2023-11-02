@@ -151,17 +151,8 @@ jobs:
         #path: |
           #./_local/_export/linux-lts-amd64-debian.tar.gz
       #timeout-minutes: 90
-    - name: _check_nv-lts-series535p
-      shell: bash
-      run: |
-        ./ubiquitous_bash.sh _check_nv-lts-series535p
-      timeout-minutes: 300
-    - name: _check_nv-lts-legacy470
-      shell: bash
-      run: |
-        ./ubiquitous_bash.sh _check_nv-lts-legacy470
-      timeout-minutes: 300
-
+      
+      
 
     # For vbox kernel module make .
     - name: _getMost_ubuntu22-VBoxManage
@@ -182,6 +173,19 @@ jobs:
       shell: bash
       run: |
         ./ubiquitous_bash.sh _check_vbox-lts
+      timeout-minutes: 300
+      
+      
+      
+    - name: _check_nv-lts-series535p
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_nv-lts-series535p
+      timeout-minutes: 300
+    - name: _check_nv-lts-legacy470
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_nv-lts-legacy470
       timeout-minutes: 300
 
 
@@ -274,16 +278,11 @@ jobs:
         #path: |
           #./_local/_export/linux-mainline-amd64-debian.tar.gz
       #timeout-minutes: 90
-    - name: _check_nv-mainline-series535p
-      shell: bash
-      run: |
-        ./ubiquitous_bash.sh _check_nv-mainline-series535p
-      timeout-minutes: 300
-    - name: _check_nv-mainline-legacy470
-      shell: bash
-      run: |
-        ./ubiquitous_bash.sh _check_nv-mainline-legacy470
-      timeout-minutes: 300
+      
+      
+      
+      
+
 
 
     # For vbox kernel module make .
@@ -307,6 +306,22 @@ jobs:
         ./ubiquitous_bash.sh _check_vbox-mainline
       timeout-minutes: 300
 
+      
+      
+      
+      
+      
+      
+    - name: _check_nv-mainline-series535p
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_nv-mainline-series535p
+      timeout-minutes: 300
+    - name: _check_nv-mainline-legacy470
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _check_nv-mainline-legacy470
+      timeout-minutes: 300
 
 
 
