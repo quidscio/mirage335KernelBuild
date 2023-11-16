@@ -71,9 +71,10 @@ if false; then true; # -->
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-legacy' for specific use cases.</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: tradeoff-harden</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-harden' for specific use cases.</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_INTEL_TDX_GUEST</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_X86_SGX_kVM</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_X86_SGX_kVM</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_INTEL_TDX_GUEST</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: TDX_GUEST_DRIVER</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualization-accessory</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualbox</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: boot</span>
@@ -89,6 +90,7 @@ if false; then true; # -->
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT: CONFIG_PREEMPT=y</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT_RT: </span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: memory</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_FRONTSWAP</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: integration</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_NTFS_RW: </span>
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX</span>
