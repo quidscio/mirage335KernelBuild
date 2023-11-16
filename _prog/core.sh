@@ -110,7 +110,7 @@ _fetchKernel-lts() {
 		# WARNING: May not be tested with an empty patchlevel.
 		#export currentKernel_MajorMinor='5.10.'
 		export currentKernel_MajorMinor='6.1.'
-		export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
+		export currentKernel_MajorMinor_regex="linux-"$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
 
 		# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.
 		#git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
@@ -216,7 +216,7 @@ _fetchKernel-mainline() {
 		export currentKernel_MajorMinor="$currentKernel_Major"
 		[[ "$currentKernel_Minor" != "" ]] && export currentKernel_MajorMinor="$currentKernel_Major"".""$currentKernel_Minor"
 		[[ "$currentKernel_patchLevel" != "" ]] && export currentKernel_MajorMinor="$currentKernel_MajorMinor""."
-		export currentKernel_MajorMinor_regex=$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
+		export currentKernel_MajorMinor_regex="linux-"$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
 
 		export currentKernel_version="$currentKernel_MajorMinor""$currentKernel_patchLevel"	
 	else
