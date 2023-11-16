@@ -34,6 +34,7 @@ on:
         type: choice
         options:
         - latest
+        - 6.6.
         - 6.5.
         - 6.5.4
         - 6.4.
