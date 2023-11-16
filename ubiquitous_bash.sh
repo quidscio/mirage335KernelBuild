@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3508318506'
+export ub_setScriptChecksum_contents='472580629'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -2838,6 +2838,19 @@ _condition_lines_zero() {
 	
 	[[ "$currentLineCount" == 0 ]] && return 0
 	return 1
+}
+
+
+_safe_declare_uid() {
+	unset _uid
+	_uid() {
+		local currentLengthUID
+		currentLengthUID="$1"
+		[[ "$currentLengthUID" == "" ]] && currentLengthUID=18
+		cat /dev/random 2> /dev/null | base64 2> /dev/null | tr -dc 'a-zA-Z0-9' 2> /dev/null | tr -d 'acdefhilmnopqrsuvACDEFHILMNOPQRSU14580' | head -c "$currentLengthUID" 2> /dev/null
+		return
+	}
+	export -f _uid
 }
 
 #Generates semi-random alphanumeric characters, default length 18.
@@ -6478,10 +6491,28 @@ _getMost_debian11_install() {
 	
 	_getMost_backend_aptGetInstall apt-utils
 	
-	
 	_getMost_backend_aptGetInstall pigz
 	_getMost_backend_aptGetInstall pixz
-	
+
+
+	_getMost_backend_aptGetInstall bash dash
+
+	_getMost_backend_aptGetInstall aria2 curl gpg
+
+	if ! _getMost_backend dash -c 'type apt-fast' > /dev/null 2>&1
+	then
+		_getMost_backend_aptGetInstall aria2 curl gpg
+		
+		_getMost_backend mkdir -p /etc/apt/keyrings
+		_getMost_backend curl -fsSL 'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xA2166B8DE8BDC3367D1901C11EE2FF37CA8DA16B' | _getMost_backend gpg --dearmor -o /etc/apt/keyrings/apt-fast.gpg
+		_getMost_backend apt-get update
+		_getMost_backend_aptGetInstall apt-fast
+
+		echo debconf apt-fast/maxdownloads string 16 | _getMost_backend debconf-set-selections
+		echo debconf apt-fast/dlflag boolean true | _getMost_backend debconf-set-selections
+		echo debconf apt-fast/aptmanager string apt-get | _getMost_backend debconf-set-selections
+	fi
+
 	
 	_messagePlain_probe 'apt-get update'
 	_getMost_backend apt-get update
@@ -6530,6 +6561,26 @@ _getMost_debian11_install() {
 	#_getMost_backend_aptGetInstall synergy quicksynergy
 	
 	_getMost_backend_aptGetInstall vim
+	
+	# WARNING: Rust is not yet (2023-11-12) anywhere near as editable on the fly or pervasively available as bash .
+	#  Criteria for such are far more necessarily far more stringent than might be intuitively obvious.
+	#  Rust is expected to remain non-competitive with bash for purposes of 'ubiquitous_bash', even for reference implementations, for at least 6years .
+	#   6 years
+	# https://users.rust-lang.org/t/does-rust-work-in-cygwin-if-so-how-can-i-get-it-working/25735
+	# https://stackoverflow.com/questions/31492799/cross-compile-a-rust-application-from-linux-to-windows
+	# https://rustup.rs/
+	#curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+	# https://packages.debian.org/search?keywords=rustup&searchon=names&suite=all&section=all
+	# https://wiki.debian.org/Rust
+	#  DANGER: Do NOT regard 'rustup' as available.
+	_getMost_backend_aptGetInstall rustc
+	_getMost_backend_aptGetInstall cargo
+	#_getMost_backend_aptGetInstall rustup
+	_getMost_backend_aptGetInstall mingw-w64
+	_getMost_backend_aptGetInstall g++-mingw-w64-x86-64-win32
+	_getMost_backend_aptGetInstall binutils-mingw-w64
+	_getMost_backend_aptGetInstall mingw-w64-tools
+	_getMost_backend_aptGetInstall gdb-mingw-w64
 	
 	if _getMost_backend bash -c '! dpkg --print-foreign-architectures | grep i386'
 	then
@@ -6637,6 +6688,9 @@ _getMost_debian11_install() {
 	_getMost_backend_aptGetInstall cmake
 	
 	
+	_getMost_backend_aptGetInstall gh
+	
+	
 	
 	_getMost_backend_aptGetInstall haskell-platform
 	_getMost_backend_aptGetInstall pkg-haskell-tools
@@ -6658,6 +6712,8 @@ _getMost_debian11_install() {
 	_getMost_backend_aptGetInstall gcc-arm-none-eabi
 	_getMost_backend_aptGetInstall binutils-arm-none-eabi
 	_getMost_backend_aptGetInstall libusb-1.0
+	
+	_getMost_backend_aptGetInstall setserial
 
 	_getMost_backend_aptGetInstall virtualenv
 	_getMost_backend_aptGetInstall python3-dev
@@ -7015,6 +7071,12 @@ _getMost_debian11_install() {
 	
 	
 	
+	_getMost_backend_aptGetInstall php
+	
+	
+	
+	
+	
 	_getMost_backend_aptGetInstall synaptic
 	
 	_getMost_backend_aptGetInstall cifs-utils
@@ -7141,6 +7203,7 @@ _getMost_debian11_install() {
 
 
 	_getMost_backend_aptGetInstall fldigi
+	_getMost_backend_aptGetInstall flamp
 	_getMost_backend_aptGetInstall psk31lx
 	
 	
@@ -7157,6 +7220,28 @@ _getMost_debian11_install() {
 	_getMost_backend_aptGetInstall trousers
 	_getMost_backend_aptGetInstall tpm-tools
 	_getMost_backend_aptGetInstall trousers-dbg
+	
+	
+	
+	_getMost_backend_aptGetInstall scdaemon
+	
+	_getMost_backend_aptGetInstall tpm2-openssl
+	_getMost_backend_aptGetInstall tpm2-openssl tpm2-tools tpm2-abrmd libtss2-tcti-tabrmd0
+	
+	_getMost_backend_aptGetInstall tpm2-abrmd
+	
+	
+	
+	_getMost_backend_aptGetInstall qrencode
+	
+	_getMost_backend_aptGetInstall qtqr
+	
+	_getMost_backend_aptGetInstall zbar-tools
+	_getMost_backend_aptGetInstall zbarcam-gtk
+	_getMost_backend_aptGetInstall zbarcam-qt
+	
+	
+	_getMost_backend_aptGetInstall cloud-guest-utils
 	
 	
 	
@@ -7348,8 +7433,15 @@ _set_getMost_backend_debian() {
 		# --no-upgrade
 		# -o Dpkg::Options::="--force-confold"
 		
-		_messagePlain_probe _getMost_backend env XZ_OPT="-T0" DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -q --install-recommends -y "$@"
-		_getMost_backend env XZ_OPT="-T0" DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -q --install-recommends -y "$@"
+		if ! _getMost_backend dash -c 'type apt-fast' > /dev/null 2>&1 || [[ "$RUNNER_OS" != "" ]]
+		then
+			_messagePlain_probe _getMost_backend env XZ_OPT="-T0" DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -q --install-recommends -y "$@"
+			_getMost_backend env XZ_OPT="-T0" DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -q --install-recommends -y "$@"
+		else
+			#DOWNLOADBEFORE=true
+			_messagePlain_probe _getMost_backend env DOWNLOADBEFORE=true XZ_OPT="-T0" DEBIAN_FRONTEND=noninteractive apt-fast -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -q --install-recommends -y "$@"
+			_getMost_backend env DOWNLOADBEFORE=true XZ_OPT="-T0" DEBIAN_FRONTEND=noninteractive apt-fast -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install -q --install-recommends -y "$@"
+		fi
 		
 		#_messagePlain_probe _getMost_backend env XZ_OPT="-T0" DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install --install-recommends -y "$@"
 		#_getMost_backend env XZ_OPT="-T0" DEBIAN_FRONTEND=noninteractive apt -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install --install-recommends -y "$@"
@@ -7490,6 +7582,25 @@ fi
 # ATTENTION: Override with 'core.sh' or similar.
 
 
+# Unusual. Strongly discouraged.
+# CAUTION: Pulls in as much as >1GB (uncompressed) of binaries. May be unaffordable on uncompressed filesystems.
+# Unless your CI job is specifically cross compiling for MSW, you almost certainly do NOT want this.
+_getMinimal_cloud-msw() {
+	#https://askubuntu.com/questions/876240/how-to-automate-setting-up-of-keyboard-configuration-package
+	#apt-get install -y debconf-utils
+	export DEBIAN_FRONTEND=noninteractive
+	
+	_set_getMost_backend "$@"
+	_test_getMost_backend "$@"
+	#_getMost_debian11_aptSources "$@"
+	
+	_getMost_backend_aptGetInstall mingw-w64
+	_getMost_backend_aptGetInstall g++-mingw-w64-x86-64-win32
+	_getMost_backend_aptGetInstall binutils-mingw-w64
+	_getMost_backend_aptGetInstall mingw-w64-tools
+	_getMost_backend_aptGetInstall gdb-mingw-w64
+}
+
 # Unusual. Strongly discouraged. Building Linux Kernel with fewer resources is helpful for compatibility and performance with some constrained and repetitive cloud services.
 _getMinimal_cloud() {
 	"$scriptAbsoluteLocation" _setupUbiquitous
@@ -7514,6 +7625,21 @@ _getMinimal_cloud() {
 	_getMost_backend_aptGetInstall vim
 	
 	_getMost_backend_aptGetInstall linux-image-amd64
+	
+	# WARNING: Rust is not yet (2023-11-12) anywhere near as editable on the fly or pervasively available as bash .
+	#  Criteria for such are far more necessarily far more stringent than might be intuitively obvious.
+	#  Rust is expected to remain non-competitive with bash for purposes of 'ubiquitous_bash', even for reference implementations, for at least 6years .
+	#   6 years
+	# https://users.rust-lang.org/t/does-rust-work-in-cygwin-if-so-how-can-i-get-it-working/25735
+	# https://stackoverflow.com/questions/31492799/cross-compile-a-rust-application-from-linux-to-windows
+	# https://rustup.rs/
+	#curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+	# https://packages.debian.org/search?keywords=rustup&searchon=names&suite=all&section=all
+	# https://wiki.debian.org/Rust
+	#  DANGER: Do NOT regard 'rustup' as available.
+	_getMost_backend_aptGetInstall rustc
+	_getMost_backend_aptGetInstall cargo
+	#_getMost_backend_aptGetInstall rustup
 	
 	_getMost_backend_aptGetInstall pigz
 
@@ -7670,6 +7796,10 @@ _getMinimal_cloud() {
 	_getMost_backend_aptGetInstall axel
 	_getMost_backend_aptGetInstall aria2
 	
+	
+	_getMost_backend_aptGetInstall gh
+	
+	
 	_getMost_backend_aptGetInstall dwarves
 	_getMost_backend_aptGetInstall pahole
 	
@@ -7771,6 +7901,11 @@ _getMinimal_cloud() {
 	_getMost_backend_aptGetInstall genisoimage
 	
 	
+	
+	_getMost_backend_aptGetInstall php
+	
+	
+	
 	# purge-old-kernels
 	_getMost_backend_aptGetInstall byobu
 	
@@ -7825,11 +7960,14 @@ _getMinimal_cloud() {
 
 
 	
-	_getMost_backend_aptGetInstall tboot
+	#_getMost_backend_aptGetInstall tboot
 
 	_getMost_backend_aptGetInstall trousers
 	_getMost_backend_aptGetInstall tpm-tools
 	_getMost_backend_aptGetInstall trousers-dbg
+	
+	
+	_getMost_backend_aptGetInstall cloud-guest-utils
 
 	
 	_getMost_backend apt-get -y clean
@@ -7861,6 +7999,31 @@ _getMinimal_cloud() {
 }
 
 
+
+
+# NOTICE
+# https://lazamar.co.uk/nix-versions/?channel=nixpkgs-unstable&package=geda
+# https://lazamar.co.uk/nix-versions/?package=geda&version=1.10.2&fullName=geda-1.10.2&keyName=geda&revision=9957cd48326fe8dbd52fdc50dd2502307f188b0d&channel=nixpkgs-unstable#instructions
+#nix-env --query
+#nix-env --uninstall geda
+#export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.geda
+#export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA geda -f https://github.com/NixOS/nixpkgs/archive/9957cd48326fe8dbd52fdc50dd2502307f188b0d.tar.gz
+#nix-collect-garbage -d
+#nix-env -iA geda -f https://github.com/NixOS/nixpkgs/archive/773a8314ef05364d856e46299722a9d849aacf8b.tar.gz
+#nix-channel --update nixpkgs
+#nix-store --realise /nix/store/a7gf7plqv6zj1zxplazzib02ank05hxj-geda-1.10.2.drv
+#nix-store --verify --repair
+#nix-store --delete /nix/store/a7gf7plqv6zj1zxplazzib02ank05hxj-geda-1.10.2.drv
+#nix-store --gc
+#nix-env --rollback
+#nix-env --install
+#sudo rm -rf /nix/var/nix/db/*
+#sudo rm -rf /nix/var/nix/temproots/*
+#sh <(curl -L https://nixos.org/nix/install) --repair
+
+#export NIXPKGS_ALLOW_INSECURE=1
+
+# ATTRIBUTION: ChatGPT-3.5 and ChatGPT4 2032-11-02 . ^
 
 _get_from_nix-user() {
 	local currentUser
@@ -7926,17 +8089,44 @@ _get_from_nix-user() {
 	#nix-env --uninstall geda
 	#nix-env --uninstall pcb
 	
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.geda'
+	
+	
+	
+	
+	# ATTENTION: NOTICE: https://github.com/NixOS/nixpkgs/blob/nixpkgs-unstable/pkgs/applications/science/electronics/geda/default.nix
+	# ATTENTION: NOTICE: CAUTION: MAJOR: SEVERE: WATCH ANALYSIS for potentially unfavorable changes. Regressions seem likely, python2 deprecation seems to be causing frequent repeated removals of possibly significant functionality. High risk.
+	#  ATTENTION: Alternative frozen version commands documented for EMERGENCY use.
+	# https://github.com/NixOS/nixpkgs/blob/nixpkgs-unstable/pkgs/applications/science/electronics/geda/default.nix
+	#  CAUTION: Be wary if this file has changed recently.
+	
+	# ###
+	# Seems to have removed xorn, python2.7 . May not have been tested through ubdist/WSL . May be accepted for now due to some apparently successful testing expected to match this specific version.
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA geda -f https://github.com/NixOS/nixpkgs/archive/773a8314ef05364d856e46299722a9d849aacf8b.tar.gz'
+	
+	# Seems to still have xorn, python2.7, etc . Should have the most functionality, and should match previously tested versions, both through ubdist/OS and ubdist/WSL .
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA geda -f https://github.com/NixOS/nixpkgs/archive/9957cd48326fe8dbd52fdc50dd2502307f188b0d.tar.gz'
+	
+	# Most recent version. May freeze until there is sufficient experience with newer versions.
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.geda'
+	# ###
+	
+	
 	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'xdg-desktop-menu install "$HOME"/.nix-profile/share/applications/geda-gschem.desktop'
 	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'xdg-desktop-menu install "$HOME"/.nix-profile/share/applications/geda-gattrib.desktop'
 	_getMost_backend sudo -n -u "$currentUser" cp -a /home/"$currentUser"/.nix-profile/share/icons /home/"$currentUser"/.local/share/
 
 	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.pcb'
 
+	
 	# Necessary, do NOT remove. Necessary for 'gsch2pcb' , 'gnetlist' , etc, since installation as a dependency does not make the necessary binaries available to the usual predictable PATH .
 	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.python2'
 
 
+	
+	
+	
+	
+	
 	# Workaround to make macros needed from 'pcb' package available to such programs as 'gsch2pcb' from the 'geda' package .
 	#sed 's/.*\/\(.*\)\/bin\/pcb.*/\1/')
 	local currentDerivationPath_pcb
@@ -7951,11 +8141,15 @@ _get_from_nix-user() {
 	_getMost_backend sudo -n cp -a "$currentDerivationPath_pcb"/share/gEDA "$currentDerivationPath_gsch2pcb"/share/
 
 	# ATTENTION: Unusual .
+	# CAUTION: Seems unnecessary - maybe 'legacy' gnetlist no longer needs xorn or python ?
 	_getMost_backend sudo -n sed -i 's/import errno, os, stat, tempfile$/& , sys/' "$currentDerivationPath_gsch2pcb"/lib/python2.7/site-packages/xorn/fileutils.py
 
 	# DOCUMENTATION - interesting copilot suggestions that may or may not be relevant
 	# --option allow-substitutes false --option allow-unsafe-native-code-during-evaluation true --option substituters 'https://cache.nixos.org https://hydra.iohk.io' --option trusted-public-keys 'cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ='
 	#export NIXPKGS_ALLOW_INSECURE=1 ; nix-env --option binary-caches "" -iA nixpkgs.geda nixpkgs.pcb --option keep-outputs true --option merge-outputs-by-path true
+	
+	
+	[[ ! -e /home/"$currentUser"/.nix-profile/bin/gnetlist ]] && [[ -e /home/"$currentUser"/.nix-profile/bin/gnetlist-legacy ]] && sudo -n ln -s /home/"$currentUser"/.nix-profile/bin/gnetlist-legacy /home/"$currentUser"/.nix-profile/bin/gnetlist
 
 	
 	[[ "$current_getMost_backend_wasSet" == "false" ]] && unset _getMost_backend
@@ -8041,6 +8235,173 @@ _custom_splice_opensslConfig() {
     fi
 
 	#cd "$functionEntryPWD"
+}
+
+
+
+
+
+# NOTICE: Destroying developer functionality on programs made for local use is NEVER an acceptable solution. At minimum such functionality must, for an ephemeral CI environment, still be usable.
+#  CAUTION: In this case, the relevant functionality is necessary to create accurate PDF output from PCB designs for integrating electronics with CAD models and for printing and comparing with 3D printed models. Such basic hardware design capability is absolutely NOT something the world can just do without.
+# https://www.kb.cert.org/vuls/id/332928/
+#  'This issue is addressed in Ghostscript version 9.24. Please also consider the following workarounds:'
+#   NO. Using these workarounds, especially on Debian Stable systems which already are up to version 10, which essentially disables all functionality, is completely unacceptable. Such intolerance of developers will NOT be tolerated, and a fork of GhostScript absolutely WILL be maintained if ever necessary.
+# https://stackoverflow.com/questions/52998331/imagemagick-security-policy-pdf-blocking-conversion
+#  'I believe that the PDF policy was added due to a bug in Ghostscript, which I believe has now been fixed. So it you are using the current Ghostscript, then you should be fine giving this policy read|write rights.'
+_get_workarounds_ghostscript_policyXML() {
+	
+	# ATTRIBUTION: ChatGPT-3.5 2023-11-02 .
+	
+	# WARNING: May be untested .
+	#sudo -n sed -i '/<!-- disable ghostscript format types -->/,/<\/policymap>/d' "$1"
+	#echo '</policymap>' | sudo -n tee -a "$1"
+	
+	sudo -n sed -i '/<policy domain="coder" rights="none" pattern="PS" \/>/d' "$1"
+	sudo -n sed -i '/<policy domain="coder" rights="none" pattern="PS2" \/>/d' "$1"
+	sudo -n sed -i '/<policy domain="coder" rights="none" pattern="PS3" \/>/d' "$1"
+	sudo -n sed -i '/<policy domain="coder" rights="none" pattern="EPS" \/>/d' "$1"
+	sudo -n sed -i '/<policy domain="coder" rights="none" pattern="PDF" \/>/d' "$1"
+	sudo -n sed -i '/<policy domain="coder" rights="none" pattern="XPS" \/>/d' "$1"
+	
+	
+	sudo -n sed -i '/<\/policymap>/i \  <policy domain="coder" rights="read | write" pattern="PDF" />\n  <policy domain="coder" rights="read | write" pattern="EPS" />\n  <policy domain="coder" rights="read | write" pattern="PS" />' "$1"
+}
+
+# No production use. Yet.
+_get_workarounds_ghostscript_policyXML_here() {
+
+cat << 'CZXWXcRMTo8EmM8i4d'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policymap [
+  <!ELEMENT policymap (policy)*>
+  <!ATTLIST policymap xmlns CDATA #FIXED ''>
+  <!ELEMENT policy EMPTY>
+  <!ATTLIST policy xmlns CDATA #FIXED '' domain NMTOKEN #REQUIRED
+    name NMTOKEN #IMPLIED pattern CDATA #IMPLIED rights NMTOKEN #IMPLIED
+    stealth NMTOKEN #IMPLIED value CDATA #IMPLIED>
+]>
+<!--
+  Configure ImageMagick policies.
+
+  Domains include system, delegate, coder, filter, path, or resource.
+
+  Rights include none, read, write, execute and all.  Use | to combine them,
+  for example: "read | write" to permit read from, or write to, a path.
+
+  Use a glob expression as a pattern.
+
+  Suppose we do not want users to process MPEG video images:
+
+    <policy domain="delegate" rights="none" pattern="mpeg:decode" />
+
+  Here we do not want users reading images from HTTP:
+
+    <policy domain="coder" rights="none" pattern="HTTP" />
+
+  The /repository file system is restricted to read only.  We use a glob
+  expression to match all paths that start with /repository:
+
+    <policy domain="path" rights="read" pattern="/repository/*" />
+
+  Lets prevent users from executing any image filters:
+
+    <policy domain="filter" rights="none" pattern="*" />
+
+  Any large image is cached to disk rather than memory:
+
+    <policy domain="resource" name="area" value="1GP"/>
+
+  Use the default system font unless overwridden by the application:
+
+    <policy domain="system" name="font" value="/usr/share/fonts/favorite.ttf"/>
+
+  Define arguments for the memory, map, area, width, height and disk resources
+  with SI prefixes (.e.g 100MB).  In addition, resource policies are maximums
+  for each instance of ImageMagick (e.g. policy memory limit 1GB, -limit 2GB
+  exceeds policy maximum so memory limit is 1GB).
+
+  Rules are processed in order.  Here we want to restrict ImageMagick to only
+  read or write a small subset of proven web-safe image types:
+
+    <policy domain="delegate" rights="none" pattern="*" />
+    <policy domain="filter" rights="none" pattern="*" />
+    <policy domain="coder" rights="none" pattern="*" />
+    <policy domain="coder" rights="read|write" pattern="{GIF,JPEG,PNG,WEBP}" />
+-->
+<policymap>
+  <!-- <policy domain="resource" name="temporary-path" value="/tmp"/> -->
+  <policy domain="resource" name="memory" value="256MiB"/>
+  <policy domain="resource" name="map" value="512MiB"/>
+  <policy domain="resource" name="width" value="16KP"/>
+  <policy domain="resource" name="height" value="16KP"/>
+  <!-- <policy domain="resource" name="list-length" value="128"/> -->
+  <policy domain="resource" name="area" value="128MP"/>
+  <policy domain="resource" name="disk" value="1GiB"/>
+  <!-- <policy domain="resource" name="file" value="768"/> -->
+  <!-- <policy domain="resource" name="thread" value="4"/> -->
+  <!-- <policy domain="resource" name="throttle" value="0"/> -->
+  <!-- <policy domain="resource" name="time" value="3600"/> -->
+  <!-- <policy domain="coder" rights="none" pattern="MVG" /> -->
+  <!-- <policy domain="module" rights="none" pattern="{PS,PDF,XPS}" /> -->
+  <!-- <policy domain="path" rights="none" pattern="@*" /> -->
+  <!-- <policy domain="cache" name="memory-map" value="anonymous"/> -->
+  <!-- <policy domain="cache" name="synchronize" value="True"/> -->
+  <!-- <policy domain="cache" name="shared-secret" value="passphrase" stealth="true"/>
+  <!-- <policy domain="system" name="max-memory-request" value="256MiB"/> -->
+  <!-- <policy domain="system" name="shred" value="2"/> -->
+  <!-- <policy domain="system" name="precision" value="6"/> -->
+  <!-- <policy domain="system" name="font" value="/path/to/font.ttf"/> -->
+  <!-- <policy domain="system" name="pixel-cache-memory" value="anonymous"/> -->
+  <!-- <policy domain="system" name="shred" value="2"/> -->
+  <!-- <policy domain="system" name="precision" value="6"/> -->
+  <!-- not needed due to the need to use explicitly by mvg: -->
+  <!-- <policy domain="delegate" rights="none" pattern="MVG" /> -->
+  <!-- use curl -->
+  <policy domain="delegate" rights="none" pattern="URL" />
+  <policy domain="delegate" rights="none" pattern="HTTPS" />
+  <policy domain="delegate" rights="none" pattern="HTTP" />
+  <!-- in order to avoid to get image with password text -->
+  <policy domain="path" rights="none" pattern="@*"/>
+  <!-- disable ghostscript format types -->
+  <policy domain="coder" rights="read | write" pattern="PDF" />
+  <policy domain="coder" rights="read | write" pattern="EPS" />
+  <policy domain="coder" rights="read | write" pattern="PS" />
+</policymap>
+CZXWXcRMTo8EmM8i4d
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_get_workarounds_ghostscript_policyXML_write() {
+	local currentExitStatus
+	currentExitStatus="1"
+	_get_workarounds_ghostscript_policyXML /etc/ImageMagick-6/policy.xml > /dev/null 2>&1
+	[[ "$?" == "0" ]] && currentExitStatus="0"
+	_get_workarounds_ghostscript_policyXML /etc/ImageMagick-7/policy.xml > /dev/null 2>&1
+	[[ "$?" == "0" ]] && currentExitStatus="0"
+	
+	return "$currentExitStatus"
+}
+
+
+
+_get_workarounds() {
+	_get_workarounds_ghostscript_policyXML_write "$@"
+	
+	
 }
 
 
@@ -8830,10 +9191,14 @@ _prepare_query() {
 	! [[ -e "$ub_queryserver" ]] && cp "$scriptAbsoluteLocation" "$ub_queryserver"
 	
 	_prepare_query_prog "$@"
+	
+	_safe_declare_uid
 }
 
 _queryServer_sequence() {
 	_start
+	
+	_safe_declare_uid
 	
 	local currentExitStatus
 	
@@ -8854,6 +9219,8 @@ _qs() {
 
 _queryClient_sequence() {
 	_start
+	
+	_safe_declare_uid
 	
 	local currentExitStatus
 	
@@ -9444,6 +9811,48 @@ _test_gitBest() {
 
 
 
+# Requires "$GH_TOKEN" .
+_gh_downloadURL() {
+	local current_url
+	local current_repo
+	local current_tagName
+	local current_file
+	
+	
+	# ATTRIBUTION: ChatGPT GPT-4 2023-11-04 .
+	
+	# The provided URL
+	current_url="$1"
+	shift
+	
+	# Use `sed` to extract the parts of the URL
+	current_repo=$(echo "$current_url" | sed -n 's|https://github.com/\([^/]*\)/\([^/]*\)/.*|\1/\2|p')
+	current_tagName=$(echo "$current_url" | sed -n 's|https://github.com/[^/]*/[^/]*/releases/download/\([^/]*\)/.*|\1|p')
+	current_file=$(echo "$current_url" | sed -n 's|https://github.com/[^/]*/[^/]*/releases/download/[^/]*/\(.*\)|\1|p')
+	
+	local current_fileOut
+	current_fileOut="$current_file"
+	if [[ "$1" == "-O" ]]
+	then
+		#_gh_downloadURL "${currentURL_array_reversed[$currentIterationNext1]}" -O "$currentAxelTmpFileRelative".tmp2
+		current_fileOut="$2"
+	fi
+	
+	# Use variables to construct the gh release download command
+	local currentIteration
+	currentIteration=0
+	while ! [[ -e "$current_fileOut" ]] && [[ "$currentIteration" -lt 3 ]]
+	do
+		gh release download "$current_tagName" -R "$current_repo" -p "$current_file" "$@"
+		! [[ -e "$current_fileOut" ]] && sleep 7
+		let currentIteration=currentIteration+1
+	done
+	[[ -e "$current_fileOut" ]]
+	return "$?"
+}
+
+
+
 _wget_githubRelease-URL() {
 	local currentURL
 	if [[ "$2" != "" ]]
@@ -9478,16 +9887,44 @@ _wget_githubRelease-URL() {
 
 _wget_githubRelease() {
 	local currentURL=$(_wget_githubRelease-URL "$@")
-	_messagePlain_probe curl -L -o "$3" "$currentURL" >&2
-	curl -L -o "$3" "$currentURL"
+	if [[ "$GH_TOKEN" == "" ]]
+	then
+		_messagePlain_probe curl -L -o "$3" "$currentURL" >&2
+		curl -L -o "$3" "$currentURL"
+	else
+		if type -p gh > /dev/null 2>&1 && [[ "$GH_TOKEN" != "" ]] && [[ "$FORCE_WGET" != "true" ]]
+		then
+			_messagePlain_probe _gh_downloadURL "$currentURL" -O "$3" >&2
+			_gh_downloadURL "$currentURL" -O "$3"
+		else
+			# Broken. Must use 'gh' instead.
+			_messagePlain_probe curl -H "Authorization: Bearer "'$GH_TOKEN' -L -o "$3" "$currentURL" >&2
+			curl -H "Authorization: Bearer $GH_TOKEN" -L -o "$3" "$currentURL"
+		fi
+	fi
 	[[ ! -e "$3" ]] && _messagePlain_bad 'missing: '"$1"' '"$2"' '"$3" && return 1
 	return 0
 }
 
 _wget_githubRelease-stdout() {
 	local currentURL=$(_wget_githubRelease-URL "$@")
-	_messagePlain_probe curl -L -o - "$currentURL" >&2
-	curl -L -o - "$currentURL"
+	if type -p gh > /dev/null 2>&1 && [[ "$GH_TOKEN" != "" ]] && [[ "$FORCE_WGET" != "true" ]]
+	then
+		_messagePlain_probe _gh_downloadURL "$currentURL" -O - >&2
+		_gh_downloadURL "$currentURL" -O -
+		return
+	else
+		if [[ "$GH_TOKEN" == "" ]]
+		then
+			_messagePlain_probe curl -L -o - "$currentURL" >&2
+			curl -L -o - "$currentURL"
+		else
+			# Broken. Must use 'gh' instead.
+			_messagePlain_probe curl -H "Authorization: Bearer "'$GH_TOKEN' -L -o - "$currentURL" >&2
+			curl -H "Authorization: Bearer $GH_TOKEN" -L -o - "$currentURL"
+		fi
+		return
+	fi
 }
 
 
@@ -9695,7 +10132,7 @@ _wget_githubRelease_join-stdout() {
 						aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
 						currentPID_2="$!"
 					else
-						_messagePlainProbe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIterationNext1]}" >&2
+						_messagePlain_probe aria2c -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIterationNext1]}" >&2
 						aria2c --log=- --log-level=info -x "$currentForceAxel" -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
 						currentPID_2="$!"
 					fi
@@ -9812,6 +10249,12 @@ _wget_githubRelease_join-stdout() {
 		rm -f "$currentAxelTmpFile".tmp2
 		rm -f "$currentAxelTmpFile".tmp2.st
 		rm -f "$currentAxelTmpFile".tmp2.aria2
+		rm -f "$currentAxelTmpFile".tmp3
+		rm -f "$currentAxelTmpFile".tmp3.st
+		rm -f "$currentAxelTmpFile".tmp3.aria2
+		rm -f "$currentAxelTmpFile".tmp4
+		rm -f "$currentAxelTmpFile".tmp4.st
+		rm -f "$currentAxelTmpFile".tmp4.aria2
 			
 		rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
 		
@@ -9821,6 +10264,342 @@ _wget_githubRelease_join-stdout() {
 		then
 			_messagePlain_probe curl -L "${currentURL_array_reversed[@]}" >&2
 			curl -L "${currentURL_array_reversed[@]}"
+		elif type -p gh > /dev/null 2>&1 && [[ "$GH_TOKEN" != "" ]] && [[ "$FORCE_WGET" != "true" ]]
+		then
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			# ATTENTION: Follows structure based on functionality for 'aria2c' .
+			
+			#local currentAxelTmpFile
+			#currentAxelTmpFile="$scriptAbsoluteFolder"/.m_axelTmp_$(_uid 14)
+			export currentAxelTmpFileRelative=.m_axelTmp_$(_uid 14)
+			export currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
+			
+			local currentPID_1
+			local currentPID_2
+			local currentPID_3
+			local currentPID_4
+			local currentIteration
+			currentIteration=0
+			local currentIterationNext1
+			let currentIterationNext1=currentIteration+1
+			local currentIterationNext2
+			let currentIterationNext2=currentIteration+2
+			local currentIterationNext3
+			let currentIterationNext3=currentIteration+3
+			rm -f "$currentAxelTmpFile"
+			rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+			while [[ "${currentURL_array_reversed[$currentIteration]}" != "" ]] || [[ "${currentURL_array_reversed[$currentIterationNext1]}" != "" ]] || [[ -e "$currentAxelTmpFile".tmp2 ]] || [[ "${currentURL_array_reversed[$currentIterationNext2]}" != "" ]] || [[ -e "$currentAxelTmpFile".tmp3 ]] || [[ "${currentURL_array_reversed[$currentIterationNext3]}" != "" ]] || [[ -e "$currentAxelTmpFile".tmp4 ]]
+			do
+				#rm -f "$currentAxelTmpFile"
+				rm -f "$currentAxelTmpFile".aria2 > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp.st > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp.aria2 > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp1 > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp1.st > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp1.aria2 > /dev/null 2>&1
+				#rm -f "$currentAxelTmpFile".tmp2 > /dev/null 2>&1
+				#rm -f "$currentAxelTmpFile".tmp2.st > /dev/null 2>&1
+				#rm -f "$currentAxelTmpFile".tmp2.aria2 > /dev/null 2>&1
+				#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+				
+				#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+
+				# https://github.com/aria2/aria2/issues/1108
+
+				if [[ "${currentURL_array_reversed[$currentIteration]}" != "" ]]
+				then
+					_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIteration]}" -O "$currentAxelTmpFileRelative".tmp1 >&2
+					#"$scriptAbsoluteLocation"
+					_gh_downloadURL "${currentURL_array_reversed[$currentIteration]}" -O "$currentAxelTmpFileRelative".tmp1 >&2 &
+					currentPID_1="$!"
+				fi
+				
+				
+				# CAUTION: ATTENTION: Very important. Simultaneous reading and writing is *very* important for writing directly to slow media (ie. BD-R) .
+				#  NOTICE: Wirting directly to slow BD-R is essential for burning a Live disc from having booted a Live disc.
+				#   DANGER: Critical for rapid recovery back to recent upstream 'ubdist/OS' ! Do NOT unnecessarily degrade this capability!
+				#  Also theoretically helpful with especially fast network connections.
+				#if [[ "$currentIteration" != "0" ]]
+				if [[ -e "$currentAxelTmpFile".tmp2 ]]
+				then
+					# ATTENTION: Staggered.
+					#sleep 10 > /dev/null 2>&1
+					wait "$currentPID_2" >&2
+					[[ "$currentPID_2" != "" ]] && _pauseForProcess "$currentPID_2" >&2
+					#wait >&2
+
+					sleep 0.2 > /dev/null 2>&1
+					if [[ -e "$currentAxelTmpFile".tmp2 ]]
+					then
+						_messagePlain_probe dd if="$currentAxelTmpFile".tmp2 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
+						
+						# ### dd if="$currentAxelTmpFile".tmp2 bs=5M status=progress >> "$currentAxelTmpFile"
+						dd if="$currentAxelTmpFile".tmp2 bs=1M status=progress
+						#cat "$currentAxelTmpFile".tmp2
+						
+						du -sh "$currentAxelTmpFile".tmp2 >> "$currentAxelTmpFile"
+						
+						#cat "$currentAxelTmpFile".tmp2 >> "$currentAxelTmpFile"
+					fi
+				else
+					if [[ "$currentIteration" == "0" ]]
+					then
+						# ATTENTION: Staggered.
+						#sleep 6 > /dev/null 2>&1
+						true
+					fi
+				fi
+				rm -f "$currentAxelTmpFile".tmp2 > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp2.st > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp2.aria2 > /dev/null 2>&1
+				#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+				
+				if [[ "${currentURL_array_reversed[$currentIterationNext1]}" != "" ]]
+				then
+					_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIterationNext1]}" -O "$currentAxelTmpFileRelative".tmp2 >&2
+					#"$scriptAbsoluteLocation" 
+					_gh_downloadURL "${currentURL_array_reversed[$currentIterationNext1]}" -O "$currentAxelTmpFileRelative".tmp2 >&2 &
+					currentPID_2="$!"
+				fi
+				
+				
+				
+				if [[ -e "$currentAxelTmpFile".tmp3 ]]
+				then
+					# ATTENTION: Staggered.
+					#sleep 10 > /dev/null 2>&1
+					wait "$currentPID_3" >&2
+					[[ "$currentPID_3" != "" ]] && _pauseForProcess "$currentPID_3" >&2
+					#wait >&2
+
+					sleep 0.2 > /dev/null 2>&1
+					if [[ -e "$currentAxelTmpFile".tmp3 ]]
+					then
+						_messagePlain_probe dd if="$currentAxelTmpFile".tmp3 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
+						
+						# ### dd if="$currentAxelTmpFile".tmp3 bs=5M status=progress >> "$currentAxelTmpFile"
+						dd if="$currentAxelTmpFile".tmp3 bs=1M status=progress
+						#cat "$currentAxelTmpFile".tmp3
+						
+						du -sh "$currentAxelTmpFile".tmp3 >> "$currentAxelTmpFile"
+						
+						#cat "$currentAxelTmpFile".tmp3 >> "$currentAxelTmpFile"
+					fi
+				else
+					if [[ "$currentIteration" == "0" ]]
+					then
+						# ATTENTION: Staggered.
+						#sleep 6 > /dev/null 2>&1
+						true
+					fi
+				fi
+				rm -f "$currentAxelTmpFile".tmp3 > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp3.st > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp3.aria2 > /dev/null 2>&1
+				#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+				
+				if [[ "${currentURL_array_reversed[$currentIterationNext2]}" != "" ]]
+				then
+					_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIterationNext2]}" -O "$currentAxelTmpFileRelative".tmp3 >&2
+					#"$scriptAbsoluteLocation" 
+					_gh_downloadURL "${currentURL_array_reversed[$currentIterationNext2]}" -O "$currentAxelTmpFileRelative".tmp3 >&2 &
+					currentPID_3="$!"
+				fi
+				
+				
+				
+				if [[ -e "$currentAxelTmpFile".tmp4 ]]
+				then
+					# ATTENTION: Staggered.
+					#sleep 10 > /dev/null 2>&1
+					wait "$currentPID_4" >&2
+					[[ "$currentPID_4" != "" ]] && _pauseForProcess "$currentPID_4" >&2
+					#wait >&2
+
+					sleep 0.2 > /dev/null 2>&1
+					if [[ -e "$currentAxelTmpFile".tmp4 ]]
+					then
+						_messagePlain_probe dd if="$currentAxelTmpFile".tmp4 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
+						
+						# ### dd if="$currentAxelTmpFile".tmp4 bs=5M status=progress >> "$currentAxelTmpFile"
+						dd if="$currentAxelTmpFile".tmp4 bs=1M status=progress
+						#cat "$currentAxelTmpFile".tmp4
+						
+						du -sh "$currentAxelTmpFile".tmp4 >> "$currentAxelTmpFile"
+						
+						#cat "$currentAxelTmpFile".tmp4 >> "$currentAxelTmpFile"
+					fi
+				else
+					if [[ "$currentIteration" == "0" ]]
+					then
+						# ATTENTION: Staggered.
+						#sleep 6 > /dev/null 2>&1
+						true
+					fi
+				fi
+				rm -f "$currentAxelTmpFile".tmp4 > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp4.st > /dev/null 2>&1
+				rm -f "$currentAxelTmpFile".tmp4.aria2 > /dev/null 2>&1
+				#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+				
+				if [[ "${currentURL_array_reversed[$currentIterationNext3]}" != "" ]]
+				then
+					_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIterationNext3]}" -O "$currentAxelTmpFileRelative".tmp4 >&2
+					#"$scriptAbsoluteLocation" 
+					_gh_downloadURL "${currentURL_array_reversed[$currentIterationNext3]}" -O "$currentAxelTmpFileRelative".tmp4 >&2 &
+					currentPID_4="$!"
+				fi
+				
+				
+
+				# ATTENTION: NOT staggered.
+				#wait "$currentPID_1" >&2
+				#[[ "$currentPID_1" != "" ]] && _pauseForProcess "$currentPID_1" >&2
+				#wait "$currentPID_2" >&2
+				#[[ "$currentPID_2" != "" ]] && _pauseForProcess "$currentPID_2" >&2
+				#wait "$currentPID_3" >&2
+				#[[ "$currentPID_3" != "" ]] && _pauseForProcess "$currentPID_3" >&2
+				#wait "$currentPID_4" >&2
+				#[[ "$currentPID_4" != "" ]] && _pauseForProcess "$currentPID_4" >&2
+				#wait >&2
+				
+				if [[ "$currentIteration" == "0" ]]
+				then
+					# CAUTION: Workaround for DUMMY , ONLY . Will NOT, by design, accept files that are both >1part and <4parts .
+					#  This is to confidently reject failures to acquire part4 during the initial multiple connections.
+					#sleep 7
+					sleep 90
+					if ( [[ ! -e "$currentAxelTmpFileRelative".tmp1 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp2 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp3 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp4 ]] ) && ! ( [[ -e "$currentAxelTmpFileRelative".tmp1 ]] && ( [[ ! -e "$currentAxelTmpFileRelative".tmp2 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp3 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp4 ]] ) )
+					then
+						_messageFAIL >&2
+						_messageFAIL
+						_stop 1
+						return 1
+					fi
+					wait "$currentPID_1" >&2
+					[[ "$currentPID_1" != "" ]] && _pauseForProcess "$currentPID_1" >&2
+					sleep 6 > /dev/null 2>&1
+					[[ "$currentPID_2" == "" ]] && sleep 35 > /dev/null 2>&1
+					[[ "$currentPID_2" != "" ]] && wait "$currentPID_2" >&2
+					[[ "$currentPID_2" != "" ]] && _pauseForProcess "$currentPID_2" >&2
+					[[ "$currentPID_3" != "" ]] && wait "$currentPID_3" >&2
+					[[ "$currentPID_3" != "" ]] && _pauseForProcess "$currentPID_3" >&2
+					[[ "$currentPID_4" != "" ]] && wait "$currentPID_4" >&2
+					[[ "$currentPID_4" != "" ]] && _pauseForProcess "$currentPID_4" >&2
+					wait >&2
+				fi
+
+				wait "$currentPID_1" >&2
+				[[ "$currentPID_1" != "" ]] && _pauseForProcess "$currentPID_1" >&2
+				sleep 0.2 > /dev/null 2>&1
+				if [[ -e "$currentAxelTmpFile".tmp1 ]]
+				then
+					_messagePlain_probe dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
+					
+					if [[ ! -e "$currentAxelTmpFile" ]]
+					then
+						# ### mv -f "$currentAxelTmpFile".tmp1 "$currentAxelTmpFile"
+						dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress
+						
+						du -sh "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
+					else
+						# ATTENTION: Staggered.
+						#dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress >> "$currentAxelTmpFile" &
+					
+						# ATTENTION: NOT staggered.
+						# ### dd if="$currentAxelTmpFile".tmp1 bs=5M status=progress >> "$currentAxelTmpFile"
+						dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress
+						#cat "$currentAxelTmpFile".tmp1
+						
+						du -sh "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
+						
+						#cat "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
+					fi
+				fi
+
+				let currentIteration=currentIteration+4
+				let currentIterationNext1=currentIteration+1
+				let currentIterationNext2=currentIteration+2
+				let currentIterationNext3=currentIteration+3
+			done
+
+			if ! [[ -e "$currentAxelTmpFile" ]]
+			then
+				true
+				# ### return 1
+			fi
+
+			# ### cat "$currentAxelTmpFile"
+
+			rm -f "$currentAxelTmpFile"
+			rm -f "$currentAxelTmpFile".aria2
+			rm -f "$currentAxelTmpFile".tmp
+			rm -f "$currentAxelTmpFile".tmp.st
+			rm -f "$currentAxelTmpFile".tmp.aria2
+			rm -f "$currentAxelTmpFile".tmp1
+			rm -f "$currentAxelTmpFile".tmp1.st
+			rm -f "$currentAxelTmpFile".tmp1.aria2
+			rm -f "$currentAxelTmpFile".tmp2
+			rm -f "$currentAxelTmpFile".tmp2.st
+			rm -f "$currentAxelTmpFile".tmp2.aria2
+			rm -f "$currentAxelTmpFile".tmp3
+			rm -f "$currentAxelTmpFile".tmp3.st
+			rm -f "$currentAxelTmpFile".tmp3.aria2
+			rm -f "$currentAxelTmpFile".tmp4
+			rm -f "$currentAxelTmpFile".tmp4.st
+			rm -f "$currentAxelTmpFile".tmp4.aria2
+			
+			rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 		else
 			_messagePlain_probe curl -H '"Authorization: Bearer $GH_TOKEN"' -L "${currentURL_array_reversed[@]}" >&2
 			curl -H "Authorization: Bearer $GH_TOKEN" -L "${currentURL_array_reversed[@]}"
@@ -11426,6 +12205,88 @@ CZXWXcRMTo8EmM8i4d
 
 
 
+_setupUbiquitous_accessories_here-coreoracle_bashrc() {
+	
+	if _if_cygwin
+	then
+		cat << CZXWXcRMTo8EmM8i4d
+
+if [[ -e /cygdrive/c/core/infrastructure/coreoracle ]]
+then
+	export shortcutsPath_coreoracle=/cygdrive/c/"core/infrastructure/coreoracle"
+	. /cygdrive/c/core/infrastructure/coreoracle/_shortcuts-cygwin.sh
+elif [[ -e /cygdrive/c/core/infrastructure/extendedInterface/_lib/coreoracle-msw ]]
+then
+	export shortcutsPath_coreoracle=/cygdrive/c/core/infrastructure/extendedInterface/_lib/coreoracle-msw"
+	. /cygdrive/c/core/infrastructure/extendedInterface/_lib/coreoracle-msw/_shortcuts-cygwin.sh
+#elif [[ -e /cygdrive/c/core/infrastructure/extendedInterface/_lib/coreoracle ]]
+#then
+	#export shortcutsPath_coreoracle=/cygdrive/c/core/infrastructure/extendedInterface/_lib/coreoracle"
+	#. /cygdrive/c/core/infrastructure/extendedInterface/_lib/coreoracle/_shortcuts-cygwin.sh
+fi
+
+CZXWXcRMTo8EmM8i4d
+	else
+		cat << CZXWXcRMTo8EmM8i4d
+
+if type sudo > /dev/null 2>&1 && groups | grep -E 'wheel|sudo' > /dev/null 2>&1 && ! uname -a | grep -i cygwin > /dev/null 2>&1
+then
+	# Greater or equal, '_priority_critical_pid_root' .
+	sudo -n renice -n -15 -p \$\$ > /dev/null 2>&1
+	sudo -n ionice -c 2 -n 2 -p \$\$ > /dev/null 2>&1
+fi
+
+
+if [[ -e "$HOME"/core/infrastructure/coreoracle ]]
+then
+	export shortcutsPath_coreoracle="$HOME"/core/infrastructure/coreoracle/
+	. "$HOME"/core/infrastructure/coreoracle/_shortcuts.sh
+fi
+
+# Returns priority to normal.
+# Greater or equal, '_priority_app_pid_root' .
+#ionice -c 2 -n 3 -p \$\$
+#renice -n -5 -p \$\$ > /dev/null 2>&1
+
+# Returns priority to normal.
+# Greater or equal, '_priority_app_pid' .
+ionice -c 2 -n 4 -p \$\$
+renice -n 0 -p \$\$ > /dev/null 2>&1
+
+
+CZXWXcRMTo8EmM8i4d
+	fi
+}
+
+
+
+
+
+
+
+_setupUbiquitous_accessories_here-user_bashrc() {
+	
+	# Calls   "$HOME"/_bashrc   as a place for user defined functions, environment varialbes, etc, which should NOT follow dist/OS updates (eg. extendedInterface reinstallation) and should be copied after dist/OS reinstallation (ie. placed on an SDCard or similar before '_revert-fromLive /dev/sda' .
+	#  WARNING: Nevertheless, bashrc is very bad practice . Instead, functionality should be pushed upstream (eg. to 'ubiquitous bash', etc) .
+	#   The exception may be very specialized infrastructure (ie. conveniently calling specialized Virtual Machines).
+	
+	cat << CZXWXcRMTo8EmM8i4d
+
+if [[ -e "$HOME"/_bashrc ]]
+then
+	. "$HOME"/_bashrc
+fi
+
+CZXWXcRMTo8EmM8i4d
+
+}
+
+
+
+
+
+
+
 
 
 
@@ -11551,8 +12412,15 @@ _setupUbiquitous_accessories_bashrc() {
 	
 	#echo true
 	
+	
+	_setupUbiquitous_accessories_here-coreoracle_bashrc "$@"
+	
+	
 	# WARNING: Python must remain last. Failure to hook python is a failure that must show as an error exit status from the users profile (a red "1" on the first line of first visual prompt command prompt).
 	_setupUbiquitous_accessories_here-python_bashrc "$@"
+	
+	
+	_setupUbiquitous_accessories_here-user_bashrc "$@"
 	
 	#echo true
 }
@@ -11570,6 +12438,21 @@ _setupUbiquitous_accessories_requests() {
 
 
 
+_setupUbiquitous_safe_bashrc() {
+
+cat << CZXWXcRMTo8EmM8i4d
+#Generates semi-random alphanumeric characters, default length 18.
+#_uid() {
+	#local currentLengthUID
+	#currentLengthUID="\$1"
+	#[[ "\$currentLengthUID" == "" ]] && currentLengthUID=18
+	#cat /dev/random 2> /dev/null | base64 2> /dev/null | tr -dc 'a-zA-Z0-9' 2> /dev/null | tr -d 'acdefhilmnopqrsuvACDEFHILMNOPQRSU14580' | head -c "\$currentLengthUID" 2> /dev/null
+	#return
+#}
+_safe_declare_uid
+CZXWXcRMTo8EmM8i4d
+
+}
 
 _setupUbiquitous_here() {
 	! uname -a | grep -i cygwin > /dev/null 2>&1 && cat << CZXWXcRMTo8EmM8i4d
@@ -11887,6 +12770,7 @@ _setupUbiquitous() {
 	
 	_setupUbiquitous_here > "$ubcoreFile"
 	_setupUbiquitous_accessories_bashrc >> "$ubcoreFile"
+	_setupUbiquitous_safe_bashrc >> "$ubcoreFile"
 	! [[ -e "$ubcoreFile" ]] && _messagePlain_bad 'missing: ubcoreFile= '"$ubcoreFile" && _messageFAIL && return 1
 	
 	
@@ -18008,6 +18892,7 @@ _test() {
 	
 	_getDep dd
 	_wantGetDep blockdev
+	_wantGetDep lsblk
 	
 	_getDep rm
 	
@@ -20294,6 +21179,8 @@ _wrap() {
 	[[ "$LANG" != "C" ]] && export LANG=C
 	. "$HOME"/.ubcore/.ubcorerc
 	
+	_safe_declare_uid
+	
 	if uname -a | grep -i 'microsoft' > /dev/null 2>&1 && uname -a | grep -i 'WSL2' > /dev/null 2>&1
 	then
 		local currentArg
@@ -20322,10 +21209,14 @@ _wrap() {
 
 #Wrapper function to launch arbitrary commands within the ubiquitous_bash environment, including its PATH with scriptBin.
 _bin() {
+	_safe_declare_uid
+	
 	"$@"
 }
 #Mostly intended to launch bash prompt for MSW/Cygwin users.
 _bash() {
+	_safe_declare_uid
+	
 	local currentIsCygwin
 	currentIsCygwin='false'
 	[[ -e '/cygdrive' ]] && uname -a | grep -i cygwin > /dev/null 2>&1 && _if_cygwin && currentIsCygwin='true'
@@ -20337,10 +21228,13 @@ _bash() {
 	_visualPrompt
 	[[ "$ub_scope_name" != "" ]] && _scopePrompt
 	
+	_safe_declare_uid
+	
 	
 	[[ "$1" == '-i' ]] && shift
 	
 	
+	_safe_declare_uid
 	
 	if [[ "$currentIsCygwin" == 'true' ]] && grep ubcore "$HOME"/.bashrc > /dev/null 2>&1 && [[ "$scriptAbsoluteLocation" == *"lean.sh" ]]
 	then
@@ -20370,6 +21264,8 @@ _bash() {
 
 #Mostly if not entirely intended for end user convenience.
 _python() {
+	_safe_declare_uid
+	
 	if [[ -e "$safeTmp"/lean.py ]]
 	then
 		"$safeTmp"/lean.py '_python()'
@@ -20390,23 +21286,33 @@ _python() {
 
 #Launch internal functions as commands, and other commands, as root.
 _sudo() {
+	_safe_declare_uid
+	
 	sudo -n "$scriptAbsoluteLocation" _bin "$@"
 }
 
 _true() {
+	_safe_declare_uid
+	
 	#"$scriptAbsoluteLocation" _false && return 1
 	#  ! "$scriptAbsoluteLocation" _bin true && return 1
 	#"$scriptAbsoluteLocation" _bin false && return 1
 	true
 }
 _false() {
+	_safe_declare_uid
+	
 	false
 }
 _echo() {
+	_safe_declare_uid
+	
 	echo "$@"
 }
 
 _diag() {
+	_safe_declare_uid
+	
 	echo "$sessionid"
 }
 
