@@ -8,12 +8,9 @@ _ Statement _
 [0;37;100m[0;31m bad: not:     Y: CONFIG_DEBUG_CREDENTIALS [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_UBSAN_LOCAL_BOUNDS [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_CFI_CLANG [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGINS [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_LATENT_ENTROPY [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_SECURITY_LOCKDOWN_LSM_EARLY [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STACKLEAK [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_RANDSTRUCT [0m[0m
 [0;37;100m[1;33m warn: not:    N: CONFIG_KEXEC [0m[0m
 [0;37;100m[1;33m warn: not:    Y: CONFIG_EFI_DISABLE_PCI_DMA [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_X86_SGX_kVM [0m[0m
