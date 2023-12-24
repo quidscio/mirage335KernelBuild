@@ -6,10 +6,8 @@ _ Statement _
 [0;37;100m[0;36m kernelConfig: tradeoff-harden [0m[0m
 [0;37;100m[0;35m Carefully evaluate 'tradeoff-harden' for specific use cases. [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_DEBUG_CREDENTIALS [0m[0m
-[0;37;100m[0;31m bad: not:     N:  [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_UBSAN_LOCAL_BOUNDS [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_CFI_CLANG [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_CC_STACKPROTECTOR_STRONG [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGINS [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_LATENT_ENTROPY [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK [0m[0m
