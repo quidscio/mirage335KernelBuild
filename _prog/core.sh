@@ -345,6 +345,10 @@ _kernelScripts-disableDebug() {
 }
 
 
+_rmCerts-kernel() {
+	rm -f ./certs/.*cmd ./certs/.*d ./certs/*.cmd ./certs/*.d ./certs/*.o ./certs/*.a ./certs/*.order ./certs/*.pem ./certs/blacklist_hash_list ./certs/extract-cert ./certs/x509_certificate_list ./certs/x509_revocation_list ./certs/extra_certificates ./certs/*.priv ./certs/signing_key* ./certs/x509.genkey ./certs/*.a ./certs/*.elf ./certs/*.mod ./certs/*.mod.* ./certs/*.o.* ./certs/*.s ./certs/*.so ./certs/*.so.* ./certs/*.symvers
+}
+
 _buildKernel-lts() {
 	_messageNormal "init: buildKernel-lts: ""$currentKernelPath"
 	make clean
@@ -365,17 +369,26 @@ _buildKernel-lts() {
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
 	
+	local currentExitStatus
+	currentExitStatus=0
+	
 	if [[ "$current_force_bindepOnly" != true ]]
 	then
 		make deb-pkg -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
 	else
 		_messageError 'bad: current_force_bindepOnly'
 		export current_force_bindepOnly=""
 		unset current_force_bindepOnly
 		#make bindeb-pkg -j $(nproc)
 		make -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
 	fi
-	[[ "$?" != "0" ]] && _messageFAIL
+	
+	_rmCerts-kernel
+	
+	[[ "$currentExitStatus" != "0" ]] && _messageFAIL
+	
 	
 	return 0
 }
@@ -400,17 +413,26 @@ _buildKernel-mainline() {
 	#make -j $(nproc)
 	#[[ "$?" != "0" ]] && _messageFAIL
 	
+	local currentExitStatus
+	currentExitStatus=0
+	
 	if [[ "$current_force_bindepOnly" != true ]]
 	then
 		make deb-pkg -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
 	else
 		_messageError 'bad: current_force_bindepOnly'
 		export current_force_bindepOnly=""
 		unset current_force_bindepOnly
 		#make bindeb-pkg -j $(nproc)
 		make -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
 	fi
-	[[ "$?" != "0" ]] && _messageFAIL
+	
+	_rmCerts-kernel
+	
+	[[ "$currentExitStatus" != "0" ]] && _messageFAIL
+	
 	
 	return 0
 }
