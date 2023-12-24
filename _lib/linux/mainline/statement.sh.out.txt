@@ -5,6 +5,19 @@ _ Statement _
 [0;37;100m[0;35m Carefully evaluate 'tradeoff-legacy' for specific use cases. [0m[0m
 [0;37;100m[0;36m kernelConfig: tradeoff-harden [0m[0m
 [0;37;100m[0;35m Carefully evaluate 'tradeoff-harden' for specific use cases. [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_DEBUG_CREDENTIALS [0m[0m
+[0;37;100m[0;31m bad: not:     N:  [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_UBSAN_LOCAL_BOUNDS [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_CFI_CLANG [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_CC_STACKPROTECTOR_STRONG [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGINS [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_LATENT_ENTROPY [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STACKLEAK [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_RANDSTRUCT [0m[0m
+[0;37;100m[1;33m warn: not:    N: CONFIG_KEXEC [0m[0m
+[0;37;100m[1;33m warn: not:    Y: CONFIG_EFI_DISABLE_PCI_DMA [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_X86_SGX_kVM [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_INTEL_TDX_GUEST [0m[0m
 [0;37;100m[0;31m bad: not:     Y: TDX_GUEST_DRIVER [0m[0m
@@ -23,6 +36,7 @@ _ Statement _
 [0;37;100m[1;33m warn: not:    Y: CPU_FREQ_DEFAULT_GOV_ONDEMAND [0m[0m
 [0;37;100m[0;35m hazard: CONFIG_PREEMPT: CONFIG_PREEMPT=y [0m[0m
 [0;37;100m[0;35m hazard: CONFIG_PREEMPT_RT:  [0m[0m
+[0;37;100m[0;31m bad: not:     N: CONFIG_DEBUG_NOTIFIERS [0m[0m
 [0;37;100m[0;36m kernelConfig: memory [0m[0m
 [0;37;100m[1;33m warn: not:    Y: CONFIG_FRONTSWAP [0m[0m
 [0;37;100m[0;36m kernelConfig: integration [0m[0m

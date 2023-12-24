@@ -69,6 +69,19 @@ if false; then true; # -->
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-legacy' for specific use cases.</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: tradeoff-harden</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-harden' for specific use cases.</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_DEBUG_CREDENTIALS</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     N: </span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_UBSAN_LOCAL_BOUNDS</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_CFI_CLANG</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_CC_STACKPROTECTOR_STRONG</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGINS</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_LATENT_ENTROPY</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STACKLEAK</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_RANDSTRUCT</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    N: CONFIG_KEXEC</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_EFI_DISABLE_PCI_DMA</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_X86_SGX_kVM</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_INTEL_TDX_GUEST</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: TDX_GUEST_DRIVER</span>
@@ -87,6 +100,7 @@ if false; then true; # -->
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CPU_FREQ_DEFAULT_GOV_ONDEMAND</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT: CONFIG_PREEMPT=y</span>
 <!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT_RT: </span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     N: CONFIG_DEBUG_NOTIFIERS</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: memory</span>
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_FRONTSWAP</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: integration</span>
