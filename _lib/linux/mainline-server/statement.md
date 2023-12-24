@@ -81,7 +81,6 @@ if false; then true; # -->
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_CFI_CLANG</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_SECURITY_LOCKDOWN_LSM_EARLY</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGINS</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_LATENT_ENTROPY</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL</span>

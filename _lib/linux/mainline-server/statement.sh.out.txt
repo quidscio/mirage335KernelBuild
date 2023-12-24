@@ -15,7 +15,6 @@ _ Statement _
 [0;37;100m[0;31m bad: not:     Y: CONFIG_CFI_CLANG [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_SECURITY_LOCKDOWN_LSM_EARLY [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGINS [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_LATENT_ENTROPY [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL [0m[0m
