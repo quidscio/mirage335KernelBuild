@@ -288,6 +288,7 @@ _fetchKernel-mainline() {
 _fetchKernel-mainline-server() {
 	export currentKernelPlatform="-server"
 	_fetchKernel-mainline "$@"
+	export currentKernelPlatform=""
 }
 
 
@@ -676,6 +677,7 @@ _export_cloud_mainline() {
 _export_cloud_mainline-server() {
 	export currentKernelPlatform="-server"
 	_export_cloud_mainline "$@"
+	export currentKernelPlatform=""
 }
 
 
