@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='563143340'
+export ub_setScriptChecksum_contents='3194466810'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -10968,6 +10968,8 @@ _kernelConfig_require-tradeoff-legacy() {
 	_kernelConfig__bad-n__ LEGACY_VSYSCALL_EMULATE
 }
 
+# WARNING: May be untested .
+# WARNING: May not identify drastically performance degrading features from harden-NOTcompatible .
 # WARNING: Risk must be evaluated for specific use cases.
 # WARNING: Insecure.
 # Standalone simulators (eg. flight sim):
@@ -11056,6 +11058,50 @@ _kernelConfig_require-tradeoff-harden() {
 	
 	
 	
+	# Special.
+	# VM guest should be tested.
+
+	# https://wiki.gentoo.org/wiki/Trusted_Boot
+	_kernelConfig__bad-y__ CONFIG_HAVE_INTEL_TXT
+	_kernelConfig__bad-y__ CONFIG_INTEL_TXT
+	_kernelConfig__bad-y__ CONFIG_IOMMU_DMA
+	_kernelConfig__bad-y__ CONFIG_INTEL_IOMMU
+
+
+	# https://www.qemu.org/docs/master/system/i386/sgx.html
+	#grep sgx /proc/cpuinfo
+	#dmesg | grep sgx
+	# Apparently normal: ' sgx: [Firmware Bug]: Unable to map EPC section to online node. Fallback to the NUMA node 0. '
+
+	# https://www.qemu.org/docs/master/system/i386/sgx.html
+	#qemuArgs+=(-cpu host,+sgx-provisionkey -machine accel=kvm -object memory-backend-epc,id=mem1,size=64M,prealloc=on -M sgx-epc.0.memdev=mem1,sgx-epc.0.node=0 )
+	#qemuArgs+=(-cpu host,-sgx-provisionkey,-sgx-tokenkey)
+
+	_kernelConfig__bad-y__ CONFIG_X86_SGX
+	_kernelConfig__bad-y__ CONFIG_X86_SGX_kVM
+	_kernelConfig__bad-y__ CONFIG_INTEL_TDX_GUEST
+	_kernelConfig__bad-y__ TDX_GUEST_DRIVER
+
+
+	# https://libvirt.org/kbase/launch_security_sev.html
+	#cat /sys/module/kvm_amd/parameters/sev
+	#dmesg | grep -i sev
+
+	# https://www.qemu.org/docs/master/system/i386/amd-memory-encryption.html
+	#qemuArgs+=(-machine accel=kvm,confidential-guest-support=sev0 -object sev-guest,id=sev0,cbitpos=47,reduced-phys-bits=1 )
+	# #,policy=0x5
+
+	# https://libvirt.org/kbase/launch_security_sev.html
+	_kernelConfig__bad-y__ CONFIG_KVM_AMD_SEV
+	_kernelConfig__bad-y__ AMD_MEM_ENCRYPT
+	_kernelConfig__bad-y__ CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
+
+
+}
+
+# WARNING: ATTENTION: Before moving to tradeoff-harden (compatible), ensure vboxdrv, vboxadd, nvidia, nvidia legacy, kernel modules can be loaded without issues, and also ensure significant performance penalty configuration options are oppositely documented in the tradeoff-perform function .
+# WARNING: Disables out-of-tree modules . VirtualBox and NVIDIA drivers WILL NOT be permitted to load .
+_kernelConfig_require-tradeoff-harden-NOTcompatible() {
 	# https://kernsec.org/wiki/index.php/Kernel_Self_Protection_Project/Recommended_Settings#sysctls
 	
 	_kernelConfig__bad-y__ CONFIG_BUG
@@ -11208,54 +11254,6 @@ _kernelConfig_require-tradeoff-harden() {
 	
 	
 	_kernelConfig_warn-y__ CONFIG_EFI_DISABLE_PCI_DMA
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	# Special.
-	# VM guest should be tested.
-
-	# https://wiki.gentoo.org/wiki/Trusted_Boot
-	_kernelConfig__bad-y__ CONFIG_HAVE_INTEL_TXT
-	_kernelConfig__bad-y__ CONFIG_INTEL_TXT
-	_kernelConfig__bad-y__ CONFIG_IOMMU_DMA
-	_kernelConfig__bad-y__ CONFIG_INTEL_IOMMU
-
-
-	# https://www.qemu.org/docs/master/system/i386/sgx.html
-	#grep sgx /proc/cpuinfo
-	#dmesg | grep sgx
-	# Apparently normal: ' sgx: [Firmware Bug]: Unable to map EPC section to online node. Fallback to the NUMA node 0. '
-
-	# https://www.qemu.org/docs/master/system/i386/sgx.html
-	#qemuArgs+=(-cpu host,+sgx-provisionkey -machine accel=kvm -object memory-backend-epc,id=mem1,size=64M,prealloc=on -M sgx-epc.0.memdev=mem1,sgx-epc.0.node=0 )
-	#qemuArgs+=(-cpu host,-sgx-provisionkey,-sgx-tokenkey)
-
-	_kernelConfig__bad-y__ CONFIG_X86_SGX
-	_kernelConfig__bad-y__ CONFIG_X86_SGX_kVM
-	_kernelConfig__bad-y__ CONFIG_INTEL_TDX_GUEST
-	_kernelConfig__bad-y__ TDX_GUEST_DRIVER
-
-
-	# https://libvirt.org/kbase/launch_security_sev.html
-	#cat /sys/module/kvm_amd/parameters/sev
-	#dmesg | grep -i sev
-
-	# https://www.qemu.org/docs/master/system/i386/amd-memory-encryption.html
-	#qemuArgs+=(-machine accel=kvm,confidential-guest-support=sev0 -object sev-guest,id=sev0,cbitpos=47,reduced-phys-bits=1 )
-	# #,policy=0x5
-
-	# https://libvirt.org/kbase/launch_security_sev.html
-	_kernelConfig__bad-y__ CONFIG_KVM_AMD_SEV
-	_kernelConfig__bad-y__ AMD_MEM_ENCRYPT
-	_kernelConfig__bad-y__ CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT
-
-
 }
 
 # ATTENTION: Override with 'ops.sh' or similar.
@@ -11268,10 +11266,18 @@ _kernelConfig_require-tradeoff() {
 	if [[ "$kernelConfig_tradeoff_perform" == 'true' ]]
 	then
 		_kernelConfig_require-tradeoff-perform "$@"
+	else
+		_kernelConfig_require-tradeoff-harden "$@"
+	fi
+	
+	[[ "$kernelConfig_tradeoff_compatible" == "" ]] && export kernelConfig_tradeoff_compatible='false'
+	
+	if [[ "$kernelConfig_tradeoff_compatible" != 'true' ]]
+	then
+		_kernelConfig_require-tradeoff-harden-NOTcompatible "$@"
 		return
 	fi
 	
-	_kernelConfig_require-tradeoff-harden "$@"
 	return
 }
 
@@ -11880,6 +11886,7 @@ _kernelConfig_panel() {
 	_messageNormal 'kernelConfig: panel'
 	
 	[[ "$kernelConfig_tradeoff_perform" == "" ]] && export kernelConfig_tradeoff_perform='false'
+	[[ "$kernelConfig_tradeoff_compatible" == "" ]] && export kernelConfig_tradeoff_compatible='true'
 	[[ "$kernelConfig_frequency" == "" ]] && export kernelConfig_frequency=300
 	[[ "$kernelConfig_tickless" == "" ]] && export kernelConfig_tickless='false'
 	
@@ -11919,6 +11926,7 @@ _kernelConfig_mobile() {
 	_messageNormal 'kernelConfig: mobile'
 	
 	[[ "$kernelConfig_tradeoff_perform" == "" ]] && export kernelConfig_tradeoff_perform='false'
+	[[ "$kernelConfig_tradeoff_compatible" == "" ]] && export kernelConfig_tradeoff_compatible='true'
 	[[ "$kernelConfig_frequency" == "" ]] && export kernelConfig_frequency=300
 	[[ "$kernelConfig_tickless" == "" ]] && export kernelConfig_tickless='true'
 	
@@ -11959,6 +11967,7 @@ _kernelConfig_desktop() {
 	_messageNormal 'kernelConfig: desktop'
 	
 	[[ "$kernelConfig_tradeoff_perform" == "" ]] && export kernelConfig_tradeoff_perform='false'
+	[[ "$kernelConfig_tradeoff_compatible" == "" ]] && export kernelConfig_tradeoff_compatible='true'
 	[[ "$kernelConfig_frequency" == "" ]] && export kernelConfig_frequency=1000
 	[[ "$kernelConfig_tickless" == "" ]] && export kernelConfig_tickless='false'
 	
@@ -11997,6 +12006,7 @@ _kernelConfig_server() {
 	_messageNormal 'kernelConfig: server'
 
 	export kernelConfig_tradeoff_perform='false'
+	export kernelConfig_tradeoff_compatible='false'
 	_kernelConfig_desktop "$@"
 }
 
@@ -19886,17 +19896,17 @@ _fetchKernel-lts() {
 
 _fetchKernel-mainline() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
-	rm -f "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
-	! [[ "$current_keepFetch" == "true" ]] && _safeRMR "$scriptLocal"/mainline
+	rm -f "$scriptLocal"/mainline"$currentKernelPlatform"/*.tar.xz > /dev/null 2>&1
+	! [[ "$current_keepFetch" == "true" ]] && _safeRMR "$scriptLocal"/mainline"$currentKernelPlatform"
 
-	mkdir -p "$scriptLocal"/mainline
-	cd "$scriptLocal"/mainline
+	mkdir -p "$scriptLocal"/mainline"$currentKernelPlatform"
+	cd "$scriptLocal"/mainline"$currentKernelPlatform"
 
 	if [[ "$forceKernel_mainline" == "" ]]
 	then
 		export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
 		export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
-		export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
+		export currentKernelPath="$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"
 
 		export currentKernel_Major=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 1 -d '.')
 		export currentKernel_Minor=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 2 -d '.')
@@ -19917,7 +19927,7 @@ _fetchKernel-mainline() {
 		git config --global fetch.parallel 10
 		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | sed 's/^.*refs\/tags\///g' | grep '^v'"$forceKernel_mainline_regex" | sed 's/^v//g' | sed 's/\^{}//g' | sort -V | tail -n1)
 		export currentKernelName=linux-"$currentKernel_version"
-		export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
+		export currentKernelPath="$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"
 	fi
 
 	
@@ -19930,7 +19940,7 @@ _fetchKernel-mainline() {
 
 	_messagePlain_probe_var currentKernel_version
 	
-	cd "$scriptLocal"/mainline
+	cd "$scriptLocal"/mainline"$currentKernelPlatform"
 
 	
 	if ! ls -1 "$currentKernelName"* > /dev/null 2>&1
@@ -19942,7 +19952,7 @@ _fetchKernel-mainline() {
 		git config --global checkout.workers -1
 		git config --global fetch.parallel 10
 
-		if ! [[ -e "$scriptLocal"/mainline/linux/ ]]
+		if ! [[ -e "$scriptLocal"/mainline"$currentKernelPlatform"/linux/ ]]
 		then
 			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
@@ -19950,29 +19960,33 @@ _fetchKernel-mainline() {
 			! git clone --branch v"$currentKernel_version" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
 		
-		cd "$scriptLocal"/mainline/linux
+		cd "$scriptLocal"/mainline"$currentKernelPlatform"/linux
 		#! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
 		! git checkout v"$currentKernel_version" && _messageError 'fail: git: checkout: 'v"$currentKernel_version" && _messageFAIL && _stop 1
 
 
 
-		cd "$scriptLocal"/mainline
+		cd "$scriptLocal"/mainline"$currentKernelPlatform"
 
-		mv "$scriptLocal"/mainline/linux "$scriptLocal"/mainline/"$currentKernelName"
+		mv "$scriptLocal"/mainline"$currentKernelPlatform"/linux "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"
 
-		mv "$scriptLocal"/mainline/"$currentKernelName"/.git "$scriptLocal"/mainline/"$currentKernelName".git
+		mv "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"/.git "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName".git
 		( [[ "$skimfast" == "true" ]] || [[ $current_force_bindepOnly == "true" ]] ) && [[ "$current_XZ_OPT_kernelSource" == "" ]] && export current_XZ_OPT_kernelSource="-0 -T0"
 		[[ "$current_XZ_OPT_kernelSource" == "" ]] && export current_XZ_OPT_kernelSource="-e9"
-		[[ $current_force_bindepOnly != "true" ]] && env XZ_OPT="$current_XZ_OPT_kernelSource" tar -cJvf "$scriptLocal"/mainline/"$currentKernelName".tar.xz ./"$currentKernelName"
+		[[ $current_force_bindepOnly != "true" ]] && env XZ_OPT="$current_XZ_OPT_kernelSource" tar -cJvf "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName".tar.xz ./"$currentKernelName"
 		#[[ "$current_force_bindepOnly" =="true" ]] && export current_force_bindepOnly=false
-		mv "$scriptLocal"/mainline/"$currentKernelName".git "$scriptLocal"/mainline/"$currentKernelName"/.git
+		mv "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName".git "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"/.git
 	fi
 	cd "$currentKernelName"
 	
 	
-	mkdir -p "$scriptLib"/linux/mainline/
-	cp -f "$scriptLib"/linux/mainline/.config "$scriptLocal"/mainline/"$currentKernelName"/
+	mkdir -p "$scriptLib"/linux/mainline"$currentKernelPlatform"/
+	cp -f "$scriptLib"/linux/mainline"$currentKernelPlatform"/.config "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"/
 
+}
+_fetchKernel-mainline-server() {
+	export currentKernelPlatform="-server"
+	_fetchKernel-mainline "$@"
 }
 
 
@@ -20125,6 +20139,49 @@ _buildKernel-mainline() {
 	
 	return 0
 }
+_buildKernel-mainline-server() {
+	_messageNormal "init: buildKernel-mainline-server: ""$currentKernelPath"
+	make clean
+
+	make olddefconfig
+
+	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
+	_kernelScripts-disableDebug
+
+	_kernelConfig_server ./.config | tee "$scriptLocal"/mainline-server/statement.sh.out.txt
+	cp "$scriptLocal"/mainline-server/*/.config "$scriptLocal"/mainline-server/
+	
+	# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+	# MCORE2
+	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	
+	#make -j $(nproc)
+	#[[ "$?" != "0" ]] && _messageFAIL
+	
+	local currentExitStatus
+	currentExitStatus=0
+	
+	if [[ "$current_force_bindepOnly" != true ]]
+	then
+		make deb-pkg -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
+	else
+		_messageError 'bad: current_force_bindepOnly'
+		export current_force_bindepOnly=""
+		unset current_force_bindepOnly
+		#make bindeb-pkg -j $(nproc)
+		make -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
+	fi
+	
+	_rmCerts-kernel
+	
+	[[ "$currentExitStatus" != "0" ]] && _messageFAIL
+	
+	
+	return 0
+}
 
 
 
@@ -20193,6 +20250,16 @@ _build_cloud_mainline() {
 	
 	_fetchKernel-mainline "$@"
 	_buildKernel-mainline "$@"
+	
+	cd "$functionEntryPWD"
+}
+
+_build_cloud_mainline-server() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	
+	_fetchKernel-mainline-server "$@"
+	_buildKernel-mainline-server "$@"
 	
 	cd "$functionEntryPWD"
 }
@@ -20270,40 +20337,44 @@ _export_cloud_mainline() {
 	_export_cloud_prepare
 	cd "$scriptLocal"/_tmp
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
-	if ls -1 "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
+	if ls -1 "$scriptLocal"/mainline"$currentKernelPlatform"/*.tar.xz > /dev/null 2>&1
 	then
-		_messageNormal '_export_cloud: mainline'
+		_messageNormal '_export_cloud: mainline"$currentKernelPlatform"'
 		
-		mkdir -p "$scriptLocal"/_tmp/mainline
+		mkdir -p "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"
 		
 		# Export single compressed files NOT directory.
-		cp "$scriptLocal"/mainline/* "$scriptLocal"/_tmp/mainline/
-		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/mainline/* "$scriptLocal"/_tmp/mainline/.
-		rm -f "$scriptLocal"/_tmp/mainline/*.orig.tar.gz
+		cp "$scriptLocal"/mainline"$currentKernelPlatform"/* "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"/
+		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/mainline"$currentKernelPlatform"/* "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"/.
+		rm -f "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"/*.orig.tar.gz
 		
 		# Export '.config' from kernel .
-		cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/_tmp/mainline/
+		cp "$scriptLocal"/mainline"$currentKernelPlatform"/*/.config "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"/
 		
 		
-		_messagePlain_nominal '_export_cloud: mainline: debian'
+		_messagePlain_nominal '_export_cloud: mainline"$currentKernelPlatform": debian'
 		cd "$scriptLocal"/_tmp
-		tar -czf linux-mainline-amd64-debian.tar.gz ./mainline/
-		mv linux-mainline-amd64-debian.tar.gz "$scriptLocal"/_export
+		tar -czf linux-mainline"$currentKernelPlatform"-amd64-debian.tar.gz ./mainline"$currentKernelPlatform"/
+		mv linux-mainline"$currentKernelPlatform"-amd64-debian.tar.gz "$scriptLocal"/_export
 		
 		
 		# Gentoo specific. Unusual. Strongly discouraged.
-		#_messagePlain_nominal '_export_cloud: mainline: all'
+		#_messagePlain_nominal '_export_cloud: mainline"$currentKernelPlatform": all'
 		#cd "$scriptLocal"
-		#tar -czf linux-mainline-amd64-all.tar.gz ./mainline/
-		##env XZ_OPT=-e9 tar -cJf linux-mainline-amd64-all.tar.xz ./mainline/
-		##env XZ_OPT=-5 tar -cJf linux-mainline-amd64-all.tar.xz ./mainline/
-		#mv linux-mainline-amd64-all.tar.gz "$scriptLocal"/_export
+		#tar -czf linux-mainline"$currentKernelPlatform"-amd64-all.tar.gz ./mainline"$currentKernelPlatform"/
+		##env XZ_OPT=-e9 tar -cJf linux-mainline"$currentKernelPlatform"-amd64-all.tar.xz ./mainline"$currentKernelPlatform"/
+		##env XZ_OPT=-5 tar -cJf linux-mainline"$currentKernelPlatform"-amd64-all.tar.xz ./mainline"$currentKernelPlatform"/
+		#mv linux-mainline"$currentKernelPlatform"-amd64-all.tar.gz "$scriptLocal"/_export
 		
 		
-		_safeRMR "$scriptLocal"/_tmp/mainline
+		_safeRMR "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"
 		
-		du -sh "$scriptLocal"/_export/linux-mainline*
+		du -sh "$scriptLocal"/_export/linux-mainline"$currentKernelPlatform"*
 	fi
+}
+_export_cloud_mainline-server() {
+	export currentKernelPlatform="-server"
+	_export_cloud_mainline "$@"
 }
 
 
