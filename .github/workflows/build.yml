@@ -254,7 +254,7 @@ jobs:
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
-    - name: forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline_server }} ______________________________
+    - name: forceKernel_mainline_server-${{ github.event.inputs.forceKernel_mainline_server }} ______________________________
       shell: bash
       run: |
         true
