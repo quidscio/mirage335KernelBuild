@@ -197,17 +197,17 @@ _fetchKernel-lts() {
 
 _fetchKernel-mainline() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
-	rm -f "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
-	! [[ "$current_keepFetch" == "true" ]] && _safeRMR "$scriptLocal"/mainline
+	rm -f "$scriptLocal"/mainline"$currentKernelPlatform"/*.tar.xz > /dev/null 2>&1
+	! [[ "$current_keepFetch" == "true" ]] && _safeRMR "$scriptLocal"/mainline"$currentKernelPlatform"
 
-	mkdir -p "$scriptLocal"/mainline
-	cd "$scriptLocal"/mainline
+	mkdir -p "$scriptLocal"/mainline"$currentKernelPlatform"
+	cd "$scriptLocal"/mainline"$currentKernelPlatform"
 
 	if [[ "$forceKernel_mainline" == "" ]]
 	then
 		export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
 		export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
-		export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
+		export currentKernelPath="$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"
 
 		export currentKernel_Major=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 1 -d '.')
 		export currentKernel_Minor=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 2 -d '.')
@@ -228,7 +228,7 @@ _fetchKernel-mainline() {
 		git config --global fetch.parallel 10
 		export currentKernel_version=$(git ls-remote --tags git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git | sed 's/^.*refs\/tags\///g' | grep '^v'"$forceKernel_mainline_regex" | sed 's/^v//g' | sed 's/\^{}//g' | sort -V | tail -n1)
 		export currentKernelName=linux-"$currentKernel_version"
-		export currentKernelPath="$scriptLocal"/mainline/"$currentKernelName"
+		export currentKernelPath="$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"
 	fi
 
 	
@@ -241,7 +241,7 @@ _fetchKernel-mainline() {
 
 	_messagePlain_probe_var currentKernel_version
 	
-	cd "$scriptLocal"/mainline
+	cd "$scriptLocal"/mainline"$currentKernelPlatform"
 
 	
 	if ! ls -1 "$currentKernelName"* > /dev/null 2>&1
@@ -253,7 +253,7 @@ _fetchKernel-mainline() {
 		git config --global checkout.workers -1
 		git config --global fetch.parallel 10
 
-		if ! [[ -e "$scriptLocal"/mainline/linux/ ]]
+		if ! [[ -e "$scriptLocal"/mainline"$currentKernelPlatform"/linux/ ]]
 		then
 			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
@@ -261,29 +261,33 @@ _fetchKernel-mainline() {
 			! git clone --branch v"$currentKernel_version" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
 		
-		cd "$scriptLocal"/mainline/linux
+		cd "$scriptLocal"/mainline"$currentKernelPlatform"/linux
 		#! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
 		! git checkout v"$currentKernel_version" && _messageError 'fail: git: checkout: 'v"$currentKernel_version" && _messageFAIL && _stop 1
 
 
 
-		cd "$scriptLocal"/mainline
+		cd "$scriptLocal"/mainline"$currentKernelPlatform"
 
-		mv "$scriptLocal"/mainline/linux "$scriptLocal"/mainline/"$currentKernelName"
+		mv "$scriptLocal"/mainline"$currentKernelPlatform"/linux "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"
 
-		mv "$scriptLocal"/mainline/"$currentKernelName"/.git "$scriptLocal"/mainline/"$currentKernelName".git
+		mv "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"/.git "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName".git
 		( [[ "$skimfast" == "true" ]] || [[ $current_force_bindepOnly == "true" ]] ) && [[ "$current_XZ_OPT_kernelSource" == "" ]] && export current_XZ_OPT_kernelSource="-0 -T0"
 		[[ "$current_XZ_OPT_kernelSource" == "" ]] && export current_XZ_OPT_kernelSource="-e9"
-		[[ $current_force_bindepOnly != "true" ]] && env XZ_OPT="$current_XZ_OPT_kernelSource" tar -cJvf "$scriptLocal"/mainline/"$currentKernelName".tar.xz ./"$currentKernelName"
+		[[ $current_force_bindepOnly != "true" ]] && env XZ_OPT="$current_XZ_OPT_kernelSource" tar -cJvf "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName".tar.xz ./"$currentKernelName"
 		#[[ "$current_force_bindepOnly" =="true" ]] && export current_force_bindepOnly=false
-		mv "$scriptLocal"/mainline/"$currentKernelName".git "$scriptLocal"/mainline/"$currentKernelName"/.git
+		mv "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName".git "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"/.git
 	fi
 	cd "$currentKernelName"
 	
 	
-	mkdir -p "$scriptLib"/linux/mainline/
-	cp -f "$scriptLib"/linux/mainline/.config "$scriptLocal"/mainline/"$currentKernelName"/
+	mkdir -p "$scriptLib"/linux/mainline"$currentKernelPlatform"/
+	cp -f "$scriptLib"/linux/mainline"$currentKernelPlatform"/.config "$scriptLocal"/mainline"$currentKernelPlatform"/"$currentKernelName"/
 
+}
+_fetchKernel-mainline-server() {
+	export currentKernelPlatform="-server"
+	_fetchKernel-mainline "$@"
 }
 
 
@@ -436,6 +440,49 @@ _buildKernel-mainline() {
 	
 	return 0
 }
+_buildKernel-mainline-server() {
+	_messageNormal "init: buildKernel-mainline-server: ""$currentKernelPath"
+	make clean
+
+	make olddefconfig
+
+	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
+	_kernelScripts-disableDebug
+
+	_kernelConfig_server ./.config | tee "$scriptLocal"/mainline-server/statement.sh.out.txt
+	cp "$scriptLocal"/mainline-server/*/.config "$scriptLocal"/mainline-server/
+	
+	# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+	# MCORE2
+	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	
+	#make -j $(nproc)
+	#[[ "$?" != "0" ]] && _messageFAIL
+	
+	local currentExitStatus
+	currentExitStatus=0
+	
+	if [[ "$current_force_bindepOnly" != true ]]
+	then
+		make deb-pkg -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
+	else
+		_messageError 'bad: current_force_bindepOnly'
+		export current_force_bindepOnly=""
+		unset current_force_bindepOnly
+		#make bindeb-pkg -j $(nproc)
+		make -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
+	fi
+	
+	_rmCerts-kernel
+	
+	[[ "$currentExitStatus" != "0" ]] && _messageFAIL
+	
+	
+	return 0
+}
 
 
 
@@ -504,6 +551,16 @@ _build_cloud_mainline() {
 	
 	_fetchKernel-mainline "$@"
 	_buildKernel-mainline "$@"
+	
+	cd "$functionEntryPWD"
+}
+
+_build_cloud_mainline-server() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	
+	_fetchKernel-mainline-server "$@"
+	_buildKernel-mainline-server "$@"
 	
 	cd "$functionEntryPWD"
 }
@@ -581,40 +638,44 @@ _export_cloud_mainline() {
 	_export_cloud_prepare
 	cd "$scriptLocal"/_tmp
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
-	if ls -1 "$scriptLocal"/mainline/*.tar.xz > /dev/null 2>&1
+	if ls -1 "$scriptLocal"/mainline"$currentKernelPlatform"/*.tar.xz > /dev/null 2>&1
 	then
-		_messageNormal '_export_cloud: mainline'
+		_messageNormal '_export_cloud: mainline"$currentKernelPlatform"'
 		
-		mkdir -p "$scriptLocal"/_tmp/mainline
+		mkdir -p "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"
 		
 		# Export single compressed files NOT directory.
-		cp "$scriptLocal"/mainline/* "$scriptLocal"/_tmp/mainline/
-		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/mainline/* "$scriptLocal"/_tmp/mainline/.
-		rm -f "$scriptLocal"/_tmp/mainline/*.orig.tar.gz
+		cp "$scriptLocal"/mainline"$currentKernelPlatform"/* "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"/
+		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/mainline"$currentKernelPlatform"/* "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"/.
+		rm -f "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"/*.orig.tar.gz
 		
 		# Export '.config' from kernel .
-		cp "$scriptLocal"/mainline/*/.config "$scriptLocal"/_tmp/mainline/
+		cp "$scriptLocal"/mainline"$currentKernelPlatform"/*/.config "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"/
 		
 		
-		_messagePlain_nominal '_export_cloud: mainline: debian'
+		_messagePlain_nominal '_export_cloud: mainline"$currentKernelPlatform": debian'
 		cd "$scriptLocal"/_tmp
-		tar -czf linux-mainline-amd64-debian.tar.gz ./mainline/
-		mv linux-mainline-amd64-debian.tar.gz "$scriptLocal"/_export
+		tar -czf linux-mainline"$currentKernelPlatform"-amd64-debian.tar.gz ./mainline"$currentKernelPlatform"/
+		mv linux-mainline"$currentKernelPlatform"-amd64-debian.tar.gz "$scriptLocal"/_export
 		
 		
 		# Gentoo specific. Unusual. Strongly discouraged.
-		#_messagePlain_nominal '_export_cloud: mainline: all'
+		#_messagePlain_nominal '_export_cloud: mainline"$currentKernelPlatform": all'
 		#cd "$scriptLocal"
-		#tar -czf linux-mainline-amd64-all.tar.gz ./mainline/
-		##env XZ_OPT=-e9 tar -cJf linux-mainline-amd64-all.tar.xz ./mainline/
-		##env XZ_OPT=-5 tar -cJf linux-mainline-amd64-all.tar.xz ./mainline/
-		#mv linux-mainline-amd64-all.tar.gz "$scriptLocal"/_export
+		#tar -czf linux-mainline"$currentKernelPlatform"-amd64-all.tar.gz ./mainline"$currentKernelPlatform"/
+		##env XZ_OPT=-e9 tar -cJf linux-mainline"$currentKernelPlatform"-amd64-all.tar.xz ./mainline"$currentKernelPlatform"/
+		##env XZ_OPT=-5 tar -cJf linux-mainline"$currentKernelPlatform"-amd64-all.tar.xz ./mainline"$currentKernelPlatform"/
+		#mv linux-mainline"$currentKernelPlatform"-amd64-all.tar.gz "$scriptLocal"/_export
 		
 		
-		_safeRMR "$scriptLocal"/_tmp/mainline
+		_safeRMR "$scriptLocal"/_tmp/mainline"$currentKernelPlatform"
 		
-		du -sh "$scriptLocal"/_export/linux-mainline*
+		du -sh "$scriptLocal"/_export/linux-mainline"$currentKernelPlatform"*
 	fi
+}
+_export_cloud_mainline-server() {
+	export currentKernelPlatform="-server"
+	_export_cloud_mainline "$@"
 }
 
 

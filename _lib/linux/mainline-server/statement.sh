@@ -1,6 +1,3 @@
-<!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q 
-#exit # scriptedIllustrator_markup_uk4uPhB663kVcygT0q 
-# <html style="size: letter;"> <!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 #!/usr/bin/env bash
 
 # Dependencies.
@@ -58,93 +55,24 @@ _document_main() {
 #b
 # NOTICE: DOCUMENT
 #__HEADER_uk4uPhB663kVcygT0q_HEADER__
- '_heading1' 'Statement'
-if false; then true; # -->
-<!-- # --><h1>Statement</h1>
-<!--
-fi
- '_o_' '_kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#54ff54;background-color:#18b2b2;"> kernelConfig: desktop</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: tradeoff-legacy</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-legacy' for specific use cases.</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: tradeoff-harden</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-harden' for specific use cases.</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_DEBUG_CREDENTIALS</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_UBSAN_LOCAL_BOUNDS</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_CFI_CLANG</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_SECURITY_LOCKDOWN_LSM_EARLY</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    N: CONFIG_KEXEC</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_EFI_DISABLE_PCI_DMA</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_X86_SGX_kVM</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_INTEL_TDX_GUEST</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: TDX_GUEST_DRIVER</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualization-accessory</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualbox</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: boot</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: arch-x64</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: -march=sandybridge -mtune=skylake</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: MCORE2: CONFIG_MCORE2=y</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: accessory</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: build</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: latency</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CPU_FREQ_DEFAULT_GOV_ONDEMAND</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT: CONFIG_PREEMPT=y</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT_RT: </span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     N: CONFIG_DEBUG_NOTIFIERS</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: memory</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_FRONTSWAP</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: integration</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_NTFS_RW: </span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX_UDEV</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX_PORTAGE</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX_INIT_SCRIPT</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX_INIT_SYSTEMD</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: ACPI_HMAT</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: CONFIG_UCLAMP_TASK</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: CPU_IDLE_GOV_TEO</span>
-<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: LOCK_EVENT_COUNTS</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation: docker</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation: prog</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: convenience</span>
-<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: special</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: make menuconfig</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: make -j $(nproc)</span>
-<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: make deb-pkg -j $(nproc)</span>
-<!-- # --></pre>
-<!--
-fi
- '_heading1' 'Description'
-if false; then true; # -->
-<!-- # --><h1>Description</h1>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">Linux kernel &#39;mainline&#39; &#39;intel&#39; . Config file in this 
-directory. 
 
-May be exact duplicate of config from &#39;lts&#39; . 
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
- '_heading1' 'Reference'
-if false; then true; # -->
-<!-- # --><h1>Reference</h1>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;"> 
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
+_heading1 'Statement'
 
+_o_ '_kernelConfig_server "$scriptAbsoluteFolder"/.config'
+
+
+
+
+
+_heading1 'Description'
+
+_t 'Linux kernel &#39;mainline&#39; &#39;intel&#39; . Config file in this directory. 
+
+May be exact duplicate of config from &#39;lts&#39; . '
+
+_heading1 'Reference'
+
+_t ' '
 
 
 #__FOOTER_uk4uPhB663kVcygT0q_FOOTER__
@@ -353,4 +281,3 @@ exit 0
 __ATTACHMENT_uk4uPhB663kVcygT0q_ATTACHMENT__
 
 
-filename.html # scriptedIllustrator_markup_uk4uPhB663kVcygT0q --> </html>
