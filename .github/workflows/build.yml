@@ -39,6 +39,19 @@ on:
         - 6.5.4
         - 6.4.
         - 6.4.16
+        - none
+      forceKernel_mainline_server:
+        required: false
+        default: latest
+        type: choice
+        options:
+        - latest
+        - 6.6.
+        - 6.5.
+        - 6.5.4
+        - 6.4.
+        - 6.4.16
+        - none
       forceKernel_lts:
         required: false
         default: latest
@@ -137,6 +150,7 @@ jobs:
         files: |
           ./_local/_export/linux-lts-amd64-debian.tar.gz
       timeout-minutes: 45
+
   build_mainline:
     runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
     #runs-on: ubuntu-latest
@@ -231,14 +245,16 @@ jobs:
         files: |
          ./_local/_export/linux-mainline-amd64-debian.tar.gz
       timeout-minutes: 45
+
   build_mainline-server:
+    if: ${{ github.event.inputs.forceKernel_mainline_server != 'none' }}
     runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
     #runs-on: ubuntu-latest
     #runs-on: ubuntu-20.04
     #runs-on: buildjet-2vcpu-ubuntu-2004
     #runs-on: buildjet-64vcpu-ubuntu-2004
     steps:
-    - name: forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline-server }} ______________________________
+    - name: forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline_server }} ______________________________
       shell: bash
       run: |
         true
@@ -288,7 +304,7 @@ jobs:
       run: |
         #export skimfast=${{ inputs.skimfast }}
         #echo skimfast $skimfast
-        [[ "${{ github.event.inputs.forceKernel_mainline-server }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_mainline-server }}" != "latest" ]] && export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline-server }}"
+        [[ "${{ github.event.inputs.forceKernel_mainline_server }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_mainline_server }}" != "latest" ]] && export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline_server }}"
         ./ubiquitous_bash.sh _build_cloud_prepare
         ./ubiquitous_bash.sh _build_cloud_mainline-server
       timeout-minutes: 300
