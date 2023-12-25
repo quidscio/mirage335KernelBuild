@@ -88,6 +88,7 @@ if false; then true; # -->
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_RANDSTRUCT</span>
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    N: CONFIG_KEXEC</span>
 <!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_EFI_DISABLE_PCI_DMA</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_MODULE_SIG_FORCE</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualization-accessory</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualbox</span>
 <!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: boot</span>

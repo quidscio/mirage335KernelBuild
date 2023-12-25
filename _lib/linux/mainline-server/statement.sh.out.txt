@@ -22,6 +22,7 @@ _ Statement _
 [0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_RANDSTRUCT [0m[0m
 [0;37;100m[1;33m warn: not:    N: CONFIG_KEXEC [0m[0m
 [0;37;100m[1;33m warn: not:    Y: CONFIG_EFI_DISABLE_PCI_DMA [0m[0m
+[0;37;100m[1;33m warn: not:    Y: CONFIG_MODULE_SIG_FORCE [0m[0m
 [0;37;100m[0;36m kernelConfig: virtualization-accessory [0m[0m
 [0;37;100m[0;36m kernelConfig: virtualbox [0m[0m
 [0;37;100m[0;36m kernelConfig: boot [0m[0m
