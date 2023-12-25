@@ -42,7 +42,7 @@ on:
         - none
       forceKernel_mainline_server:
         required: false
-        default: latest
+        default: none
         type: choice
         options:
         - latest
@@ -55,6 +55,14 @@ on:
       forceKernel_lts:
         required: false
         default: latest
+        type: choice
+        options:
+        - latest
+        - 6.1.
+        - none
+      forceKernel_lts_server:
+        required: false
+        default: none
         type: choice
         options:
         - latest
@@ -340,6 +348,103 @@ jobs:
         name: build
         files: |
          ./_local/_export/linux-mainline-server-amd64-debian.tar.gz
+      timeout-minutes: 45
+
+
+  build_lts-server:
+    if: ${{ github.event.inputs.forceKernel_lts_server != 'none' }}
+    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
+    #runs-on: ubuntu-latest
+    #runs-on: ubuntu-20.04
+    #runs-on: buildjet-2vcpu-ubuntu-2004
+    #runs-on: buildjet-64vcpu-ubuntu-2004
+    steps:
+    - name: forceKernel_lts_server-${{ github.event.inputs.forceKernel_lts_server }} ______________________________
+      shell: bash
+      run: |
+        true
+    - name: RAND_SEED
+      shell: bash
+      run: |
+        echo "$RAND_SEED" | tee /dev/urandom > /dev/null
+        echo "$RAND_SEED" | tee /dev/random > /dev/null
+        echo "$RAND_SEED" | sudo -n tee /dev/urandom > /dev/null
+        echo "$RAND_SEED" | sudo -n tee /dev/random > /dev/null
+      env:
+        RAND_SEED: ${{ secrets.RAND_SEED }}
+    - name: users
+      shell: bash
+      run: |
+        sudo -u ubuntu -n bash -c 'sudo -n useradd runner --non-unique -u $UID -g $UID' || true
+        sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
+        sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
+        true
+      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
+      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
+    - name: Maximize build space
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 1625
+        temp-reserve-mb: 50
+        swap-size-mb: 2
+        #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-dotnet: 'true'
+        #remove-android: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-android: 'true'
+        #remove-haskell: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-haskell: 'true'
+        #remove-codeql: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-codeql: 'true'
+        #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
+        remove-docker-images: 'true'
+    - uses: actions/checkout@v2
+    - name: _getMinimal_cloud
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _getMinimal_cloud
+      timeout-minutes: 90
+    - name: _build_cloud_lts
+      shell: bash
+      run: |
+        #export skimfast=${{ inputs.skimfast }}
+        #echo skimfast $skimfast
+        [[ "${{ github.event.inputs.forceKernel_lts_server }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_lts_server }}" != "latest" ]] && export forceKernel_lts="${{ github.event.inputs.forceKernel_lts_server }}"
+        ./ubiquitous_bash.sh _build_cloud_prepare
+        ./ubiquitous_bash.sh _build_cloud_lts-server
+      timeout-minutes: 300
+    - name: _export_cloud_lts
+      shell: bash
+      run: |
+        ./ubiquitous_bash.sh _export_cloud_lts-server
+      timeout-minutes: 90
+    # https://github.com/marketplace/actions/debugging-with-tmate
+    # $RUNNER_WORKSPACE
+    # rclone config --config="/rclone.conf"
+    # sudo touch /continue
+    # bash -i
+    # source ~/.bashrc
+    # Type 'q' at the 'Web shell' or use SSH .
+    #- name: Setup tmate session
+      #if: ${{ failure() }}
+      #uses: mxschmitt/action-tmate@v3
+      ## ssh -i <path-to-key> <tmate-connection-string>
+      #with:
+        #limit-access-to-actor: true
+      #timeout-minutes: 5
+    #- name: artifacts
+      #uses: actions/upload-artifact@v3
+      #with:
+        #name: build-lts
+        #path: |
+          #./_local/_export/linux-lts-amd64-debian.tar.gz
+    - name: release! linux-lts-server-amd64-debian
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: build-${{ github.run_id }}-${{ github.run_attempt }}
+        name: build
+        files: |
+         ./_local/_export/linux-lts-server-amd64-debian.tar.gz
       timeout-minutes: 45
 
 

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='4127905839'
+export ub_setScriptChecksum_contents='2783933215'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -19801,11 +19801,11 @@ _fetchKernel-mainline-legacyHTTPS() {
 
 _fetchKernel-lts() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
-	rm -f "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
-	! [[ "$current_keepFetch" == "true" ]] && _safeRMR "$scriptLocal"/lts
+	rm -f "$scriptLocal"/lts"$currentKernelPlatform"/*.tar.xz > /dev/null 2>&1
+	! [[ "$current_keepFetch" == "true" ]] && _safeRMR "$scriptLocal"/lts"$currentKernelPlatform"
 
-	mkdir -p "$scriptLocal"/lts
-	cd "$scriptLocal"/lts
+	mkdir -p "$scriptLocal"/lts"$currentKernelPlatform"
+	cd "$scriptLocal"/lts"$currentKernelPlatform"
 
 
 	if [[ "$forceKernel_lts" == "" ]]
@@ -19818,15 +19818,15 @@ _fetchKernel-lts() {
 
 		# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.
 		#git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
-		#cd "$scriptLocal"/lts/linux
+		#cd "$scriptLocal"/lts"$currentKernelPlatform"/linux
 		#export currentKernel_patchLevel=$(git tag | grep '^v'"$currentKernel_MajorMinor_regex" | sed 's/v'"$currentKernel_MajorMinor_regex"'//g' | tr -dc '0-9\.\n' | sort -n | tail -n1)
 		#export currentKernelName=linux-"$currentKernel_MajorMinor""$currentKernel_patchLevel"
-		#cd "$scriptLocal"/lts
+		#cd "$scriptLocal"/lts"$currentKernelPlatform"
 
 
 		export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep "$currentKernel_MajorMinor_regex" | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
 		export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
-		export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
+		export currentKernelPath="$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName"
 
 		export currentKernel_patchLevel=$(echo "$currentKernelName" | tr -dc '0-9\.\n' | cut -f 3 -d '.')
 
@@ -19836,7 +19836,7 @@ _fetchKernel-lts() {
 
 		export currentKernelURL=$(wget -q -O - 'https://kernel.org/' | grep https | grep 'tar\.xz' | grep "$forceKernel_lts_regex" | head -n1 | sed 's/^.*https/https/' | sed 's/.tar.xz.*$/\.tar\.xz/' | tr -dc 'a-zA-Z0-9.:\=\_\-/%')
 		export currentKernelName=$(_safeEcho_newline "$currentKernelURL" | sed 's/^.*\///' | sed 's/\.tar\.xz$//')
-		export currentKernelPath="$scriptLocal"/lts/"$currentKernelName"
+		export currentKernelPath="$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName"
 
 		export currentKernel_version=$(echo "$currentKernelName" | tr -dc '0-9\.\n')
 	fi
@@ -19853,7 +19853,7 @@ _fetchKernel-lts() {
 	_messagePlain_probe v"$currentKernel_MajorMinor""$currentKernel_patchLevel"
 
 	
-	cd "$scriptLocal"/lts
+	cd "$scriptLocal"/lts"$currentKernelPlatform"
 
 	
 	if ! ls -1 "$currentKernelName"* > /dev/null 2>&1
@@ -19865,7 +19865,7 @@ _fetchKernel-lts() {
 		git config --global checkout.workers -1
 		git config --global fetch.parallel 10
 
-		if ! [[ -e "$scriptLocal"/lts/linux/ ]]
+		if ! [[ -e "$scriptLocal"/lts"$currentKernelPlatform"/linux/ ]]
 		then
 			# https://codeandbitters.com/git-shallow-clones/
 			#! git clone --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
@@ -19873,29 +19873,34 @@ _fetchKernel-lts() {
 			! git clone --branch v"$currentKernel_version" --depth=1 --recursive git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git && _messageError 'fail: git: clone' && _messageFAIL && _stop 1
 		fi
 		
-		cd "$scriptLocal"/lts/linux
+		cd "$scriptLocal"/lts"$currentKernelPlatform"/linux
 		#! git checkout v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageError 'fail: git: checkout: 'v"$currentKernel_MajorMinor""$currentKernel_patchLevel" && _messageFAIL && _stop 1
 		! git checkout v"$currentKernel_version" && _messageError 'fail: git: checkout: 'v"$currentKernel_version" && _messageFAIL && _stop 1
 
 
 
-		cd "$scriptLocal"/lts
+		cd "$scriptLocal"/lts"$currentKernelPlatform"
 
-		mv "$scriptLocal"/lts/linux "$scriptLocal"/lts/"$currentKernelName"
+		mv "$scriptLocal"/lts"$currentKernelPlatform"/linux "$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName"
 
-		mv "$scriptLocal"/lts/"$currentKernelName"/.git "$scriptLocal"/lts/"$currentKernelName".git
+		mv "$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName"/.git "$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName".git
 		( [[ "$skimfast" == "true" ]] || [[ $current_force_bindepOnly == "true" ]] ) && [[ "$current_XZ_OPT_kernelSource" == "" ]] && export current_XZ_OPT_kernelSource="-0 -T0"
 		[[ "$current_XZ_OPT_kernelSource" == "" ]] && export current_XZ_OPT_kernelSource="-e9"
-		[[ $current_force_bindepOnly != "true" ]] && env XZ_OPT="$current_XZ_OPT_kernelSource" tar -cJvf "$scriptLocal"/lts/"$currentKernelName".tar.xz ./"$currentKernelName"
+		[[ $current_force_bindepOnly != "true" ]] && env XZ_OPT="$current_XZ_OPT_kernelSource" tar -cJvf "$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName".tar.xz ./"$currentKernelName"
 		#[[ "$current_force_bindepOnly" =="true" ]] && export current_force_bindepOnly=false
-		mv "$scriptLocal"/lts/"$currentKernelName".git "$scriptLocal"/lts/"$currentKernelName"/.git
+		mv "$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName".git "$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName"/.git
 	fi
 	cd "$currentKernelName"
 	
 	
-	mkdir -p "$scriptLib"/linux/lts/
-	cp -f "$scriptLib"/linux/lts/.config "$scriptLocal"/lts/"$currentKernelName"/
+	mkdir -p "$scriptLib"/linux/lts"$currentKernelPlatform"/
+	cp -f "$scriptLib"/linux/lts"$currentKernelPlatform"/.config "$scriptLocal"/lts"$currentKernelPlatform"/"$currentKernelName"/
 
+}
+_fetchKernel-lts-server() {
+	export currentKernelPlatform="-server"
+	_fetchKernel-lts "$@"
+	export currentKernelPlatform=""
 }
 
 
@@ -20101,6 +20106,49 @@ _buildKernel-lts() {
 	
 	return 0
 }
+_buildKernel-lts-server() {
+	_messageNormal "init: buildKernel-lts-server: ""$currentKernelPath"
+	make clean
+
+	make olddefconfig
+
+	# https://superuser.com/questions/925079/compile-linux-kernel-deb-pkg-target-without-generating-dbg-package
+	_kernelScripts-disableDebug
+
+	_kernelConfig_server ./.config | tee "$scriptLocal"/lts-server/statement.sh.out.txt
+	cp "$scriptLocal"/lts-server/*/.config "$scriptLocal"/lts-server/
+	
+	# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
+	# MCORE2
+	#export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	#export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"
+	
+	#make -j $(nproc)
+	#[[ "$?" != "0" ]] && _messageFAIL
+	
+	local currentExitStatus
+	currentExitStatus=0
+	
+	if [[ "$current_force_bindepOnly" != true ]]
+	then
+		make deb-pkg -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
+	else
+		_messageError 'bad: current_force_bindepOnly'
+		export current_force_bindepOnly=""
+		unset current_force_bindepOnly
+		#make bindeb-pkg -j $(nproc)
+		make -j $(nproc)
+		[[ "$?" != "0" ]] && currentExitStatus=1
+	fi
+	
+	_rmCerts-kernel
+	
+	[[ "$currentExitStatus" != "0" ]] && _messageFAIL
+	
+	
+	return 0
+}
 
 _buildKernel-mainline() {
 	_messageNormal "init: buildKernel-mainline: ""$currentKernelPath"
@@ -20269,6 +20317,15 @@ _build_cloud_mainline-server() {
 	
 	cd "$functionEntryPWD"
 }
+_build_cloud_lts-server() {
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
+	
+	_fetchKernel-lts-server "$@"
+	_buildKernel-lts-server "$@"
+	
+	cd "$functionEntryPWD"
+}
 
 _build_cloud() {
 	local functionEntryPWD
@@ -20301,42 +20358,47 @@ _export_cloud_lts() {
 	_export_cloud_prepare
 	cd "$scriptLocal"/_tmp
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
-	if ls -1 "$scriptLocal"/lts/*.tar.xz > /dev/null 2>&1
+	if ls -1 "$scriptLocal"/lts"$currentKernelPlatform"/*.tar.xz > /dev/null 2>&1
 	then
-		_messageNormal '_export_cloud: lts'
+		_messageNormal '_export_cloud: lts"$currentKernelPlatform"'
 		
-		mkdir -p "$scriptLocal"/_tmp/lts
+		mkdir -p "$scriptLocal"/_tmp/lts"$currentKernelPlatform"
 		
 		# Export single compressed files NOT directory.
-		cp "$scriptLocal"/lts/* "$scriptLocal"/_tmp/lts/
-		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/lts/* "$scriptLocal"/_tmp/lts/.
-		rm -f "$scriptLocal"/_tmp/lts/*.orig.tar.gz
+		cp "$scriptLocal"/lts"$currentKernelPlatform"/* "$scriptLocal"/_tmp/lts"$currentKernelPlatform"/
+		rsync --exclude '*.orig.tar.gz' "$scriptLocal"/lts"$currentKernelPlatform"/* "$scriptLocal"/_tmp/lts"$currentKernelPlatform"/.
+		rm -f "$scriptLocal"/_tmp/lts"$currentKernelPlatform"/*.orig.tar.gz
 		
 		# Export '.config' from kernel .
-		cp "$scriptLocal"/lts/*/.config "$scriptLocal"/_tmp/lts/
+		cp "$scriptLocal"/lts"$currentKernelPlatform"/*/.config "$scriptLocal"/_tmp/lts"$currentKernelPlatform"/
 		
 		
-		_messagePlain_nominal '_export_cloud: lts: debian'
+		_messagePlain_nominal '_export_cloud: lts"$currentKernelPlatform": debian'
 		cd "$scriptLocal"/_tmp
-		tar -czf linux-lts-amd64-debian.tar.gz ./lts/
-		mv linux-lts-amd64-debian.tar.gz "$scriptLocal"/_export
+		tar -czf linux-lts"$currentKernelPlatform"-amd64-debian.tar.gz ./lts"$currentKernelPlatform"/
+		mv linux-lts"$currentKernelPlatform"-amd64-debian.tar.gz "$scriptLocal"/_export
 		
 		
 		# Gentoo specific. Unusual. Strongly discouraged.
-		#_messagePlain_nominal '_export_cloud: lts: all'
+		#_messagePlain_nominal '_export_cloud: lts"$currentKernelPlatform": all'
 		#cd "$scriptLocal"
-		#tar -czf linux-lts-amd64-all.tar.gz ./lts/
-		##env XZ_OPT=-e9 tar -cJf linux-lts-amd64-all.tar.xz ./lts/
-		##env XZ_OPT=-5 tar -cJf linux-lts-amd64-all.tar.xz ./lts/
-		#mv linux-lts-amd64-all.tar.gz "$scriptLocal"/_export
+		#tar -czf linux-lts"$currentKernelPlatform"-amd64-all.tar.gz ./lts"$currentKernelPlatform"/
+		##env XZ_OPT=-e9 tar -cJf linux-lts"$currentKernelPlatform"-amd64-all.tar.xz ./lts"$currentKernelPlatform"/
+		##env XZ_OPT=-5 tar -cJf linux-lts"$currentKernelPlatform"-amd64-all.tar.xz ./lts"$currentKernelPlatform"/
+		#mv linux-lts"$currentKernelPlatform"-amd64-all.tar.gz "$scriptLocal"/_export
 		
 		
-		_safeRMR "$scriptLocal"/_tmp/lts
+		_safeRMR "$scriptLocal"/_tmp/lts"$currentKernelPlatform"
 		
-		du -sh "$scriptLocal"/_export/linux-lts*
+		du -sh "$scriptLocal"/_export/linux-lts"$currentKernelPlatform"*
 	else
-		_messageError 'bad: missing: "$scriptLocal"/lts/*.tar.xz' && _messageFAIL && _stop 1
+		_messageError 'bad: missing: "$scriptLocal"/lts"$currentKernelPlatform"/*.tar.xz' && _messageFAIL && _stop 1
 	fi
+}
+_export_cloud_lts-server() {
+	export currentKernelPlatform="-server"
+	_export_cloud_mainline "$@"
+	export currentKernelPlatform=""
 }
 
 _export_cloud_mainline() {
