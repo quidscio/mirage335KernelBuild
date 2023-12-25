@@ -693,7 +693,7 @@ _export_cloud_lts() {
 }
 _export_cloud_lts-server() {
 	export currentKernelPlatform="-server"
-	_export_cloud_mainline "$@"
+	_export_cloud_lts "$@"
 	export currentKernelPlatform=""
 }
 
