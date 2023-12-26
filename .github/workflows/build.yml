@@ -62,7 +62,7 @@ on:
         - none
       forceKernel_lts_server:
         required: false
-        default: none
+        default: latest
         type: choice
         options:
         - latest
