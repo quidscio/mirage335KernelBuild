@@ -30,7 +30,7 @@ on:
         - ubuntu-latest-h
       forceKernel_mainline:
         required: false
-        default: latest
+        default: 6.6
         type: choice
         options:
         - latest
@@ -54,7 +54,7 @@ on:
         - none
       forceKernel_lts:
         required: false
-        default: latest
+        default: 6.1
         type: choice
         options:
         - latest
@@ -62,7 +62,7 @@ on:
         - none
       forceKernel_lts_server:
         required: false
-        default: latest
+        default: 6.1
         type: choice
         options:
         - latest
