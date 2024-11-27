@@ -109,7 +109,8 @@ _fetchKernel-lts() {
 		# ATTENTION: Omit the trailing '.' if patchlevel is "" . Usually though, for a preferable well established LTS kernel, the patchlevel will not be empty.
 		# WARNING: May not be tested with an empty patchlevel.
 		#export currentKernel_MajorMinor='5.10.'
-		export currentKernel_MajorMinor='6.1.'
+		#export currentKernel_MajorMinor='6.1.'
+		#export currentKernel_MajorMinor='6.6.'
 		export currentKernel_MajorMinor_regex="linux-"$(echo "$currentKernel_MajorMinor" | sed 's/\./\\./g')
 
 		# WARNING: Sorting the git tags has the benefit of depending on one rather than two upstream sources, at the risk that the git tags may not be as carefully curated. Not recommended as default.

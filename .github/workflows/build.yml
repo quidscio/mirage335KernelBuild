@@ -16,7 +16,8 @@ permissions:
   statuses: read
 
 
-
+# TODO: Add SLTS (and any needed fetch procedure) after 6.1 and 6.6 are no longer supported as LTS (6.1 SLTS expected to remain supported until 2033).
+# https://en.wikipedia.org/wiki/Linux_kernel_version_history
 on:
   workflow_dispatch:
     inputs:
@@ -30,15 +31,12 @@ on:
         - ubuntu-latest-h
       forceKernel_mainline:
         required: false
-        default: 6.6.
+        default: 6.12.
         type: choice
         options:
         - latest
+        - 6.12.
         - 6.6.
-        - 6.5.
-        - 6.5.4
-        - 6.4.
-        - 6.4.16
         - none
       forceKernel_mainline_server:
         required: false
@@ -46,26 +44,25 @@ on:
         type: choice
         options:
         - latest
+        - 6.12.
         - 6.6.
-        - 6.5.
-        - 6.5.4
-        - 6.4.
-        - 6.4.16
         - none
       forceKernel_lts:
         required: false
-        default: 6.1.
+        default: 6.6.
         type: choice
         options:
         - latest
+        - 6.6.
         - 6.1.
         - none
       forceKernel_lts_server:
         required: false
-        default: 6.1.
+        default: 6.6.
         type: choice
         options:
         - latest
+        - 6.6.
         - 6.1.
         - none
       skimfast:
