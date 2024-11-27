@@ -35,7 +35,6 @@ on:
         options:
         - latest
         - 6.12.
-        - 6.6.
       forceKernel_lts:
         required: false
         default: latest

@@ -36,7 +36,6 @@ on:
         options:
         - latest
         - 6.12.
-        - 6.6.
         - none
       forceKernel_mainline_server:
         required: false
@@ -45,7 +44,6 @@ on:
         options:
         - latest
         - 6.12.
-        - 6.6.
         - none
       forceKernel_lts:
         required: false
