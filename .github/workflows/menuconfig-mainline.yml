@@ -74,21 +74,21 @@ jobs:
         export current_XZ_OPT_kernelSource="-2"
         ./ubiquitous_bash.sh _fetchKernel-mainline
       timeout-minutes: 180
-    #- name: Setup tmate session
-      #uses: mxschmitt/action-tmate@v3
-      ## ssh -i <path-to-key> <tmate-connection-string>
-      #with:
-          #limit-access-to-actor: true
-      #timeout-minutes: 320
-    - name: Setup upterm session
-      uses: lhotari/action-upterm@v1
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      # ssh -i <path-to-key> <tmate-connection-string>
       with:
+          limit-access-to-actor: true
+      timeout-minutes: 320
+    #- name: Setup upterm session
+      #uses: lhotari/action-upterm@v1
+      #with:
         ## limits ssh access and adds the ssh public key for the user which triggered the workflow
-        limit-access-to-actor: true
+        #limit-access-to-actor: true
         ## limits ssh access and adds the ssh public keys of the listed GitHub users
         # DANGER: Discouraged. Prefer 'limit-access-to-actor' instead.
         #limit-access-to-users: githubuser1,githubuser2
-      timeout-minutes: 320
+      #timeout-minutes: 320
     - name: artifacts
       uses: actions/upload-artifact@v3
       with:
