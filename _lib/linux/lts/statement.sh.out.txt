@@ -23,7 +23,7 @@ _ Statement _
 [0;37;100m[0;31m bad: not:     Y: MITIGATION_SPECTRE_V2 [0m[0m
 [0;37;100m[0;31m bad: not:     Y: MITIGATION_SRBDS [0m[0m
 [0;37;100m[0;31m bad: not:     Y: MITIGATION_SSB [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_X86_SGX_kVM [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_SLS [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_INTEL_TDX_GUEST [0m[0m
 [0;37;100m[0;31m bad: not:     Y: TDX_GUEST_DRIVER [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT [0m[0m

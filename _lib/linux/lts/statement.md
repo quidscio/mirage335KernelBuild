@@ -89,7 +89,7 @@ if false; then true; # -->
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: MITIGATION_SPECTRE_V2</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: MITIGATION_SRBDS</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: MITIGATION_SSB</span>
-<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_X86_SGX_kVM</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: MITIGATION_SLS</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_INTEL_TDX_GUEST</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: TDX_GUEST_DRIVER</span>
 <!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT</span>
