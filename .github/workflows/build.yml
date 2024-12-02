@@ -52,7 +52,6 @@ on:
         options:
         - latest
         - 6.6.
-        - 6.1.
         - none
       forceKernel_lts_server:
         required: false
@@ -61,7 +60,6 @@ on:
         options:
         - latest
         - 6.6.
-        - 6.1.
         - none
       skimfast:
         type: boolean
