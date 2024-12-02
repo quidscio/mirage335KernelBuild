@@ -217,6 +217,10 @@ to obsolete kernel symbol names in case these are ever seen again).
 For the &#39;server&#39; config, minimizing the effect of any future or 
 unknown vulnerabilities, especially for kernel network drivers, 
 &#39;BadUSB&#39;/SDIO, etc, is most important.
+
+Upstream changes to &#39;_kernelConfig&#39; report functions, once compiled 
+in, will affect &#39;statement.sh&#39; files, which can be used to quickly 
+obtain and git diff new reports.
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
  '_' '_page'
