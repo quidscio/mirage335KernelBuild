@@ -58,229 +58,103 @@ _document_main() {
 #b
 # NOTICE: DOCUMENT
 #__HEADER_uk4uPhB663kVcygT0q_HEADER__
+ '_heading1' 'Statement'
+if false; then true; # -->
+<!-- # --><h1>Statement</h1>
+<!--
+fi
+ '_o_' '_kernelConfig_server "$scriptAbsoluteFolder"/.config'
+if false; then true; # -->
+<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
+<!-- # --><span style="color:#54ff54;background-color:#18b2b2;"> kernelConfig: server</span>
+<!-- # --><span style="color:#54ff54;background-color:#18b2b2;"> kernelConfig: desktop</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: tradeoff-legacy</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-legacy' for specific use cases.</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: tradeoff-harden</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> Carefully evaluate 'tradeoff-harden' for specific use cases.</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_RETPOLINE</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_PAGE_TABLE_ISOLATION</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_RETHUNK</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_CPU_UNRET_ENTRY</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_CPU_IBPB_ENTRY</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_CPU_IBRS_ENTRY</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_SLS</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_X86_SGX_kVM</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: TDX_GUEST_DRIVER</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_DEBUG_CREDENTIALS</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_UBSAN_SANITIZE_ALL</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     N: CONFIG_UBSAN_ENUM</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_UBSAN_LOCAL_BOUNDS</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_CFI_CLANG</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGINS</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_LATENT_ENTROPY</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_STACKLEAK</span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     Y: CONFIG_GCC_PLUGIN_RANDSTRUCT</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    N: CONFIG_KEXEC</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_EFI_DISABLE_PCI_DMA</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualization-accessory</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: virtualbox</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: boot</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: arch-x64</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: -march=sandybridge -mtune=skylake</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> export KCFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> export KCPPFLAGS="-O2 -march=sandybridge -mtune=skylake -pipe"</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: MCORE2: CONFIG_MCORE2=y</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: accessory</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: build</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: latency</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CPU_FREQ_DEFAULT_GOV_ONDEMAND</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT: CONFIG_PREEMPT=y</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_PREEMPT_RT: </span>
+<!-- # --><span style="color:#b21818;background-color:#848484;"> bad: not:     N: CONFIG_DEBUG_NOTIFIERS</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: memory</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_FRONTSWAP</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: integration</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> hazard: CONFIG_NTFS_RW: </span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX_UDEV</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX_PORTAGE</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX_INIT_SCRIPT</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    Y: CONFIG_GENTOO_LINUX_INIT_SYSTEMD</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    N: ACPI_HMAT</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: CONFIG_UCLAMP_TASK</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: CPU_IDLE_GOV_TEO</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:  M/Y: LOCK_EVENT_COUNTS</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation: docker</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: investigation: prog</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: convenience</span>
+<!-- # --><span style="color:#18b2b2;background-color:#848484;"> kernelConfig: special</span>
+<!-- # --><span style="color:#ffff54;background-color:#848484;"> warn: not:    N: BLK_DEV_WRITE_MOUNTED</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: make menuconfig</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: make -j $(nproc)</span>
+<!-- # --><span style="color:#b218b2;background-color:#848484;"> request: make deb-pkg -j $(nproc)</span>
+<!-- # --></pre>
+<!--
+fi
+ '_heading1' 'Description'
+if false; then true; # -->
+<!-- # --><h1>Description</h1>
+<!--
+fi
 _t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-Copyright (C) 2022 mirage335
-See the end of the file for license conditions.
-See license.txt for mirage335KernelBuild license conditions.
+scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">Linux kernel &#39;mainline&#39; &#39;intel&#39; . Config file in this 
+directory. 
 
-Assistance for ensuring reasonably correct Linux kernel configuration and 
-building.
+May be exact duplicate of config from &#39;lts&#39; . 
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
- '_heading1' 'Usage'
-if false; then true; # -->
-<!-- # --><h1>Usage</h1>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-Copy &#39;.config&#39; files to &#39; "$scriptLib"/linux/lts/.config &#39; 
-or similar.
-
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
- '_o' '_messagePlain_probe' './_getMinimal_cloud'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_getMinimal_cloud</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' './_build_cloud'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_build_cloud</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' '#./_build_cloud_lts'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_build_cloud_lts</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' '#./_build_cloud_mainline'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_build_cloud_mainline</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' './_export_cloud'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_export_cloud</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' '#./_export_cloud_lts'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_export_cloud_lts</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' '#./_export_cloud_mainline'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_export_cloud_mainline</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' './_upload_cloud'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_upload_cloud</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' '#./_upload_cloud_lts'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_upload_cloud_lts</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' '#./_upload_cloud_mainline'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> #./_upload_cloud_mainline</span>
-<!-- # --></pre>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;"> 
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
- '_o' '_messagePlain_probe' './_getMinimal_cloud'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_getMinimal_cloud</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' './_create_lts'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_create_lts</span>
-<!-- # --></pre>
-<!--
-fi
- '_o' '_messagePlain_probe' './_create_mainline'
-if false; then true; # -->
-<!-- # --><pre style="-webkit-print-color-adjust: exact;background-color:#848484;margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-<!-- # --><span style="color:#1818b2;background-color:#848484;"> ./_create_mainline</span>
-<!-- # --></pre>
-<!--
-fi
- '_' '_page'
- '_heading1' 'Design'
-if false; then true; # -->
-<!-- # --><h1>Design</h1>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">Local build and upload included.
-
-Multiple cloud build service configurations may be included - GitHub 
-Actions, BuildJet, AWS CodeBuilder, etc.
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
- '_heading2' 'Design - Kernel Configuration'
-if false; then true; # -->
-<!-- # --><h2>Design - Kernel Configuration</h2>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">Kernel may be configured as follows:
-
-1) Obtain kernel configuration from upstream dist/OS package or sources 
-(eg. Debian Stable linux-config-ver package).
-2) Configure kernel with &#39;make oldconfig&#39; and &#39;make 
-menuconfig&#39; until _kernelConfig_desktop report is acceptably similar to 
-the report for a previous kernel version.
-3) Configure kernel again with &#39;make oldconfig&#39; and &#39;make 
-menuconfig&#39;, this time to acceptably satisfy _kernelConfig_server 
-report.
-
-Both the LTS and Mainline kernels may be configured as such. Beware the 
-upstream dist/OS package should be for as recent a kernel as possible (to 
-correctly enable drivers for newer hardware), but NEVER newer than the 
-kernel to configure (as &#39;make oldconfig&#39; obviously may not 
-correctly backport differently named kernel symbols to a previous kernel 
-version config). Reports from _kernelConfig functions are strong but not 
-absolute recommendations (eg. some messages may be precautionary references 
-to obsolete kernel symbol names in case these are ever seen again).
-
-For the &#39;server&#39; config, minimizing the effect of any future or 
-unknown vulnerabilities, especially for kernel network drivers, 
-&#39;BadUSB&#39;/SDIO, etc, is most important.
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
- '_' '_page'
- '_heading1' 'Redistribution and Preservation'
-if false; then true; # -->
-<!-- # --><h1>Redistribution and Preservation</h1>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-git clone --depth 1 git@github.com:mirage335/mirage335KernelBuild.git
-cd mirage335KernelBuild/
-./ubiquitous_bash.sh _gitBest submodule update --init --depth 1 --recursive
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
- '_' '_page'
- '_heading1' 'Safety'
-if false; then true; # -->
-<!-- # --><h1>Safety</h1>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-Reasonably sane Linux kernel configuration still does not ensure 
-reliability, security, performance, etc. Be careful to at least understand 
-the choices presented, experiment thoroughly, and when appropriate, update 
-frequently. Your accident is your accident. You have been warned.
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
- '_' '_page'
  '_heading1' 'Reference'
 if false; then true; # -->
 <!-- # --><h1>Reference</h1>
 <!--
 fi
 _t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-https://en.wikipedia.org/wiki/Menuconfig
-	&#39;Configuring Linux is a significant labor&#39;
-		Maybe not so much anymore.
-<!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
-'
- '_' '_page'
- '_heading1' 'Copyright'
-if false; then true; # -->
-<!-- # --><h1>Copyright</h1>
-<!--
-fi
-_t '
-scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">This file is part of mirage335KernelBuild.
-
-mirage335KernelBuild is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-mirage335KernelBuild is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with mirage335KernelBuild.  If not, see 
-&lt;http://www.gnu.org/licenses/&gt;.
+scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;"> 
 <!-- # --></pre><!-- scriptedIllustrator_markup_uk4uPhB663kVcygT0q
 '
 
@@ -303,9 +177,9 @@ echo -e '\n\n'
 
 #####Functions. Some may be from 'ubiquitous bash' .
 #_compressedFunctions_uk4uPhB663kVcygT0q_compressedFunctions_uk4uPhB663kVcygT0q_compressedFunctions_uk4uPhB663kVcygT0q_compressedFunctions
-current_internal_CompressedFunctions_bytes='12375'
-current_internal_CompressedFunctions_cksum='3023785929'
-current_internal_CompressedFunctions='
+current_internal_CompressedFunctions_bytes="12375"
+current_internal_CompressedFunctions_cksum="3023785929"
+current_internal_CompressedFunctions="
 /Td6WFoAAATm1rRGAgAhARwAAAAQz1jM4cduI8NdAC+ciKYksL89qRi90TdMvSwSEM6J8ipM2rR/Iqc/oYbShD5P+hKgz3ONSu7BhrUf8OSN4oZ8BL1e7m0JQ33pEQs007VTHA7nLczyIuWiilZSo+0zB132
 DrV189uAlZ6oqD3MK7bjrSmuGreEaBOC+z5QkGUPIDVaXfJmDg73/A1Y9JqRKxtli7ZDurfX2t/Z3m6RV6ku3LwPHl2qt8/kbWEubRkY3Fl2VTTFWjQ8Z9qfpBK4YyV7fw3X3hcUmN6Fz+u2P8eCSl/fCnNX
 HtvGeiwoJbZ3wje2iPvqVhHoy0BMVkEDcSqWo+znkV0BwqE45qLsZQ9IGG1CzglgciwcOU2fdsqKBFC5XA3WYFGg6uZ2q4mvn5jWR+FbeUz7YjupLAvLl7DE+daOBWzzyYeFrcMhDk1QeqOKpv41V0GTTqAm
@@ -384,7 +258,7 @@ K3rs0mjN1y5uIQKsryZwZfhyGJ0rqw15RHxbDR3rX9EYxkNbYkvM0XyW9IhW6F8hIeanz8BcziCThDY7
 CLOK878aamEjZRONYxTrQS87VtZysfLRbJbw+LZDLkIfnMKs4D/EdxfRbhtSv5jrPVky0nXUpFhz6bQ8lyOiOIp4wUOIcMFZwE510ODJX8NtpxisfxiYUuCaihrK8+hJBG0nbe4kaL5wOQuPP6NJsb5PCjxO
 QmLWD6GyNDRD7gbYyluYaL+lthK22HgOOrFU1JL3qT4RGDLv37LelxRto/drLLlAjq0cY0sGRhvvB4l9KbxLe2n6upQ46HXJ50sg4+0hHk3ZjTdbJq5T6PsO6SE+Q8PKv2u/Iit+nW6EZKIHFzdtG/H32uvX
 ittGFgYT23izDSV6kXsjY0D+1eldNG2EfZZAlSevM/IQkXN/6LzWi8eGYnHHYLtgsv98z6C84JGhJm+PBbwofDN6GAJ0BOb+/pVFb8hHEjpuD+koTjFLdw8u7QJ68tTqJwTom35a6Ztlqfd7IYXro46q+kix
-/EtTD6VQd/T5zT1n+mCxJ7m04472WQ9s7K0SIAutdCdedxFnAHPBAQNgus4/nTcXSWfmUgutV6bCfmy8AAAsi55xarRDbgAB30fvjgcAXQ8Y4LHEZ/sCAAAAAARZWg=='
+/EtTD6VQd/T5zT1n+mCxJ7m04472WQ9s7K0SIAutdCdedxFnAHPBAQNgus4/nTcXSWfmUgutV6bCfmy8AAAsi55xarRDbgAB30fvjgcAXQ8Y4LHEZ/sCAAAAAARZWg=="
 ! echo "$current_internal_CompressedFunctions" | base64 -d | xz -d > /dev/null && exit 1
 source <( echo "$current_internal_CompressedFunctions" | base64 -d | xz -d )
 unset current_internal_CompressedFunctions ; unset current_internal_CompressedFunctions_cksum ; unset current_internal_CompressedFunctions_bytes
@@ -403,13 +277,13 @@ _tiny_set_strings
 # Import of 'ubiquitous_bash.sh' intended ONLY to provide most recent 'message' and similar functions.
 #_messagePlain_probe() { return; }
 ! type -p "ubiquitous_bash.sh" > /dev/null 2>&1 && exit 1
-[[ "$ubiquitousBashID" != "uk4uPhB663kVcygT0q" ]] && exit 1
 current_script_path=$(type -p "ubiquitous_bash.sh")
 [[ ! -e "$current_script_path" ]] && exit 1
 ! ls -l "$current_script_path" 2>/dev/null | grep 'ubiquitous_bash.sh$' > /dev/null 2>&1 && exit 1
 export importScriptLocation=$(_getScriptAbsoluteLocation)
 export importScriptFolder=$(_getScriptAbsoluteFolder)
 . "$current_script_path" --call
+[[ "$ubiquitousBashID" != "uk4uPhB663kVcygT0q" ]] && exit 1
 unset current_script_path
 #_messagePlain_probe "$scriptAbsoluteLocation"
 #exit 0
@@ -441,17 +315,21 @@ _default() {
 	current_deleteScriptLocal="false"
 	[[ ! -e "$scriptLocal" ]] && current_deleteScriptLocal="true"
 	
-	#"$scriptAbsoluteLocation" DOCUMENT > "$scriptAbsoluteLocation".out.txt
+	"$scriptAbsoluteLocation" DOCUMENT > "$scriptAbsoluteLocation".out.txt
 	
 	_scribble_markdown "$@"
 	_scribble_html "$@"
+	_scribble_html_presentation "$@"
 	_scribble_pdf "$@"
+	
 	
 	local currentScriptBasename
 	currentScriptBasename=$(basename "$scriptAbsoluteLocation" | sed 's/\.[^.]*$//')
-	"$scriptAbsoluteFolder"/"$currentScriptBasename".html _test
 	
-	[[ "$current_deleteScriptLocal" == "true" ]] && rmdir "$scriptLocal"
+	
+	#"$scriptAbsoluteFolder"/"$currentScriptBasename".html _test
+	
+	[[ "$current_deleteScriptLocal" == "true" ]] && rmdir "$scriptLocal" > /dev/null 2>&1
 }
 
 # NOTICE: Overrides ( 'ops.sh' equivalent ).

@@ -83,6 +83,16 @@ _heading1 'Design'
 _t 'Local build and upload included.
 
 Multiple cloud build service configurations may be included - GitHub Actions, BuildJet, AWS CodeBuilder, etc.'
+_heading2 'Design - Kernel Configuration'
+_t 'Kernel may be configured as follows:
+
+1) Obtain kernel configuration from upstream dist/OS package or sources (eg. Debian Stable linux-config-ver package).
+2) Configure kernel with &#39;make oldconfig&#39; and &#39;make menuconfig&#39; until _kernelConfig_desktop report is acceptably similar to the report for a previous kernel version.
+3) Configure kernel again with &#39;make oldconfig&#39; and &#39;make menuconfig&#39;, this time to acceptably satisfy _kernelConfig_server report.
+
+Both the LTS and Mainline kernels may be configured as such. Beware the upstream dist/OS package should be for as recent a kernel as possible (to correctly enable drivers for newer hardware), but NEVER newer than the kernel to configure (as &#39;make oldconfig&#39; obviously may not correctly backport differently named kernel symbols to a previous kernel version config). Reports from _kernelConfig functions are strong but not absolute recommendations (eg. some messages may be precautionary references to obsolete kernel symbol names in case these are ever seen again).
+
+For the &#39;server&#39; config, minimizing the effect of any future or unknown vulnerabilities, especially for kernel network drivers, &#39;BadUSB&#39;/SDIO, etc, is most important.'
 _ _page
 _heading1 'Redistribution and Preservation'
 _t 'git clone --depth 1 git@github.com:mirage335/mirage335KernelBuild.git
