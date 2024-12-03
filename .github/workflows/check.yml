@@ -35,6 +35,7 @@ on:
         options:
         - latest
         - 6.12.
+        - none
       forceKernel_lts:
         required: false
         default: latest
@@ -43,6 +44,7 @@ on:
         - latest
         - 6.6.
         - 6.1.
+        - none
       skimfast:
         type: boolean
         default: true
@@ -62,6 +64,7 @@ concurrency:
 
 jobs:
   check_lts:
+    if: ${{ github.event.inputs.forceKernel_lts != 'none' }}
     runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
     #runs-on: ubuntu-latest
     #runs-on: ubuntu-20.04
@@ -189,6 +192,7 @@ jobs:
 
 
   check_mainline:
+    if: ${{ github.event.inputs.forceKernel_mainline != 'none' }}
     runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
     #runs-on: ubuntu-latest
     #runs-on: ubuntu-20.04
