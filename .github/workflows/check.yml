@@ -88,8 +88,10 @@ jobs:
       if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 1625
-        temp-reserve-mb: 50
+        #root-reserve-mb: 1625
+        root-reserve-mb: 6000
+        #temp-reserve-mb: 50
+        temp-reserve-mb: 6000
         swap-size-mb: 2
         #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-dotnet: 'true'
@@ -216,8 +218,10 @@ jobs:
       if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
       uses: easimon/maximize-build-space@master
       with:
-        root-reserve-mb: 1625
-        temp-reserve-mb: 50
+        #root-reserve-mb: 1625
+        root-reserve-mb: 6000
+        #temp-reserve-mb: 50
+        temp-reserve-mb: 6000
         swap-size-mb: 2
         #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-dotnet: 'true'

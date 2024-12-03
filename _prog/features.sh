@@ -35,9 +35,9 @@ _check_nv_sequence() {
 
     ! "$safeTmp"/_get_nvidia.sh _patch_nvidia "$currentVersion" "$currentKernelPath_version" && _messagePlain_bad 'bad: fail: patch' && return 1
 
-
+    mkdir -p "$safeTmp"/tmp
     _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
-    "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only
+    "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --extract-only
 	mv -f "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"
     cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
