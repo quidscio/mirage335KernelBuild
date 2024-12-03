@@ -9,7 +9,7 @@ _check_nv_sequence() {
     export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
     _messagePlain_probe_var currentKernelPath
 
-    export currentKernelPath_version=$(echo 'linux-6.12.1-1' | cut -f 2- -d\- | cut -f 1-3 -d. | cut -f 1 -d\- )
+    export currentKernelPath_version=$(echo "$currentKernelPath" | cut -f 2- -d\- | cut -f 1-3 -d. | cut -f 1 -d\- )
     _messagePlain_probe_var currentKernelPath_version
 
     cd "$currentKernelPath"
