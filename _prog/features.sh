@@ -9,6 +9,9 @@ _check_nv_sequence() {
     export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$2"/linux-* | sort -n | head -n 1)
     _messagePlain_probe_var currentKernelPath
 
+    export currentKernelPath_version=$(echo 'linux-6.12.1-1' | cut -f 2- -d\- | cut -f 1-3 -d. | cut -f 1 -d\- )
+    _messagePlain_probe_var currentKernelPath_version
+
     cd "$currentKernelPath"
 
     #make olddefconfig
@@ -27,6 +30,10 @@ _check_nv_sequence() {
 
     ! "$safeTmp"/_get_nvidia.sh _fetch_nvidia-wget "$currentVersion" && return 1
     ! [[ -e "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run ]] && _messagePlain_bad 'bad: missing: NVIDIA-Linux-x86_64-"$currentVersion".run' && return 1
+
+
+
+    ! "$safeTmp"/_get_nvidia.sh _patch_nvidia "$currentVersion" "$currentKernelPath_version" && _messagePlain_bad 'bad: fail: patch' && return 1
 
 
     _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
