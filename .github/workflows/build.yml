@@ -39,7 +39,7 @@ on:
         - none
       forceKernel_mainline_server:
         required: false
-        default: none
+        default: 6.12.
         type: choice
         options:
         - latest
@@ -55,7 +55,7 @@ on:
         - none
       forceKernel_lts_server:
         required: false
-        default: 6.6.
+        default: none
         type: choice
         options:
         - latest
