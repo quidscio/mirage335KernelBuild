@@ -38,6 +38,7 @@ _check_nv_sequence() {
 
     _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
     "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only
+	mv -f "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"
     cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
 
