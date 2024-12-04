@@ -58,7 +58,7 @@ _document_main() {
 
 _heading1 'Statement'
 
-_o_ '_kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
+_o_ '"$scriptAbsoluteFolder"/../../../ubiquitous_bash.sh _kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
 
 
 
@@ -66,9 +66,7 @@ _o_ '_kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
 
 _heading1 'Description'
 
-_t 'Linux kernel &#39;mainline&#39; &#39;intel&#39; . Config file in this directory. 
-
-May be exact duplicate of config from &#39;lts&#39; . '
+_t 'Linux kernel &#39;lts_5.10.???-intel&#39; . Config file in this directory. '
 
 _heading1 'Reference'
 

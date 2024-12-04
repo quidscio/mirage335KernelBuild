@@ -58,7 +58,7 @@ _document_main() {
 
 _heading1 'Statement'
 
-_o_ '_kernelConfig_desktop "$scriptAbsoluteFolder"/.config'
+_o_ '_kernelConfig_server "$scriptAbsoluteFolder"/.config'
 
 
 

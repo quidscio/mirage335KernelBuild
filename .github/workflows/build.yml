@@ -47,11 +47,11 @@ on:
         - none
       forceKernel_lts:
         required: false
-        default: 6.6.
+        default: 6.12.
         type: choice
         options:
         - latest
-        - 6.6.
+        - 6.12.
         - none
       forceKernel_lts_server:
         required: false
@@ -59,7 +59,7 @@ on:
         type: choice
         options:
         - latest
-        - 6.6.
+        - 6.12.
         - none
       skimfast:
         type: boolean

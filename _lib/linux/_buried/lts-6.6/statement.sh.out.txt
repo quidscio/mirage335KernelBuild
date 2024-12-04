@@ -1,36 +1,34 @@
 
 _ Statement _
-[0;37;100m[1;32;46m kernelConfig: server [0m[0m
 [0;37;100m[1;32;46m kernelConfig: desktop [0m[0m
 [0;37;100m[0;36m kernelConfig: tradeoff-legacy [0m[0m
 [0;37;100m[0;35m Carefully evaluate 'tradeoff-legacy' for specific use cases. [0m[0m
 [0;37;100m[0;36m kernelConfig: tradeoff-harden [0m[0m
 [0;37;100m[0;35m Carefully evaluate 'tradeoff-harden' for specific use cases. [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_RETPOLINE [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_PAGE_TABLE_ISOLATION [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_RETHUNK [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_CPU_UNRET_ENTRY [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_CPU_IBPB_ENTRY [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_CPU_IBRS_ENTRY [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_SLS [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_X86_SGX_kVM [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_PAGE_TABLE_ISOLATION [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_RETPOLINE [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_RETHUNK [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_UNRET_ENTRY [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_CALL_DEPTH_TRACKING [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_IBPB_ENTRY [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_IBRS_ENTRY [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_SRSO [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_GDS [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_MDS [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_TAA [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_MMIO_STALE_DATA [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_L1TF [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_RETBLEED [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_SPECTRE_V1 [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_SPECTRE_V2 [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_SRBDS [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_SSB [0m[0m
+[0;37;100m[0;31m bad: not:     Y: MITIGATION_SLS [0m[0m
+[0;37;100m[0;31m bad: not:     Y: CONFIG_INTEL_TDX_GUEST [0m[0m
 [0;37;100m[0;31m bad: not:     Y: TDX_GUEST_DRIVER [0m[0m
 [0;37;100m[0;31m bad: not:     Y: CONFIG_AMD_MEM_ENCRYPT_ACTIVE_BY_DEFAULT [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_DEBUG_CREDENTIALS [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_UBSAN_SANITIZE_ALL [0m[0m
-[0;37;100m[0;31m bad: not:     N: CONFIG_UBSAN_ENUM [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_UBSAN_LOCAL_BOUNDS [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_CFI_CLANG [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGINS [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_LATENT_ENTROPY [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STRUCTLEAK_BYREF_ALL [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_STACKLEAK [0m[0m
-[0;37;100m[0;31m bad: not:     Y: CONFIG_GCC_PLUGIN_RANDSTRUCT [0m[0m
-[0;37;100m[1;33m warn: not:    N: CONFIG_KEXEC [0m[0m
-[0;37;100m[1;33m warn: not:    Y: CONFIG_EFI_DISABLE_PCI_DMA [0m[0m
 [0;37;100m[0;36m kernelConfig: virtualization-accessory [0m[0m
+[0;37;100m[1;33m warn: not:    Y: KVM_HYPERV [0m[0m
 [0;37;100m[0;36m kernelConfig: virtualbox [0m[0m
 [0;37;100m[0;36m kernelConfig: boot [0m[0m
 [0;37;100m[0;36m kernelConfig: arch-x64 [0m[0m
@@ -55,7 +53,7 @@ _ Statement _
 [0;37;100m[1;33m warn: not:    Y: CONFIG_GENTOO_LINUX_INIT_SCRIPT [0m[0m
 [0;37;100m[1;33m warn: not:    Y: CONFIG_GENTOO_LINUX_INIT_SYSTEMD [0m[0m
 [0;37;100m[0;36m kernelConfig: investigation [0m[0m
-[0;37;100m[1;33m warn: not:    N: ACPI_HMAT [0m[0m
+[0;37;100m[1;33m warn: not:  M/Y: ACPI_HMAT [0m[0m
 [0;37;100m[1;33m warn: not:  M/Y: CONFIG_UCLAMP_TASK [0m[0m
 [0;37;100m[1;33m warn: not:  M/Y: CPU_IDLE_GOV_TEO [0m[0m
 [0;37;100m[1;33m warn: not:  M/Y: LOCK_EVENT_COUNTS [0m[0m
@@ -63,15 +61,17 @@ _ Statement _
 [0;37;100m[0;36m kernelConfig: investigation: prog [0m[0m
 [0;37;100m[0;36m kernelConfig: convenience [0m[0m
 [0;37;100m[0;36m kernelConfig: special [0m[0m
-[0;37;100m[1;33m warn: not:    N: BLK_DEV_WRITE_MOUNTED [0m[0m
+[0;37;100m[0;31m bad: not:     Y: X86_FRED [0m[0m
+[0;37;100m[0;31m bad: not:     Y: SLAB_BUCKETS [0m[0m
+[0;37;100m[0;31m bad: not:     Y: BLK_DEV_WRITE_MOUNTED [0m[0m
+[0;37;100m[0;31m bad: not:     N: SSB_SDIOHOST_POSSIBLE [0m[0m
 [0;37;100m[0;35m request: make menuconfig [0m[0m
 [0;37;100m[0;35m request: make -j $(nproc) [0m[0m
 [0;37;100m[0;35m request: make deb-pkg -j $(nproc) [0m[0m
 
 _ Description _
-Linux kernel &#39;mainline&#39; &#39;intel&#39; . Config file in this directory. 
 
-May be exact duplicate of config from &#39;lts&#39; . 
+Linux kernel &#39;lts_5.10.???-intel&#39; . Config file in this directory. 
 
 _ Reference _
  

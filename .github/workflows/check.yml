@@ -42,6 +42,7 @@ on:
         type: choice
         options:
         - latest
+        - 6.12.
         - 6.6.
         - 6.1.
         - none
