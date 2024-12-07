@@ -37,38 +37,49 @@ _check_nv_sequence() {
         ! "$safeTmp"/_get_nvidia.sh _patch_nvidia "$currentVersion" "$currentKernelPath_version" && _messagePlain_bad 'bad: fail: patch' && return 1
 
         mkdir -p "$safeTmp"/tmp
-        _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --extract-only'
-        "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --extract-only
-        #mv -f "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"
-        cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom/kernel
+        #_messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --extract-only'
+        #"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --extract-only
+        ##mv -f "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"
+        #cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom/kernel
+
+        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && return 1
+        currentExitStatus="$?"
+        cat /var/log/nvidia-installer.log
     else
         mkdir -p "$safeTmp"/tmp
-        _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
-        "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --extract-only
-        cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
+        #_messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
+        #"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --extract-only
+        #cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
+
+        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && return 1
+        currentExitStatus="$?"
+        cat /var/log/nvidia-installer.log
     fi
 
     
 
+    # DISABLED. Has been tested. May eventually be useful toward open-source kernel drivers, or maybe better logging.
+    # https://github.com/NVIDIA/open-gpu-kernel-modules
+    # Does NOT compile properly with Debian packages splitting the headers with 'common' packages.
+    if false
+    then
+        _messagePlain_nominal 'make'
+
+        export SYSSRC="$currentKernelPath"
+        export IGNORE_CC_MISMATCH=1
+
+        export IGNORE_MISSING_MODULE_SYMVERS=1
 
 
-    _messagePlain_nominal 'make'
+        cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
-    export SYSSRC="$currentKernelPath"
-    export IGNORE_CC_MISMATCH=1
-    
-    export IGNORE_MISSING_MODULE_SYMVERS=1
+        make clean
 
-    
-    cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
+        _messagePlain_probe 'make -j $(nproc)'
+        make -j $(nproc)
+        currentExitStatus="$?"
+    fi
 
-    make clean
-
-    _messagePlain_probe 'make -j $(nproc)'
-    make -j $(nproc)
-    currentExitStatus="$?"
-
-    
 
     cd "$localFunctionEntryPWD"
     if [[ "$currentExitStatus" != "0" ]]
