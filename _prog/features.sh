@@ -43,7 +43,7 @@ _check_nv_sequence() {
         #cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom/kernel
 
         currentExitStatus=0
-        ! sh "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j $(nproc) --no-cc-version-check -k "$currentKernelPath_version" -m=kernel && currentExitStatus=1
+        ! sudo -n sh "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j $(nproc) --no-cc-version-check -k "$currentKernelPath_version" -m=kernel && currentExitStatus=1
         cat /var/log/nvidia-installer.log
         [[ "$currentExitStatus" != "0" ]] && return 1
     else
@@ -53,7 +53,7 @@ _check_nv_sequence() {
         #cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
         currentExitStatus=0
-        ! sh "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j $(nproc) --no-cc-version-check -k "$currentKernelPath_version" -m=kernel && currentExitStatus=1
+        ! sudo -n sh "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j $(nproc) --no-cc-version-check -k "$currentKernelPath_version" -m=kernel && currentExitStatus=1
         cat /var/log/nvidia-installer.log
         [[ "$currentExitStatus" != "0" ]] && return 1
     fi
