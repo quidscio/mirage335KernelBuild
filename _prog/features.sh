@@ -32,14 +32,23 @@ _check_nv_sequence() {
     ! [[ -e "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run ]] && _messagePlain_bad 'bad: missing: NVIDIA-Linux-x86_64-"$currentVersion".run' && return 1
 
 
+    if "$safeTmp"/_get_nvidia.sh _if_patch_nvidia "$currentVersion" "$currentKernelPath_version"
+    then
+        ! "$safeTmp"/_get_nvidia.sh _patch_nvidia "$currentVersion" "$currentKernelPath_version" && _messagePlain_bad 'bad: fail: patch' && return 1
 
-    ! "$safeTmp"/_get_nvidia.sh _patch_nvidia "$currentVersion" "$currentKernelPath_version" && _messagePlain_bad 'bad: fail: patch' && return 1
+        mkdir -p "$safeTmp"/tmp
+        _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --extract-only'
+        "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --extract-only
+        #mv -f "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"
+        cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom/kernel
+    else
+        mkdir -p "$safeTmp"/tmp
+        _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
+        "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --extract-only
+        cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
+    fi
 
-    mkdir -p "$safeTmp"/tmp
-    _messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
-    "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --extract-only
-	mv -f "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"
-    cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
+    
 
 
 
