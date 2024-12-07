@@ -42,18 +42,20 @@ _check_nv_sequence() {
         ##mv -f "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"
         #cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom/kernel
 
-        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && return 1
-        currentExitStatus="$?"
+        currentExitStatus=0
+        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && currentExitStatus=1
         cat /var/log/nvidia-installer.log
+        [[ "$currentExitStatus" != "0" ]] && return 1
     else
         mkdir -p "$safeTmp"/tmp
         #_messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
         #"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --extract-only
         #cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
-        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && return 1
-        currentExitStatus="$?"
+        currentExitStatus=0
+        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && currentExitStatus=1
         cat /var/log/nvidia-installer.log
+        [[ "$currentExitStatus" != "0" ]] && return 1
     fi
 
     

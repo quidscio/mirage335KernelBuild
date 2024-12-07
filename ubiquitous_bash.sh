@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='1862887308'
+export ub_setScriptChecksum_contents='1508846377'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -21936,18 +21936,20 @@ _check_nv_sequence() {
         ##mv -f "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"
         #cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"-custom/kernel
 
-        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && return 1
-        currentExitStatus="$?"
+        currentExitStatus=0
+        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion"-custom.run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && currentExitStatus=1
         cat /var/log/nvidia-installer.log
+        [[ "$currentExitStatus" != "0" ]] && return 1
     else
         mkdir -p "$safeTmp"/tmp
         #_messagePlain_probe '"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --extract-only'
         #"$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --extract-only
         #cd "$safeTmp"/NVIDIA-Linux-x86_64-"$currentVersion"/kernel
 
-        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && return 1
-        currentExitStatus="$?"
+        currentExitStatus=0
+        ! sh "$scriptAbsoluteFolder"/NVIDIA-Linux-x86_64-"$currentVersion".run --tmpdir="$safeTmp"/tmp --ui=none --no-questions -j "$currentParallel" --no-cc-version-check -k "$currentLine" -m=kernel && currentExitStatus=1
         cat /var/log/nvidia-installer.log
+        [[ "$currentExitStatus" != "0" ]] && return 1
     fi
 
     
