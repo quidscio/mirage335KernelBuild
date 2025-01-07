@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3555997009'
+export ub_setScriptChecksum_contents='2476189741'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -1261,10 +1261,10 @@ then
 
 	##! type -p wslg
 	#[[ -e '/cygdrive/c/WINDOWS/system32/wslg.exe' ]] && wsl() { '/cygdrive/c/WINDOWS/system32/wslg.exe' "$@" ; }
-	[[ -e '/cygdrive/c/Program Files/WSL/wslg.exe' ]] && wslg() { '/cygdrive/c/Program Files/WSL/wslg.exe' "$@" ; }
+	[[ -e '/cygdrive/c/Program Files/WSL/wslg.exe' ]] && wslg() { '/cygdrive/c/Program Files/WSL/wslg.exe' "$@" ; } && wslg.exe() { wslg "$@" ; }
 	##! type -p wsl
 	#[[ -e '/cygdrive/c/WINDOWS/system32/wsl.exe' ]] && wsl() { '/cygdrive/c/WINDOWS/system32/wsl.exe' "$@" ; }
-	[[ -e '/cygdrive/c/Program Files/WSL/wsl.exe' ]] && wsl() { '/cygdrive/c/Program Files/WSL/wsl.exe' "$@" ; }
+	[[ -e '/cygdrive/c/Program Files/WSL/wsl.exe' ]] && wsl() { '/cygdrive/c/Program Files/WSL/wsl.exe' "$@" ; } && wsl.exe() { wsl "$@" ; }
 fi
 
 # WARNING: What is otherwise considered bad practice may be accepted to reduce substantial MSW/Cygwin inconvenience .
@@ -4980,7 +4980,7 @@ _fetchDep_debianBookworm_special() {
 		return 0
 	fi
 	
-	if [[ "$1" == "docker" ]]
+	if [[ "$1" == "docker" ]] || [[ "$1" == "docker-compose" ]]
 	then
 		sudo -n update-alternatives --set iptables /usr/sbin/iptables-legacy
 		sudo -n update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
@@ -5005,6 +5005,7 @@ _fetchDep_debianBookworm_special() {
 		
 		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get remove -y docker docker-engine docker.io docker-ce docker
 		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y docker-ce
+		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y docker-compose-plugin
 		
 		sudo -n usermod -a -G docker "$USER"
 		
@@ -5019,14 +5020,14 @@ _fetchDep_debianBookworm_special() {
 	
 	if [[ "$1" == "atom" ]]
 	then
-		curl -L https://packagecloud.io/AtomEditor/atom/gpgkey | sudo -n apt-key add -
-		sudo -n sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/ub_atom.list'
+		#curl -L https://packagecloud.io/AtomEditor/atom/gpgkey | sudo -n apt-key add -
+		#sudo -n sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/ub_atom.list'
 		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
+		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
 		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y atom
+		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y atom
 		
-		return 0
+		return 1
 	fi
 	
 	if [[ "$1" == "GL/gl.h" ]] || [[ "$1" == "GL/glext.h" ]] || [[ "$1" == "GL/glx.h" ]] || [[ "$1" == "GL/glxext.h" ]] || [[ "$1" == "GL/dri_interface.h" ]] || [[ "$1" == "x86_64-linux-gnu/pkgconfig/dri.pc" ]]
@@ -5511,14 +5512,14 @@ _fetchDep_debianBullseye_special() {
 	
 	if [[ "$1" == "atom" ]]
 	then
-		curl -L https://packagecloud.io/AtomEditor/atom/gpgkey | sudo -n apt-key add -
-		sudo -n sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/ub_atom.list'
+		#curl -L https://packagecloud.io/AtomEditor/atom/gpgkey | sudo -n apt-key add -
+		#sudo -n sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/ub_atom.list'
 		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
+		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
 		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y atom
+		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y atom
 		
-		return 0
+		return 1
 	fi
 	
 	if [[ "$1" == "GL/gl.h" ]] || [[ "$1" == "GL/glext.h" ]] || [[ "$1" == "GL/glx.h" ]] || [[ "$1" == "GL/glxext.h" ]] || [[ "$1" == "GL/dri_interface.h" ]] || [[ "$1" == "x86_64-linux-gnu/pkgconfig/dri.pc" ]]
@@ -6736,6 +6737,11 @@ _getMost_debian11_install() {
 	
 
 	_getMost_backend_aptGetInstall xvfb
+
+	# terminal-serial: agetty, screen, resize
+	_getMost_backend_aptGetInstall util-linux
+	_getMost_backend_aptGetInstall screen
+	_getMost_backend_aptGetInstall xterm
 	
 	#_getMost_backend_aptGetInstall original-awk
 	_getMost_backend_aptGetInstall gawk
@@ -6897,7 +6903,9 @@ _getMost_debian11_install() {
 		
 		# WARNING: Untested. May cause problems.
 		#_getMost_backend_aptGetInstall docker-ce
+		#_getMost_backend_aptGetInstall docker-compose-plugin
 		_getMost_backend apt-get -d install -y docker-ce
+		_getMost_backend apt-get -d install -y docker-compose-plugin
 	fi
 	
 	
@@ -8036,9 +8044,9 @@ _getMinimal_cloud() {
 
 	# ATTRIBUTION-AI ChatGPT o1 2025-01-03 ... partially. Seems there is some evidence newer dist/OS versions may be more likely to break by default, 'i386', needed for building MSW installers, etc.
 	_getMost_backend dpkg --add-architecture i386
-	#_getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get -y update
+	_getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get -y update
 	_getMost_backend_aptGetInstall libc6:i386 lib32z1
-	_getMost_backend_aptGetInstall wine wine32 wine64 libwine libwine:i386 fonts-wine
+	#_getMost_backend_aptGetInstall wine wine32 wine64 libwine libwine:i386 fonts-wine
 
 
 	
@@ -14077,7 +14085,6 @@ export profileScriptFolder="$ubcoreUBdir"
 [[ "\$scriptAbsoluteLocation" == "" ]] && . "\$profileScriptLocation" --profile _importShortcuts
 [[ "\$ub_setScriptChecksum_disable" == 'true' ]] && export ub_setScriptChecksum_disable="" && unset ub_setScriptChecksum_disable
 
-
 # Returns priority to normal.
 # Greater or equal, '_priority_app_pid_root' .
 #ionice -c 2 -n 3 -p \$\$
@@ -14146,6 +14153,14 @@ then
 fi
 
 CZXWXcRMTo8EmM8i4d
+}
+
+
+
+_setupUbiquitous_resize() {
+	echo "# Hardware serial terminals connected through screen require explicit resize to change number of columns/lines. Usually doing this once will at least increase the usable 'screen real estate' from the very small defaults."
+	echo "# Ignored by Cygwin/MSW, etc."
+	echo "type -p resize > /dev/null 2>&1 && resize > /dev/null 2>&1"
 }
 
 _configureLocal() {
@@ -14345,7 +14360,7 @@ _setupUbiquitous() {
 		_setupUbiquitous_bashProfile_here >> "$HOME"/.bash_profile
 	fi
 	
-	
+	_setupUbiquitous_resize >> "$ubcoreFile"
 	
 	
 	_messageNormal "install: setupUbiquitous_accessories"
