@@ -60,7 +60,7 @@ _document_main() {
 #__HEADER_uk4uPhB663kVcygT0q_HEADER__
 _t '
 scriptedIllustrator_markup_uk4uPhB663kVcygT0q --><!-- # --><pre style="margin-top: 0px;margin-bottom: 0px;white-space: pre-wrap;">
-Copyright (C) 2022 mirage335
+Copyright (C) 2022 Soaring Distributions LLC
 See the end of the file for license conditions.
 See license.txt for mirage335KernelBuild license conditions.
 
