@@ -39,6 +39,60 @@ _test_build_kernel() {
 
 
 
+# ATTRIBUTION-AI: ChatGPT o1 2025-01-11 ... suggested Debian package postprocessing.
+_supplement_kernel_debPkg-dpkg_sequence() {
+	_messagePlain_nominal 'init: _supplement_kernel_debPkg-dpkg_sequence'
+
+	local currentFile="$1"
+	_messagePlain_probe_var currentFile
+
+	local currentConfigDir="$2"
+	_messagePlain_probe_var currentConfigDir
+	
+	_start
+	mkdir -p "$safeTmp"/kernel-headers
+	
+	_messagePlain_probe_cmd dpkg-deb -R "$currentFile" "$safeTmp"/kernel-headers
+
+	# ATTENTION: Usually there will be only one matching destination. Mostly, the for loop is used due to the especially unpredictable directory naming.
+	local currentDestination
+	for currentDestination in "$safeTmp"/kernel-headers/usr/src/linux-headers-*
+	do
+		_messagePlain_probe_cmd cp -a "$currentConfigDir"/.config "$currentDestination"/
+	done
+
+	rm -f "$currentFile"
+	_messagePlain_probe_cmd dpkg-deb -b /tmp/kernel-headers "$currentFile"
+
+	_stop
+}
+_supplement_kernel_debPkg_sequence() {
+	#local functionEntryPWD
+	#functionEntryPWD="$PWD"
+
+	_messagePlain_nominal 'init: _supplement_kernel_debPkg_sequence'
+	
+	local currentFile
+
+	local currentExitStatus
+	currentExitStatus=1
+	
+	# ATTENTION: Usually there will be only one matching filename. Most of the reason for using a for loop is unpredictable filenames, such as the apparently used "$currentKernelName_$currentKernelName" pattern, or the "$currentKernelName"'_mainline', etc, patterns.
+	# Expected to begin in the same directory as "make deb-pkg" , Debian package files expected at '../' .
+	for currentFile in ../linux-headers-"$currentKernelName"*.deb
+	do
+		_messagePlain_probe_cmd "$scriptAbsoluteLocation" _supplement_kernel_debPkg-dpkg_sequence "$currentFile" "$functionEntryPWD"
+		currentExitStatus="$?"
+	done
+
+	#cd "$functionEntryPWD"
+	return "$currentExitStatus"
+}
+_supplement_kernel_debPkg() {
+	"$scriptAbsoluteLocation" _supplement_kernel_debPkg_sequence "$@"
+}
+
+
 
 _fetchKernel-lts-legacyHTTPS() {
 	# DANGER: NOTICE: Do NOT export without corresponding source code!
@@ -387,6 +441,7 @@ _buildKernel-lts() {
 	then
 		make deb-pkg -j $(nproc)
 		[[ "$?" != "0" ]] && currentExitStatus=1
+		_supplement_kernel_debPkg
 	else
 		_messageError 'bad: current_force_bindepOnly'
 		export current_force_bindepOnly=""
@@ -430,6 +485,7 @@ _buildKernel-lts-server() {
 	then
 		make deb-pkg -j $(nproc)
 		[[ "$?" != "0" ]] && currentExitStatus=1
+		_supplement_kernel_debPkg
 	else
 		_messageError 'bad: current_force_bindepOnly'
 		export current_force_bindepOnly=""
@@ -474,6 +530,7 @@ _buildKernel-mainline() {
 	then
 		make deb-pkg -j $(nproc)
 		[[ "$?" != "0" ]] && currentExitStatus=1
+		_supplement_kernel_debPkg
 	else
 		_messageError 'bad: current_force_bindepOnly'
 		export current_force_bindepOnly=""
@@ -517,6 +574,7 @@ _buildKernel-mainline-server() {
 	then
 		make deb-pkg -j $(nproc)
 		[[ "$?" != "0" ]] && currentExitStatus=1
+		_supplement_kernel_debPkg
 	else
 		_messageError 'bad: current_force_bindepOnly'
 		export current_force_bindepOnly=""
