@@ -67,8 +67,8 @@ _supplement_kernel_debPkg-dpkg_sequence() {
 	_stop
 }
 _supplement_kernel_debPkg_sequence() {
-	#local functionEntryPWD
-	#functionEntryPWD="$PWD"
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
 
 	_messagePlain_nominal 'init: _supplement_kernel_debPkg_sequence'
 	
@@ -77,15 +77,15 @@ _supplement_kernel_debPkg_sequence() {
 	local currentExitStatus
 	currentExitStatus=1
 	
-	# ATTENTION: Usually there will be only one matching filename. Most of the reason for using a for loop is unpredictable filenames, such as the apparently used "$currentKernelName_$currentKernelName" pattern, or the "$currentKernelName"'_mainline', etc, patterns.
+	# ATTENTION: Usually there will be only one matching filename. Most of the reason for using a for loop is unpredictable filenames, such as the apparently used "$currentKernel_version_$currentKernel_version" pattern, or the "$currentKernel_version"'_mainline', etc, patterns.
 	# Expected to begin in the same directory as "make deb-pkg" , Debian package files expected at '../' .
-	for currentFile in ../linux-headers-"$currentKernelName"*.deb
+	for currentFile in ../linux-headers-"$currentKernel_version"*.deb
 	do
 		_messagePlain_probe_cmd "$scriptAbsoluteLocation" _supplement_kernel_debPkg-dpkg_sequence "$currentFile" "$functionEntryPWD"
 		currentExitStatus="$?"
 	done
 
-	#cd "$functionEntryPWD"
+	cd "$functionEntryPWD"
 	return "$currentExitStatus"
 }
 _supplement_kernel_debPkg() {

@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='2022055273'
+export ub_setScriptChecksum_contents='1713267027'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -21186,8 +21186,8 @@ _supplement_kernel_debPkg-dpkg_sequence() {
 	_stop
 }
 _supplement_kernel_debPkg_sequence() {
-	#local functionEntryPWD
-	#functionEntryPWD="$PWD"
+	local functionEntryPWD
+	functionEntryPWD="$PWD"
 
 	_messagePlain_nominal 'init: _supplement_kernel_debPkg_sequence'
 	
@@ -21196,15 +21196,15 @@ _supplement_kernel_debPkg_sequence() {
 	local currentExitStatus
 	currentExitStatus=1
 	
-	# ATTENTION: Usually there will be only one matching filename. Most of the reason for using a for loop is unpredictable filenames, such as the apparently used "$currentKernelName_$currentKernelName" pattern, or the "$currentKernelName"'_mainline', etc, patterns.
+	# ATTENTION: Usually there will be only one matching filename. Most of the reason for using a for loop is unpredictable filenames, such as the apparently used "$currentKernel_version_$currentKernel_version" pattern, or the "$currentKernel_version"'_mainline', etc, patterns.
 	# Expected to begin in the same directory as "make deb-pkg" , Debian package files expected at '../' .
-	for currentFile in ../linux-headers-"$currentKernelName"*.deb
+	for currentFile in ../linux-headers-"$currentKernel_version"*.deb
 	do
 		_messagePlain_probe_cmd "$scriptAbsoluteLocation" _supplement_kernel_debPkg-dpkg_sequence "$currentFile" "$functionEntryPWD"
 		currentExitStatus="$?"
 	done
 
-	#cd "$functionEntryPWD"
+	cd "$functionEntryPWD"
 	return "$currentExitStatus"
 }
 _supplement_kernel_debPkg() {
