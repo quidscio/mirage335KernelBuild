@@ -62,7 +62,7 @@ _supplement_kernel_debPkg-dpkg_sequence() {
 	done
 
 	rm -f "$currentFile"
-	_messagePlain_probe_cmd dpkg-deb -b /tmp/kernel-headers "$currentFile"
+	_messagePlain_probe_cmd dpkg-deb -b "$safeTmp"/kernel-headers "$currentFile"
 
 	_stop
 }
