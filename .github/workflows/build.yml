@@ -2,6 +2,10 @@
 name: build
 
 
+# ATTENTION: NOTICE: FURTHER: Development roadmap for better ensuring a consistent kernel build compiler toolchain would be to add '_chroot lite' functions or exported environment variable to chroot without using a separate filesystem/loopback, etc. Either 'debootstrap', or 'Live ISO' (similar to AppImage build process) would be used to create a very minimal chroot environment sufficient for kernel compiling, at minimal disk space consumption, etc.
+
+# For the shorter term, docker container experiments are used for the same purpose.
+
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
   actions: write
