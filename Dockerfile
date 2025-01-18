@@ -37,7 +37,18 @@ apt-get install -y sudo gpg wget pigz dnsutils bind9-dnsutils curl gdisk parted 
 apt-get install -y rustc cargo
 EOF
 
+# Allow members of the 'sudo' group to execute any command without a password
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
+
+RUN <<"EOF"
+cd /
+sudo -n wget https://raw.githubusercontent.com/mirage335-colossus/ubiquitous_bash/master/ubiquitous_bash.sh
+sudo -n chmod 755 /ubiquitous_bash.sh
+#/ubiquitous_bash.sh _setupUbiquitous.bat
+sudo -n /ubiquitous_bash.sh _setupUbiquitous.bat
+/ubiquitous_bash.sh _custom_splice_opensslConfig
+EOF
 
 
 # Build arguments to set UID and GID at build time:
@@ -49,6 +60,8 @@ ARG USERNAME=containeruser
 # Create a matching group and user, and a corresponding home directory
 RUN groupadd --gid $HOST_GID $USERNAME && \
     useradd --uid $HOST_UID --gid $HOST_GID --create-home --shell /bin/bash $USERNAME
+
+RUN usermod -aG sudo $USERNAME
 
 # Set this user as default
 USER $USERNAME
@@ -62,15 +75,6 @@ RUN chown $USERNAME:$USERNAME /home/$USERNAME
 
 
 
-RUN <<"EOF"
-
-cd /
-sudo -n wget https://raw.githubusercontent.com/mirage335-colossus/ubiquitous_bash/master/ubiquitous_bash.sh
-sudo -n chmod 755 /ubiquitous_bash.sh
-/ubiquitous_bash.sh _setupUbiquitous.bat
-sudo -n /ubiquitous_bash.sh _setupUbiquitous.bat
-/ubiquitous_bash.sh _custom_splice_opensslConfig
-EOF
 
 WORKDIR /currentPWD
 
