@@ -149,6 +149,7 @@ jobs:
       timeout-minutes: 45
 
   build_mainline:
+    if: ${{ github.event.inputs.forceKernel_mainline != 'none' }}
     runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-22.04' || github.event.inputs.runnerName }}
     steps:
     - name: forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline }} ______________________________
