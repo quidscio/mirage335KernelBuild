@@ -23,12 +23,12 @@ on:
     inputs:
       runnerName:
         required: false
-        default: ubuntu-latest
+        default: ubuntu-22.04
         type: choice
         options:
-        - ubuntu-latest
-        - ubuntu-latest-m
-        - ubuntu-latest-h
+        - ubuntu-22.04
+        - ubuntu-22.04-m
+        - ubuntu-22.04-h
       forceKernel_mainline:
         required: false
         default: 6.12.
@@ -81,11 +81,7 @@ concurrency:
 jobs:
   build_lts:
     if: ${{ github.event.inputs.forceKernel_lts != 'none' }}
-    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
-    #runs-on: ubuntu-latest
-    #runs-on: ubuntu-20.04
-    #runs-on: buildjet-2vcpu-ubuntu-2004
-    #runs-on: buildjet-64vcpu-ubuntu-2004
+    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-22.04' || github.event.inputs.runnerName }}
     steps:
     - name: forceKernel_lts-${{ github.event.inputs.forceKernel_lts }} ______________________________
       shell: bash
@@ -101,7 +97,7 @@ jobs:
       # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
       # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest'  || github.event.inputs.runnerName == 'ubuntu-22.04' }}
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 1625
@@ -109,17 +105,15 @@ jobs:
         #temp-reserve-mb: 50
         temp-reserve-mb: 6000
         swap-size-mb: 2
-        #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-dotnet: 'true'
-        #remove-android: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-android: 'true'
-        #remove-haskell: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-haskell: 'true'
-        #remove-codeql: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-codeql: 'true'
-        #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-docker-images: 'true'
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+        submodules: 'recursive'
     - name: _getMinimal_cloud
       shell: bash
       run: |
@@ -155,11 +149,7 @@ jobs:
       timeout-minutes: 45
 
   build_mainline:
-    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
-    #runs-on: ubuntu-latest
-    #runs-on: ubuntu-20.04
-    #runs-on: buildjet-2vcpu-ubuntu-2004
-    #runs-on: buildjet-64vcpu-ubuntu-2004
+    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-22.04' || github.event.inputs.runnerName }}
     steps:
     - name: forceKernel_mainline-${{ github.event.inputs.forceKernel_mainline }} ______________________________
       shell: bash
@@ -184,7 +174,7 @@ jobs:
       # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
       # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest'  || github.event.inputs.runnerName == 'ubuntu-22.04' }}
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 1625
@@ -192,17 +182,15 @@ jobs:
         #temp-reserve-mb: 50
         temp-reserve-mb: 6000
         swap-size-mb: 2
-        #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-dotnet: 'true'
-        #remove-android: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-android: 'true'
-        #remove-haskell: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-haskell: 'true'
-        #remove-codeql: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-codeql: 'true'
-        #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-docker-images: 'true'
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+        submodules: 'recursive'
     - name: _getMinimal_cloud
       shell: bash
       run: |
@@ -253,11 +241,7 @@ jobs:
 
   build_mainline-server:
     if: ${{ github.event.inputs.forceKernel_mainline_server != 'none' }}
-    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
-    #runs-on: ubuntu-latest
-    #runs-on: ubuntu-20.04
-    #runs-on: buildjet-2vcpu-ubuntu-2004
-    #runs-on: buildjet-64vcpu-ubuntu-2004
+    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-22.04' || github.event.inputs.runnerName }}
     steps:
     - name: forceKernel_mainline_server-${{ github.event.inputs.forceKernel_mainline_server }} ______________________________
       shell: bash
@@ -282,7 +266,7 @@ jobs:
       # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
       # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest'  || github.event.inputs.runnerName == 'ubuntu-22.04' }}
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 1625
@@ -290,17 +274,15 @@ jobs:
         #temp-reserve-mb: 50
         temp-reserve-mb: 6000
         swap-size-mb: 2
-        #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-dotnet: 'true'
-        #remove-android: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-android: 'true'
-        #remove-haskell: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-haskell: 'true'
-        #remove-codeql: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-codeql: 'true'
-        #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-docker-images: 'true'
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+        submodules: 'recursive'
     - name: _getMinimal_cloud
       shell: bash
       run: |
@@ -352,11 +334,7 @@ jobs:
 
   build_lts-server:
     if: ${{ github.event.inputs.forceKernel_lts_server != 'none' }}
-    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-latest' || github.event.inputs.runnerName }}
-    #runs-on: ubuntu-latest
-    #runs-on: ubuntu-20.04
-    #runs-on: buildjet-2vcpu-ubuntu-2004
-    #runs-on: buildjet-64vcpu-ubuntu-2004
+    runs-on: ${{ github.event.inputs.runnerName == '' && 'ubuntu-22.04' || github.event.inputs.runnerName }}
     steps:
     - name: forceKernel_lts_server-${{ github.event.inputs.forceKernel_lts_server }} ______________________________
       shell: bash
@@ -378,10 +356,9 @@ jobs:
         sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
         sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
         true
-      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
-      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
+    # https://github.com/easimon/maximize-build-space
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest' }}
+      if: ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' && github.event.inputs.runnerName != 'ubuntu-latest-l' && github.event.inputs.runnerName != 'ubuntu-latest-h' && github.event.inputs.runnerName != 'ubuntu-22.04-m' && github.event.inputs.runnerName != 'ubuntu-22.04-l' && github.event.inputs.runnerName != 'ubuntu-22.04-h' }}
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 1625
@@ -389,17 +366,50 @@ jobs:
         #temp-reserve-mb: 50
         temp-reserve-mb: 6000
         swap-size-mb: 2
-        #remove-dotnet: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-dotnet: 'true'
-        #remove-android: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-android: 'true'
-        #remove-haskell: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-haskell: 'true'
-        #remove-codeql: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-codeql: 'true'
-        #remove-docker-images: ${{ github.event.inputs.runnerName != 'ubuntu-latest-h' }}
         remove-docker-images: 'true'
-    - uses: actions/checkout@v2
+    - name: Maximize build space ! remove ONLY
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest-m' || github.event.inputs.runnerName == 'ubuntu-latest-l' || github.event.inputs.runnerName == 'ubuntu-latest-h' || github.event.inputs.runnerName == 'ubuntu-22.04-m' || github.event.inputs.runnerName == 'ubuntu-22.04-l' || github.event.inputs.runnerName == 'ubuntu-22.04-h' }}
+      uses: AdityaGarg8/remove-unwanted-software@v4.1
+      with:
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+        remove-large-packages: 'true'
+        remove-cached-tools: 'true'
+        remove-swapfile: 'true'
+        verbose: 'false'
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+        submodules: 'recursive'
+    # https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/?utm_source=chatgpt.com
+    # ATTRIBUTION-AI: ChatGPT  4o , o1  2025-01-18 .
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: build docker image
+      run: |
+        docker build -t debianStable-docker-image .
+    - name: run command in docker and retrieve artifact from docker image
+      run: |
+        #docker run -it --name debianStable-docker-container -d debianStable-docker-image:latest
+        #docker run -it --name debianStable-docker-container -d debianStable-docker-image:latest --rm "${dockerRunArgs[@]}" "$dockerImageObjectName" "${processedArgs[@]}"
+        docker run -it --name debianStable-docker-container --rm -d debianStable-docker-image:latest bash -c "echo 'Hello, World!' > /artifact.txt"
+        docker cp debianStable-docker-container:/artifact.txt ${{ github.workspace }}
+        cat ${{ github.workspace }}/artifact.txt
+        cat ./artifact.txt
+        false
     - name: _getMinimal_cloud
       shell: bash
       run: |
