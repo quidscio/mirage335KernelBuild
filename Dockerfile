@@ -41,8 +41,9 @@ mkdir -p "$HOME"
 cd "$HOME"
 git clone --depth 1 --recursive https://github.com/mirage335-colossus/ubiquitous_bash.git
 cd ubiquitous_bash
-./_setupUbiquitous.bat
+bash ./_setupUbiquitous.bat
 ./ubiquitous_bash.sh _custom_splice_opensslConfig
+EOF
 
 WORKDIR /app
 
