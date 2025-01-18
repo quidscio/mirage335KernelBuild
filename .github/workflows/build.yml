@@ -68,6 +68,13 @@ on:
       skimfast:
         type: boolean
         default: false
+      container:
+        required: false
+        default: docker
+        type: choice
+        options:
+        - docker
+        - none
   # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#schedule
   schedule:
     #- cron: '5 1 * * 6'
@@ -407,7 +414,8 @@ jobs:
       run: |
         #docker build -t debian_bookworm-docker-image .
         docker build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t debian_bookworm-docker-image:latest .
-    - name: run command in docker and retrieve artifact from docker image
+    - name: _build_cloud_lts! docker
+      if: ${{ github.event.inputs.container != 'none' && github.event.inputs.container != '' }}
       run: |
         #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest
         #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest --rm "${dockerRunArgs[@]}" "$dockerImageObjectName" "${processedArgs[@]}"
@@ -421,14 +429,17 @@ jobs:
         #cat ./artifact.txt
         #
         docker run --name debian_bookworm-docker-container --user "$(id -u):$(id -g)" -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c './ubiquitous_bash.sh _build_cloud_prepare'
+        docker run --name debian_bookworm-docker-container --user "$(id -u):$(id -g)" -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c './ubiquitous_bash.sh _build_cloud_lts-server'
         docker rm debian_bookworm-docker-container
         false
     - name: _getMinimal_cloud
+      #if: ${{ github.event.inputs.container != 'docker' }}
       shell: bash
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
     - name: _build_cloud_lts
+      if: ${{ github.event.inputs.container != 'docker' }}
       shell: bash
       run: |
         #export skimfast=${{ inputs.skimfast }}
