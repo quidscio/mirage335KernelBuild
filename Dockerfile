@@ -39,9 +39,9 @@ EOF
 
 
 RUN <<"EOF"
-apt-get update
-apt-get install build-essential wget git -y
-apt-get build-dep linux -y
+sudo -n apt-get update
+sudo -n apt-get install build-essential wget git -y
+sudo -n apt-get build-dep linux -y
 
 ##xz btrfs-tools grub-mkstandalone mkfs.vfat mkswap mmd mcopy mksquashfs
 
@@ -51,9 +51,9 @@ apt-get build-dep linux -y
 ##qemu-system-x86
 ##qemu-user qemu-utils
 
-apt-get install -y sudo gpg wget pigz dnsutils bind9-dnsutils curl gdisk parted lz4 mawk jq gawk build-essential bison libelf-dev elfutils flex libncurses-dev autoconf libudev-dev dwarves pahole cmake pkg-config bsdutils findutils patch tar gzip bzip2 flex sed sockstat liblinear4 liblua5.3-0 lua-lpeg nmap nmap-common socat axel aria2 gh rsync libssl-dev cpio pv expect libfuse2 cifs-utils dos2unix xxd debhelper p7zip iputils-ping btrfs-progs btrfs-compsize zstd zlib1g nilfs-tools coreutils python3 util-linux kpartx openssl udev cryptsetup bc e2fsprogs xz-utils libreadline8 byobu squashfs-tools grub-pc-bin grub-efi-amd64-bin grub-common mtools dosfstools fdisk cloud-guest-utils trousers tpm-tools
+sudo -n apt-get install -y sudo gpg wget pigz dnsutils bind9-dnsutils curl gdisk parted lz4 mawk jq gawk build-essential bison libelf-dev elfutils flex libncurses-dev autoconf libudev-dev dwarves pahole cmake pkg-config bsdutils findutils patch tar gzip bzip2 flex sed sockstat liblinear4 liblua5.3-0 lua-lpeg nmap nmap-common socat axel aria2 gh rsync libssl-dev cpio pv expect libfuse2 cifs-utils dos2unix xxd debhelper p7zip iputils-ping btrfs-progs btrfs-compsize zstd zlib1g nilfs-tools coreutils python3 util-linux kpartx openssl udev cryptsetup bc e2fsprogs xz-utils libreadline8 byobu squashfs-tools grub-pc-bin grub-efi-amd64-bin grub-common mtools dosfstools fdisk cloud-guest-utils trousers tpm-tools
 
-apt-get install -y rustc cargo
+sudo -n apt-get install -y rustc cargo
 EOF
 
 
@@ -64,7 +64,7 @@ sudo -n wget https://raw.githubusercontent.com/mirage335-colossus/ubiquitous_bas
 sudo -n chmod 755 /ubiquitous_bash.sh
 /ubiquitous_bash.sh _setupUbiquitous.bat
 sudo -n /ubiquitous_bash.sh _setupUbiquitous.bat
-/ubiquitous_bash.sh _custom_splice_opensslConfig
+sudo -n /ubiquitous_bash.sh _custom_splice_opensslConfig
 EOF
 
 WORKDIR /currentPWD
