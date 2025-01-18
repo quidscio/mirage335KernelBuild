@@ -135,7 +135,7 @@ _check_vbox_sequence() {
 	
 	_getMost_backend apt-get update
 
-    ! _getMost_ubuntu22-VBoxManage && exit 1
+    ! _getMost_ubuntu24-VBoxManage && exit 1
 
 
 
