@@ -400,13 +400,13 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: build docker image
       run: |
-        docker build -t debianStable-docker-image .
+        docker build -t debian_bookworm-docker-image .
     - name: run command in docker and retrieve artifact from docker image
       run: |
-        #docker run -it --name debianStable-docker-container -d debianStable-docker-image:latest
-        #docker run -it --name debianStable-docker-container -d debianStable-docker-image:latest --rm "${dockerRunArgs[@]}" "$dockerImageObjectName" "${processedArgs[@]}"
-        docker run -it --name debianStable-docker-container --rm -d debianStable-docker-image:latest bash -c "echo 'Hello, World!' > /artifact.txt"
-        docker cp debianStable-docker-container:/artifact.txt ${{ github.workspace }}
+        #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest
+        #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest --rm "${dockerRunArgs[@]}" "$dockerImageObjectName" "${processedArgs[@]}"
+        docker run -it --name debian_bookworm-docker-container --rm -d debian_bookworm-docker-image:latest bash -c "echo 'Hello, World!' > /artifact.txt"
+        docker cp debian_bookworm-docker-container:/artifact.txt ${{ github.workspace }}
         cat ${{ github.workspace }}/artifact.txt
         cat ./artifact.txt
         false
