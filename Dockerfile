@@ -53,7 +53,7 @@ WORKDIR /app
 #ENTRYPOINT ["/usr/local/bin/ubiquitous_bash.sh", "_drop_docker"]
 ENTRYPOINT ["./ubiquitous_bash.sh", "_bin"]
 
-EOF
+
 
 
 
