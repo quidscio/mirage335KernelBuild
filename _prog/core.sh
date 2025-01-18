@@ -39,7 +39,7 @@ _test_build_kernel() {
 
 
 
-# ATTRIBUTION-AI: ChatGPT o1 2025-01-11 ... suggested Debian package postprocessing.
+# ATTRIBUTION-AI: ChatGPT o1 2025-01-11 , 2025-01-17 ... suggested Debian package postprocessing.
 _supplement_kernel_debPkg-dpkg_sequence() {
 	_messagePlain_nominal 'init: _supplement_kernel_debPkg-dpkg_sequence'
 
@@ -61,8 +61,13 @@ _supplement_kernel_debPkg-dpkg_sequence() {
 		_messagePlain_probe_cmd cp -a "$currentConfigDir"/.config "$currentDestination"/
 	done
 
+
+	sudo -n chown -R root:root "$safeTmp"/kernel-headers
+
 	rm -f "$currentFile"
-	_messagePlain_probe_cmd dpkg-deb -b "$safeTmp"/kernel-headers "$currentFile"
+	_messagePlain_probe_cmd dpkg-deb --build --root-owner-group "$safeTmp"/kernel-headers "$currentFile"
+
+	sudo -n chown -R "$USER":"$USER" "$safeTmp"/kernel-headers
 
 	_stop
 }
