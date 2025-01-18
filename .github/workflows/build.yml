@@ -410,10 +410,17 @@ jobs:
       run: |
         #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest
         #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest --rm "${dockerRunArgs[@]}" "$dockerImageObjectName" "${processedArgs[@]}"
-        docker run -it --name debian_bookworm-docker-container --rm -d debian_bookworm-docker-image:latest bash -c "echo 'Hello, World!' > /artifact.txt"
-        docker cp debian_bookworm-docker-container:/artifact.txt ${{ github.workspace }}
-        cat ${{ github.workspace }}/artifact.txt
-        cat ./artifact.txt
+        #docker run -it --name debian_bookworm-docker-container --rm debian_bookworm-docker-image:latest bash -c 'echo "Hello, World!" > /artifact.txt'
+        #docker run -it --name debian_bookworm-docker-container --rm debian_bookworm-docker-image:latest bash -c 'echo $PWD | tee /artifact.txt'
+        #
+        #docker run -it --name debian_bookworm-docker-container -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'echo $PWD | tee /artifact.txt'
+        #docker cp debian_bookworm-docker-container:/artifact.txt ${{ github.workspace }}
+        #docker rm debian_bookworm-docker-container
+        #cat ${{ github.workspace }}/artifact.txt
+        #cat ./artifact.txt
+        #
+        docker run -it --name debian_bookworm-docker-container --user "$(id -u):$(id -g)" -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c './ubiquitous_bash.sh _build_cloud_prepare'
+        docker rm debian_bookworm-docker-container
         false
     - name: _getMinimal_cloud
       shell: bash

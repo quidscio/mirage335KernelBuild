@@ -34,25 +34,25 @@ apt-get install -y sudo gpg wget pigz dnsutils bind9-dnsutils curl gdisk parted 
 apt-get install -y rustc cargo
 EOF
 
-FROM install-dependency AS debianStable
+FROM install-dependency AS deb
 RUN <<"EOF"
 
-mkdir -p "$HOME"
-cd "$HOME"
-git clone --depth 1 --recursive https://github.com/mirage335-colossus/ubiquitous_bash.git
-cd ubiquitous_bash
-bash ./_setupUbiquitous.bat
-./ubiquitous_bash.sh _custom_splice_opensslConfig
+cd /
+sudo -n wget https://raw.githubusercontent.com/mirage335-colossus/ubiquitous_bash/master/ubiquitous_bash.sh
+sudo -n chmod 755 /ubiquitous_bash.sh
+/ubiquitous_bash.sh _setupUbiquitous.bat
+sudo -n /ubiquitous_bash.sh _setupUbiquitous.bat
+/ubiquitous_bash.sh _custom_splice_opensslConfig
 EOF
 
-WORKDIR /app
+WORKDIR /currentPWD
 
 #COPY . /app
 
 
 #ENTRYPOINT ["/usr/local/bin/ubiquitous_bash.sh", "_drop_docker"]
-#ENTRYPOINT ["./ubiquitous_bash.sh", "_bin"]
-ENTRYPOINT ["bash", "-c", "echo ls / ; ls / ; echo ls ; ls ; echo $PWD"]
+#ENTRYPOINT ["bash", "-c", "echo ls / ; ls / ; echo ls ; ls ; echo $PWD"]
+ENTRYPOINT ["/ubiquitous_bash.sh", "_bin"]
 
 
 
