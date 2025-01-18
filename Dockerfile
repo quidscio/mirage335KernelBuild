@@ -2,7 +2,29 @@
 # https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/?utm_source=chatgpt.com
 # ATTRIBUTION-AI: ChatGPT  4o , o1  2025-01-18 .
 
-FROM debian:12.1 AS deb-src
+FROM debian:bookworm
+
+# Build arguments to set UID and GID at build time:
+# e.g. docker build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t my_image:latest .
+ARG HOST_UID=1000
+ARG HOST_GID=1000
+ARG USERNAME=containeruser
+
+# Create a matching group and user, and a corresponding home directory
+RUN groupadd --gid $HOST_GID $USERNAME && \
+    useradd --uid $HOST_UID --gid $HOST_GID --create-home --shell /bin/bash $USERNAME
+
+# Set this user as default
+USER $USERNAME
+
+# Set HOME explicitly (usually set automatically, but good for clarity)
+ENV HOME=/home/$USERNAME
+
+RUN mkdir -p /home/$USERNAME
+RUN chown $USERNAME:$USERNAME /home/$USERNAME
+
+
+
 COPY <<"EOF" /etc/apt/sources.list
 deb http://deb.debian.org/debian bookworm main
 deb-src http://deb.debian.org/debian bookworm main
@@ -15,7 +37,7 @@ deb-src http://deb.debian.org/debian bookworm-updates main
 EOF
 
 
-FROM deb-src AS install-dependency
+
 RUN <<"EOF"
 apt-get update
 apt-get install build-essential wget git -y
@@ -34,7 +56,7 @@ apt-get install -y sudo gpg wget pigz dnsutils bind9-dnsutils curl gdisk parted 
 apt-get install -y rustc cargo
 EOF
 
-FROM install-dependency AS deb
+
 RUN <<"EOF"
 
 cd /

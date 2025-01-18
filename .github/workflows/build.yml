@@ -405,7 +405,8 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: build docker image
       run: |
-        docker build -t debian_bookworm-docker-image .
+        #docker build -t debian_bookworm-docker-image .
+        docker build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t debian_bookworm-docker-image:latest .
     - name: run command in docker and retrieve artifact from docker image
       run: |
         #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest
