@@ -415,7 +415,7 @@ jobs:
         #docker build -t debian_bookworm-docker-image .
         docker build --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t debian_bookworm-docker-image:latest .
     - name: _build_cloud_lts! docker
-      if: ${{ github.event.inputs.container != 'none' && github.event.inputs.container != '' }}
+      if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
       run: |
         #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest
         #docker run -it --name debian_bookworm-docker-container -d debian_bookworm-docker-image:latest --rm "${dockerRunArgs[@]}" "$dockerImageObjectName" "${processedArgs[@]}"
@@ -433,13 +433,13 @@ jobs:
         docker rm debian_bookworm-docker-container
         false
     - name: _getMinimal_cloud
-      #if: ${{ github.event.inputs.container != 'docker' }}
+      #if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
     - name: _build_cloud_lts
-      if: ${{ github.event.inputs.container != 'docker' }}
+      if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
         #export skimfast=${{ inputs.skimfast }}
