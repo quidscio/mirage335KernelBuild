@@ -65,7 +65,9 @@ _supplement_kernel_debPkg-dpkg_sequence() {
 	sudo -n chown -R root:root "$safeTmp"/kernel-headers
 
 	rm -f "$currentFile"
-	_messagePlain_probe_cmd dpkg-deb --build --root-owner-group "$safeTmp"/kernel-headers "$currentFile"
+	_messagePlain_probe_cmd sudo -n dpkg-deb --build --root-owner-group "$safeTmp"/kernel-headers "$currentFile"
+
+	sudo -n chown "$USER":"$USER" "$currentFile"
 
 	sudo -n chown -R "$USER":"$USER" "$safeTmp"/kernel-headers
 
