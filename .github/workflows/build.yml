@@ -108,10 +108,9 @@ jobs:
         sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
         sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
         true
-      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
-      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
+    # https://github.com/easimon/maximize-build-space
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest'  || github.event.inputs.runnerName == 'ubuntu-22.04' }}
+      if: ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' && github.event.inputs.runnerName != 'ubuntu-latest-l' && github.event.inputs.runnerName != 'ubuntu-latest-h' && github.event.inputs.runnerName != 'ubuntu-22.04-m' && github.event.inputs.runnerName != 'ubuntu-22.04-l' && github.event.inputs.runnerName != 'ubuntu-22.04-h' }}
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 1625
@@ -124,17 +123,60 @@ jobs:
         remove-haskell: 'true'
         remove-codeql: 'true'
         remove-docker-images: 'true'
+    - name: Maximize build space ! remove ONLY
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest-m' || github.event.inputs.runnerName == 'ubuntu-latest-l' || github.event.inputs.runnerName == 'ubuntu-latest-h' || github.event.inputs.runnerName == 'ubuntu-22.04-m' || github.event.inputs.runnerName == 'ubuntu-22.04-l' || github.event.inputs.runnerName == 'ubuntu-22.04-h' }}
+      uses: AdityaGarg8/remove-unwanted-software@v4.1
+      with:
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+        remove-large-packages: 'true'
+        remove-cached-tools: 'true'
+        remove-swapfile: 'true'
+        verbose: 'false'
     - uses: actions/checkout@v3
       with:
         fetch-depth: 1
         submodules: 'recursive'
+    # https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/?utm_source=chatgpt.com
+    # https://dev.to/emmanuelnk/using-sudo-without-password-prompt-as-non-root-docker-user-52bg
+    # https://stackoverflow.com/questions/35594987/how-to-force-docker-for-a-clean-build-of-an-image
+    # https://www.howtogeek.com/devops/how-to-make-docker-rebuild-an-image-without-its-cache/
+    # ATTRIBUTION-AI: ChatGPT  4o , o1  2025-01-18 .
+    # ATTENTION: See Dockerfile for additional very relevant example commands, documentation, CAUTIONs, DANGERs, WARNINGs, etc !
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: build docker image
+      #if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
+      run: |
+        docker build --pull --no-cache --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t debian_bookworm-docker-image:latest .
+    - name: _build_cloud_lts! docker
+      if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
+      run: |
+        #export skimfast=${{ inputs.skimfast }}
+        #echo skimfast $skimfast
+        [[ "${{ github.event.inputs.forceKernel_lts }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_lts }}" != "latest" ]] && export forceKernel_lts="${{ github.event.inputs.forceKernel_lts }}"
+        #'export skimfast='"$skimfast"' ; '
+        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'export forceKernel_lts='"$forceKernel_lts"' ; ''./ubiquitous_bash.sh _build_cloud_prepare'
+        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'export forceKernel_lts='"$forceKernel_lts"' ; ''./ubiquitous_bash.sh _build_cloud_lts'
+        true
     - name: _getMinimal_cloud
+      #if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
         export getfast=${{ inputs.getfast }}
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
     - name: _build_cloud_lts
+      if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
         #export skimfast=${{ inputs.skimfast }}
@@ -187,10 +229,9 @@ jobs:
         sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
         sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
         true
-      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
-      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
+    # https://github.com/easimon/maximize-build-space
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest'  || github.event.inputs.runnerName == 'ubuntu-22.04' }}
+      if: ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' && github.event.inputs.runnerName != 'ubuntu-latest-l' && github.event.inputs.runnerName != 'ubuntu-latest-h' && github.event.inputs.runnerName != 'ubuntu-22.04-m' && github.event.inputs.runnerName != 'ubuntu-22.04-l' && github.event.inputs.runnerName != 'ubuntu-22.04-h' }}
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 1625
@@ -203,17 +244,60 @@ jobs:
         remove-haskell: 'true'
         remove-codeql: 'true'
         remove-docker-images: 'true'
+    - name: Maximize build space ! remove ONLY
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest-m' || github.event.inputs.runnerName == 'ubuntu-latest-l' || github.event.inputs.runnerName == 'ubuntu-latest-h' || github.event.inputs.runnerName == 'ubuntu-22.04-m' || github.event.inputs.runnerName == 'ubuntu-22.04-l' || github.event.inputs.runnerName == 'ubuntu-22.04-h' }}
+      uses: AdityaGarg8/remove-unwanted-software@v4.1
+      with:
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+        remove-large-packages: 'true'
+        remove-cached-tools: 'true'
+        remove-swapfile: 'true'
+        verbose: 'false'
     - uses: actions/checkout@v3
       with:
         fetch-depth: 1
         submodules: 'recursive'
+    # https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/?utm_source=chatgpt.com
+    # https://dev.to/emmanuelnk/using-sudo-without-password-prompt-as-non-root-docker-user-52bg
+    # https://stackoverflow.com/questions/35594987/how-to-force-docker-for-a-clean-build-of-an-image
+    # https://www.howtogeek.com/devops/how-to-make-docker-rebuild-an-image-without-its-cache/
+    # ATTRIBUTION-AI: ChatGPT  4o , o1  2025-01-18 .
+    # ATTENTION: See Dockerfile for additional very relevant example commands, documentation, CAUTIONs, DANGERs, WARNINGs, etc !
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: build docker image
+      #if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
+      run: |
+        docker build --pull --no-cache --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t debian_bookworm-docker-image:latest .
+    - name: _build_cloud_mainline! docker
+      if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
+      run: |
+        #export skimfast=${{ inputs.skimfast }}
+        #echo skimfast $skimfast
+        [[ "${{ github.event.inputs.forceKernel_mainline }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_mainline }}" != "latest" ]] && export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline }}"
+        #'export skimfast='"$skimfast"' ; '
+        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'export forceKernel_mainline='"$forceKernel_mainline"' ; ''./ubiquitous_bash.sh _build_cloud_prepare'
+        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'export forceKernel_mainline='"$forceKernel_mainline"' ; ''./ubiquitous_bash.sh _build_cloud_mainline'
+        true
     - name: _getMinimal_cloud
+      #if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
         export getfast=${{ inputs.getfast }}
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
     - name: _build_cloud_mainline
+      if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
         #export skimfast=${{ inputs.skimfast }}
@@ -280,10 +364,9 @@ jobs:
         sudo -u ubuntu -n bash -c 'sudo -n groupadd runner --non-unique -g $UID' || true
         sudo -u runner -n bash -c 'sudo -n echo $USER $UID' || true
         true
-      # Apparently may increase buildJet 'runner' to 77GB (instead of 61GB).
-      # Apparently may increase Github Actions 'runner' to 59GB (instead of 31GB) .
+    # https://github.com/easimon/maximize-build-space
     - name: Maximize build space
-      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest'  || github.event.inputs.runnerName == 'ubuntu-22.04' }}
+      if: ${{ github.event.inputs.runnerName != 'ubuntu-latest-m' && github.event.inputs.runnerName != 'ubuntu-latest-l' && github.event.inputs.runnerName != 'ubuntu-latest-h' && github.event.inputs.runnerName != 'ubuntu-22.04-m' && github.event.inputs.runnerName != 'ubuntu-22.04-l' && github.event.inputs.runnerName != 'ubuntu-22.04-h' }}
       uses: easimon/maximize-build-space@master
       with:
         #root-reserve-mb: 1625
@@ -296,17 +379,60 @@ jobs:
         remove-haskell: 'true'
         remove-codeql: 'true'
         remove-docker-images: 'true'
+    - name: Maximize build space ! remove ONLY
+      if: ${{ github.event.inputs.runnerName == 'ubuntu-latest-m' || github.event.inputs.runnerName == 'ubuntu-latest-l' || github.event.inputs.runnerName == 'ubuntu-latest-h' || github.event.inputs.runnerName == 'ubuntu-22.04-m' || github.event.inputs.runnerName == 'ubuntu-22.04-l' || github.event.inputs.runnerName == 'ubuntu-22.04-h' }}
+      uses: AdityaGarg8/remove-unwanted-software@v4.1
+      with:
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+        remove-large-packages: 'true'
+        remove-cached-tools: 'true'
+        remove-swapfile: 'true'
+        verbose: 'false'
     - uses: actions/checkout@v3
       with:
         fetch-depth: 1
         submodules: 'recursive'
+    # https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/?utm_source=chatgpt.com
+    # https://dev.to/emmanuelnk/using-sudo-without-password-prompt-as-non-root-docker-user-52bg
+    # https://stackoverflow.com/questions/35594987/how-to-force-docker-for-a-clean-build-of-an-image
+    # https://www.howtogeek.com/devops/how-to-make-docker-rebuild-an-image-without-its-cache/
+    # ATTRIBUTION-AI: ChatGPT  4o , o1  2025-01-18 .
+    # ATTENTION: See Dockerfile for additional very relevant example commands, documentation, CAUTIONs, DANGERs, WARNINGs, etc !
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    - name: Log in to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: build docker image
+      #if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
+      run: |
+        docker build --pull --no-cache --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t debian_bookworm-docker-image:latest .
+    - name: _build_cloud_mainline-server! docker
+      if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
+      run: |
+        #export skimfast=${{ inputs.skimfast }}
+        #echo skimfast $skimfast
+        [[ "${{ github.event.inputs.forceKernel_mainline_server }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_mainline_server }}" != "latest" ]] && export forceKernel_mainline="${{ github.event.inputs.forceKernel_mainline_server }}"
+        #'export skimfast='"$skimfast"' ; '
+        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'export forceKernel_mainline='"$forceKernel_mainline"' ; ''./ubiquitous_bash.sh _build_cloud_prepare'
+        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'export forceKernel_mainline='"$forceKernel_mainline"' ; ''./ubiquitous_bash.sh _build_cloud_mainline-server'
+        true
     - name: _getMinimal_cloud
+      #if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
         export getfast=${{ inputs.getfast }}
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
-    - name: _build_cloud_mainline
+    - name: _build_cloud_mainline-server
+      if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
         #export skimfast=${{ inputs.skimfast }}
@@ -424,7 +550,7 @@ jobs:
       #if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
       run: |
         docker build --pull --no-cache --build-arg HOST_UID=$(id -u) --build-arg HOST_GID=$(id -g) -t debian_bookworm-docker-image:latest .
-    - name: _build_cloud_lts! docker
+    - name: _build_cloud_lts-server! docker
       if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
       run: |
         #export skimfast=${{ inputs.skimfast }}
@@ -441,7 +567,7 @@ jobs:
         export getfast=${{ inputs.getfast }}
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
-    - name: _build_cloud_lts
+    - name: _build_cloud_lts-server
       if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
