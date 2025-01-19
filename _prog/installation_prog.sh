@@ -12,7 +12,6 @@ _test_prog() {
 
 
 
-#Override (Program).
 
 
 # Attempts to reduce adding the necessary Debian packages, from ~5minutes , to much less . However, in practice, '_getMinimal_cloud' , is already very minimal.
