@@ -68,6 +68,9 @@ on:
       skimfast:
         type: boolean
         default: false
+      getfast:
+        type: boolean
+        default: true
       container:
         required: false
         default: docker
@@ -128,6 +131,7 @@ jobs:
     - name: _getMinimal_cloud
       shell: bash
       run: |
+        export getfast=${{ inputs.getfast }}
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
     - name: _build_cloud_lts
@@ -206,6 +210,7 @@ jobs:
     - name: _getMinimal_cloud
       shell: bash
       run: |
+        export getfast=${{ inputs.getfast }}
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
     - name: _build_cloud_mainline
@@ -298,6 +303,7 @@ jobs:
     - name: _getMinimal_cloud
       shell: bash
       run: |
+        export getfast=${{ inputs.getfast }}
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
     - name: _build_cloud_mainline
@@ -432,6 +438,7 @@ jobs:
       #if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
       run: |
+        export getfast=${{ inputs.getfast }}
         ./ubiquitous_bash.sh _getMinimal_cloud
       timeout-minutes: 90
     - name: _build_cloud_lts
