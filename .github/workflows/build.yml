@@ -421,8 +421,12 @@ jobs:
     - name: _build_cloud_lts! docker
       if: ${{ github.event.inputs.container == 'docker' || github.event.inputs.container == '' }}
       run: |
-        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c './ubiquitous_bash.sh _build_cloud_prepare'
-        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c './ubiquitous_bash.sh _build_cloud_lts-server'
+        #export skimfast=${{ inputs.skimfast }}
+        #echo skimfast $skimfast
+        [[ "${{ github.event.inputs.forceKernel_lts_server }}" != "" ]] && [[ "${{ github.event.inputs.forceKernel_lts_server }}" != "latest" ]] && export forceKernel_lts="${{ github.event.inputs.forceKernel_lts_server }}"
+        #'export skimfast='"$skimfast"' ; '
+        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'export forceKernel_lts='"$forceKernel_lts"' ; ''./ubiquitous_bash.sh _build_cloud_prepare'
+        docker run --name debian_bookworm-docker-container --rm -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c 'export forceKernel_lts='"$forceKernel_lts"' ; ''./ubiquitous_bash.sh _build_cloud_lts-server'
         true
     - name: _getMinimal_cloud
       #if: ${{ github.event.inputs.container == 'none' }}
