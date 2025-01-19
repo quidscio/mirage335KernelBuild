@@ -430,7 +430,7 @@ jobs:
         #
         docker run --name debian_bookworm-docker-container --rm --user "$(id -u):$(id -g)" -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c './ubiquitous_bash.sh _build_cloud_prepare'
         docker run --name debian_bookworm-docker-container --rm --user "$(id -u):$(id -g)" -v "$PWD":/currentPWD:rw debian_bookworm-docker-image:latest bash -c './ubiquitous_bash.sh _build_cloud_lts-server'
-        false
+        true
     - name: _getMinimal_cloud
       #if: ${{ github.event.inputs.container == 'none' }}
       shell: bash
