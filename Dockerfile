@@ -64,8 +64,8 @@ RUN <<"EOF"
 cd /
 sudo -n wget https://raw.githubusercontent.com/mirage335-colossus/ubiquitous_bash/master/ubiquitous_bash.sh
 sudo -n chmod 755 /ubiquitous_bash.sh
-#/ubiquitous_bash.sh _setupUbiquitous.bat
-sudo -n /ubiquitous_bash.sh _setupUbiquitous.bat
+#/ubiquitous_bash.sh _setupUbiquitous
+sudo -n /ubiquitous_bash.sh _setupUbiquitous
 /ubiquitous_bash.sh _custom_splice_opensslConfig
 EOF
 
@@ -96,6 +96,12 @@ RUN mkdir -p /home/$USERNAME
 RUN chown $USERNAME:$USERNAME /home/$USERNAME
 
 
+RUN <<EOF
+cp -a /ubiquitous_bash.sh /home/$USERNAME/ubiquitous_bash.sh
+sudo -n chown $USERNAME:$USERNAME /home/$USERNAME/ubiquitous_bash.sh
+cd /home/$USERNAME/
+/home/$USERNAME/ubiquitous_bash.sh _setupUbiquitous
+EOF
 
 
 
