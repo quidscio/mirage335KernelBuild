@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3289137932'
+export ub_setScriptChecksum_contents='1537401414'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -1447,6 +1447,11 @@ _report_setup_ubcp() {
 	[[ "$currentCygdriveC_equivalent" == "" ]] && currentCygdriveC_equivalent=$(cygpath -S | sed 's/\/Windows\/System32//g')
 	[[ "$1" == "/" ]] && currentCygdriveC_equivalent=$(echo "$PWD" | sed 's/\(\/cygdrive\/[a-zA-Z]*\).*/\1/')
 
+
+	mkdir -p "$currentCygdriveC_equivalent"/core/infrastructure/
+	#cd "$currentCygdriveC_equivalent"/core/infrastructure/
+
+
 	find /bin/ /usr/bin/ /sbin/ /usr/sbin/ | tee "$currentCygdriveC_equivalent"/core/infrastructure/ubcp-binReport > /dev/null
 
 
@@ -1926,6 +1931,75 @@ _package-cygwin() {
 
 
 
+
+
+
+
+# Discouraged. Few file paths, some setup, etc, may be different. Otherwise, WSL should not be treated differently.
+_if_wsl() {
+    uname -a | grep -i 'microsoft' > /dev/null 2>&1 || uname -a | grep -i 'WSL2' > /dev/null 2>&1
+}
+
+
+
+# Ingredients. Debian pacakges mirror, docker images, pre-built dist/OS images, etc.
+_set_ingredients() {
+    export ub_INGREDIENTS=""
+
+    local currentDriveLetter
+
+    if ! _if_cygwin
+    then
+        [[ -e /mnt/ingredients/ingredients ]] && mountpoint /mnt/ingredients && export ub_INGREDIENTS=/mnt/ingredients/ingredients && return 0
+
+        # STRONGLY PREFERRED.
+        [[ -e /mnt/ingredients ]] && mountpoint /mnt/ingredients && export ub_INGREDIENTS=/mnt/ingredients && return 0
+
+        # STRONGLY DISCOURAGED.
+        # Do NOT create "$HOME"/core/ingredients unless for some very unexpected reason it is necessary for a non-root user to use ingredients.
+        [[ -e "$HOME"/core/ingredients ]] && export ub_INGREDIENTS="$HOME"/core/ingredients && return 0
+
+        # WSL(2) specific.
+        #_if_wsl
+        #uname -a | grep -i 'microsoft' > /dev/null 2>&1 || uname -a | grep -i 'WSL2' > /dev/null 2>&1
+        if type _if_wsl > /dev/null 2>&1 && _if_wsl
+        then
+            [[ -e /mnt/host/z/mnt/ingredients ]] && export ub_INGREDIENTS=/mnt/host/z/mnt/ingredients && return 0
+            [[ -e /mnt/z/mnt/ingredients ]] && export ub_INGREDIENTS=/mnt/z/mnt/ingredients && return 0
+            [[ -e /mnt/c/core/ingredients ]] && export ub_INGREDIENTS=/mnt/c/core/ingredients && return 0
+            [[ -e /mnt/host/c/core/ingredients ]] && export ub_INGREDIENTS=/mnt/host/c/core/ingredients && return 0
+            #
+            for currentDriveLetter in d e f g h i j k l m n o p q r s t u v w D E F G H I J K L M N O P Q R S T U V W
+            do
+                [[ -e /mnt/"$currentDriveLetter"/ingredients ]] && export ub_INGREDIENTS=/mnt/"$currentDriveLetter"/ingredients && return 0
+            done
+            if [[ -e /mnt/host ]]
+            then
+                for currentDriveLetter in d e f g h i j k l m n o p q r s t u v w D E F G H I J K L M N O P Q R S T U V W
+                do
+                    [[ -e /mnt/host/"$currentDriveLetter"/ingredients ]] && export ub_INGREDIENTS=/mnt/host/"$currentDriveLetter"/ingredients && return 0
+                done
+            fi
+        fi
+    fi
+
+    if _if_cygwin
+    then
+        [[ -e /cygdrive/z/mnt/ingredients ]] && export ub_INGREDIENTS=/cygdrive/z/mnt/ingredients && return 0
+        [[ -e /cygdrive/c/core/ingredients ]] && export ub_INGREDIENTS=/cygdrive/c/core/ingredients && return 0
+        #
+        for currentDriveLetter in d e f g h i j k l m n o p q r s t u v w D E F G H I J K L M N O P Q R S T U V W
+        do
+            [[ -e /cygdrive/"$currentDriveLetter"/ingredients ]] && export ub_INGREDIENTS=/cygdrive/"$currentDriveLetter"/ingredients && return 0
+        done
+    fi
+
+
+
+
+    [[ "$ub_INGREDIENTS" == "" ]] && return 1
+    return 0
+}
 
 
 
@@ -3644,6 +3718,17 @@ _messagePlain_probe_noindent() {
 	echo
 	return 0
 }
+# WARNING: Less track record with very unusual text. May or may not output correctly in some (unknown, unexpected) situations.
+# DANGER: MUST use this function instead of _messagePlain_probe when text is from external origins!
+_messagePlain_probe_safe() {
+	_color_begin_probe
+	#_color_begin_probe_noindent
+	#echo -n "$@"
+	_safeEcho "$@"
+	_color_end
+	echo
+	return
+}
 
 #Blue. Diagnostic instrumentation.
 #"generic/ubiquitousheader.sh"
@@ -5013,14 +5098,14 @@ _fetchDep_debianBookworm_special() {
 
 		
 		# WARNING: Untested. May cause problems.
-		#_getMost_backend_aptGetInstall docker-ce
-		##_getMost_backend_aptGetInstall docker-compose-plugin
-		#_getMost_backend_aptGetInstall docker-ce
-		#_getMost_backend_aptGetInstall docker-buildx-plugin docker-ce-cli docker-ce-rootless-extras
-		_getMost_backend apt-get -d install -y docker-ce
-		#_getMost_backend apt-get -d install -y docker-compose-plugin
-		_getMost_backend apt-get -d install -y docker-ce
-		#_getMost_backend apt-get -d install -y docker-buildx-plugin docker-ce-cli docker-ce-rootless-extras
+		##_getMost_backend_aptGetInstall docker-ce
+		###_getMost_backend_aptGetInstall docker-compose-plugin
+		##_getMost_backend_aptGetInstall docker-ce
+		##_getMost_backend_aptGetInstall docker-buildx-plugin docker-ce-cli docker-ce-rootless-extras
+		#_getMost_backend apt-get -d install -y docker-ce
+		##_getMost_backend apt-get -d install -y docker-compose-plugin
+		#_getMost_backend apt-get -d install -y docker-ce
+		##_getMost_backend apt-get -d install -y docker-buildx-plugin docker-ce-cli docker-ce-rootless-extras
 
 		# ATTENTION: Speculative . May be untested. Enable if ever necessary.
 		#https://docs.docker.com/compose/install/
@@ -5187,7 +5272,7 @@ CZXWXcRMTo8EmM8i4d
 			curl -L "https://deb.debian.org/debian/pool/main/d/digimend-dkms/digimend-dkms_11-3_amd64.deb" -o "$safeTmp"/"digimend-dkms_11-3_amd64.deb"
 			yes | sudo -n dpkg -i "$safeTmp"/"digimend-dkms_11-3_amd64.deb"
 			sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y -f
-			sudo rm -f "$safeTmp"/"digimend-dkms_11-3_amd64.deb"
+			sudo -n rm -f "$safeTmp"/"digimend-dkms_11-3_amd64.deb"
 		fi
 		
 		return 0
@@ -5233,6 +5318,25 @@ CZXWXcRMTo8EmM8i4d
 		! _wantDep 'nc' && echo 'warn: missing: nc'
 		
 		return 0
+	fi
+
+	if [[ "$1" == "curlftpfs" ]]
+	then
+		if [[ -e "$HOME"/"core/installations/curlftpfs/curlftpfs_0.9.2-9+b1_amd64.deb" ]]
+		then
+			yes | sudo -n dpkg -i "$HOME"/"core/installations/curlftpfs/curlftpfs_0.9.2-9+b1_amd64.deb"
+		fi
+
+		if ! [[ -e "$HOME"/"core/installations/curlftpfs/curlftpfs_0.9.2-9+b1_amd64.deb" ]]
+		then
+			curl -L 'http://deb.debian.org/debian/pool/main/c/curlftpfs/curlftpfs_0.9.2-9+b1_amd64.deb' -o "$safeTmp"/"curlftpfs_0.9.2-9+b1_amd64.deb"
+			yes | sudo -n dpkg -i "$safeTmp"/"curlftpfs_0.9.2-9+b1_amd64.deb"
+		fi
+		
+		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y -f
+		sudo -n rm -f "$safeTmp"/"curlftpfs_0.9.2-9+b1_amd64.deb"
+		
+		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y curlftpfs
 	fi
 	
 	
@@ -5286,512 +5390,73 @@ _fetchDep_debianBookworm_sequence() {
 
 _fetchDep_debianBookworm() {
 	# https://askubuntu.com/questions/104899/make-apt-get-or-aptitude-run-with-y-but-not-prompt-for-replacement-of-configu
-	echo 'Dpkg::Options {"--force-confdef"};' | sudo tee /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
-	echo 'Dpkg::Options {"--force-confold"};' | sudo tee -a /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
-	
-	export DEBIAN_FRONTEND=noninteractive
-	
-	#Run up to 2 times. On rare occasion, cache will become unusable again by apt-find before an installation can be completed. Overall, apt-find is the single weakest link in the system.
-	"$scriptAbsoluteLocation" _fetchDep_debianBookworm_sequence "$@"
-	"$scriptAbsoluteLocation" _fetchDep_debianBookworm_sequence "$@"
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-_fetchDep_debianBullseye_special() {
-	sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
-	
-# 	if [[ "$1" == *"java"* ]]
-# 	then
-# 		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y default-jdk default-jre
-# 		return 0
-# 	fi
-	
-	if [[ "$1" == *"wine"* ]] && ! dpkg --print-foreign-architectures | grep i386 > /dev/null 2>&1
-	then
-		sudo -n dpkg --add-architecture i386
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y wine wine32 wine64 libwine libwine:i386 fonts-wine
-		return 0
-	fi
-	
-	if [[ "$1" == "realpath" ]] || [[ "$1" == "readlink" ]] || [[ "$1" == "dirname" ]] || [[ "$1" == "basename" ]] || [[ "$1" == "sha512sum" ]] || [[ "$1" == "sha256sum" ]] || [[ "$1" == "head" ]] || [[ "$1" == "tail" ]] || [[ "$1" == "sleep" ]] || [[ "$1" == "env" ]] || [[ "$1" == "cat" ]] || [[ "$1" == "mkdir" ]] || [[ "$1" == "dd" ]] || [[ "$1" == "rm" ]] || [[ "$1" == "ln" ]] || [[ "$1" == "ls" ]] || [[ "$1" == "test" ]] || [[ "$1" == "true" ]] || [[ "$1" == "false" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y coreutils
-		return 0
-	fi
-	
-	if [[ "$1" == "mount" ]] || [[ "$1" == "umount" ]] || [[ "$1" == "losetup" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y mount
-		return 0
-	fi
-	
-	if [[ "$1" == "mountpoint" ]] || [[ "$1" == "mkfs" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y util-linux
-		return 0
-	fi
-	
-	if [[ "$1" == "mkfs.ext4" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y e2fsprogs
-		return 0
-	fi
-	
-	if [[ "$1" == "parted" ]] || [[ "$1" == "partprobe" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y parted
-		return 0
-	fi
-	
-	if [[ "$1" == "qemu-arm-static" ]] || [[ "$1" == "qemu-armeb-static" ]] || [[ "$1" == "update-binfmts" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y qemu qemu-user-static binfmt-support
-		#update-binfmts --display
-		return 0
-	fi
-	
-	if [[ "$1" == "qemu-system-x86_64" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y qemu-system-x86
-		return 0
-	fi
-	
-	if [[ "$1" == "qemu-img" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y qemu-utils
-		return 0
-	fi
-	
-	if [[ "$1" == "VirtualBox" ]] || [[ "$1" == "VBoxSDL" ]] || [[ "$1" == "VBoxManage" ]] || [[ "$1" == "VBoxHeadless" ]]
-	then
-		sudo -n mkdir -p /etc/apt/sources.list.d
-		echo 'deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian bullseye contrib' | sudo -n tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
-		
-		"$scriptAbsoluteLocation" _getDep wget
-		! _wantDep wget && return 1
-		
-		# TODO Check key fingerprints match "B9F8 D658 297A F3EF C18D  5CDF A2F6 83C5 2980 AECF" and "7B0F AB3A 13B9 0743 5925  D9C9 5442 2A4B 98AB 5139" respectively.
-		wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo -n apt-key add -
-		wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo -n apt-key add -
-		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y dkms virtualbox-6.1
-		
-		# https://www.virtualbox.org/ticket/20949
-		if ! type -p virtualbox > /dev/null 2>&1 && ! type -p VirtualBox > /dev/null 2>&1
-		then
-			curl -L "https://download.virtualbox.org/virtualbox/6.1.34/virtualbox-6.1_6.1.34-150636.1~Debian~bullseye_amd64.deb" -o "$safeTmp"/"virtualbox-6.1_6.1.34-150636.1~Debian~bullseye_amd64.deb"
-			sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y dkms
-			yes | sudo -n dpkg -i "$safeTmp"/"virtualbox-6.1_6.1.34-150636.1~Debian~bullseye_amd64.deb"
-			sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y -f
-		fi
-		
-		echo "WARNING: Recommend manual system configuration after install. See https://www.virtualbox.org/wiki/Downloads ."
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "gpg" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y gnupg
-		return 0
-	fi
-	
-	#Unlikely scenario for hosts.
-	if [[ "$1" == "grub-install" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y grub2
-		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y grub-legacy
-		return 0
-	fi
-	
-	if [[ "$1" == "MAKEDEV" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y makedev
-		return 0
-	fi
-	
-	if [[ "$1" == "fgrep" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y grep
-		return 0
-	fi
-	
-	if [[ "$1" == "fgrep" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y grep
-		return 0
-	fi
-	
-	if [[ "$1" == "awk" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y mawk
-		return 0
-	fi
-	
-	if [[ "$1" == "kill" ]] || [[ "$1" == "ps" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y procps
-		return 0
-	fi
-	
-	if [[ "$1" == "find" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y findutils
-		return 0
-	fi
-	
-	if [[ "$1" == "docker" ]] || [[ "$1" == "docker-compose" ]]
-	then
-		sudo -n update-alternatives --set iptables /usr/sbin/iptables-legacy
-		sudo -n update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
-		#sudo -n systemctl restart docker
-		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y apt-transport-https ca-certificates curl gnupg2 software-properties-common
-		
-		# Sometimes may be useful as a workaround for docker 'overlay2' 'storage-driver' .
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y fuse-overlayfs
-		
-		"$scriptAbsoluteLocation" _getDep curl
-		! _wantDep curl && return 1
-		
-		curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | sudo -n apt-key add -
-		local aptKeyFingerprint
-		aptKeyFingerprint=$(sudo -n apt-key fingerprint 0EBFCD88 2> /dev/null)
-		[[ "$aptKeyFingerprint" == "" ]] && return 1
-		
-		sudo -n add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
-		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get remove -y docker docker-engine docker.io docker-ce docker
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y docker-ce
-		
-		sudo -n usermod -a -G docker "$USER"
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "smbd" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y samba
-		return 0
-	fi
-	
-	if [[ "$1" == "atom" ]]
-	then
-		#curl -L https://packagecloud.io/AtomEditor/atom/gpgkey | sudo -n apt-key add -
-		#sudo -n sh -c 'echo "deb [arch=amd64] https://packagecloud.io/AtomEditor/atom/any/ any main" > /etc/apt/sources.list.d/ub_atom.list'
-		
-		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
-		
-		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y atom
-		
-		#return 0
-		return 1
-	fi
-	
-	if [[ "$1" == "GL/gl.h" ]] || [[ "$1" == "GL/glext.h" ]] || [[ "$1" == "GL/glx.h" ]] || [[ "$1" == "GL/glxext.h" ]] || [[ "$1" == "GL/dri_interface.h" ]] || [[ "$1" == "x86_64-linux-gnu/pkgconfig/dri.pc" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y mesa-common-dev
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "go" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y golang-go
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "php" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends -y php
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "cura-lulzbot" ]]
-	then
-		#Testing/Sid only as of Stretch release cycle.
-		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y rustc cargo
-		
-		echo "Requires manual installation. See https://www.lulzbot.com/learn/tutorials/cura-lulzbot-edition-installation-debian ."
-cat << 'CZXWXcRMTo8EmM8i4d'
-wget -qO - https://download.alephobjects.com/ao/aodeb/aokey.pub | sudo -n apt-key add -
-sudo -n cp /etc/apt/sources.list /etc/apt/sources.list.bak && sudo -n sed -i '$a deb http://download.alephobjects.com/ao/aodeb jessie main' /etc/apt/sources.list && sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update && sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install cura-lulzbot
-CZXWXcRMTo8EmM8i4d
-		echo "(typical)"
-		_stop 1
-	fi
-	
-	if [[ "$1" =~ "FlashPrint" ]]
-	then
-		#Testing/Sid only as of Stretch release cycle.
-		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y rustc cargo
-		
-		echo "Requires manual installation. See http://www.flashforge.com/support-center/flashprint-support/ ."
-		_stop 1
-	fi
-	
-	if [[ "$1" == "cargo" ]] || [[ "$1" == "rustc" ]]
-	then
-		#Testing/Sid only as of Stretch release cycle.
-		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y rustc cargo
-		
-		echo "Requires manual installation."
-cat << 'CZXWXcRMTo8EmM8i4d'
-curl https://sh.rustup.rs -sSf | sh
-echo '[[ -e "$HOME"/.cargo/bin ]] && export PATH="$HOME/.cargo/bin:$PATH"' >> ~/.bashrc
-CZXWXcRMTo8EmM8i4d
-		echo "(typical)"
-		_stop 1
-	fi
-	
-	if [[ "$1" == "firejail" ]]
-	then
-		echo "WARNING: Recommend manual system configuration after install. See https://firejail.wordpress.com/download-2/ ."
-		echo "WARNING: Desktop override symlinks may cause problems, especially preventing proxy host jumping by CoreAutoSSH!"
-		return 1
-	fi
-	
-	
-	if [[ "$1" == "nix-env" ]]
-	then
-		_tryExec '_test_nix-env_upstream'
-		#_tryExec '_test_nix-env_upstream_beta'
-		
-		return 0
-	fi
-	
-	
-	if [[ "$1" == "croc" ]]
-	then
-		_tryExec '_test_croc_upstream'
-		#_tryExec '_test_croc_upstream_beta'
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "rclone" ]]
-	then
-		_tryExec '_test_rclone_upstream'
-		#_tryExec '_test_rclone_upstream_beta'
-		
-		return 0
-	fi
-	
-	
-	if [[ "$1" == "terraform" ]]
-	then
-		curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo -n apt-key add -
-		sudo -n apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y terraform
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "vagrant" ]]
-	then
-		#curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo -n apt-key add -
-		#sudo -n apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-		#sudo -n env DEBIAN_FRONTEND=noninteractive apt-get -y update
-		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y vagrant-libvirt
-		
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y vagrant
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "digimend-debug" ]] || [[ "$1" == 'udev/rules.d/90-digimend.rules' ]] || [[ "$1" == 'X11/xorg.conf.d/50-digimend.conf' ]]
-	then
-		if ! _wantDep digimend-debug && [[ -e /etc/issue ]] && cat /etc/issue | grep 'Debian' > /dev/null 2>&1
-		then
-			if [[ -e "$HOME"/core/installations/digimend-dkms/digimend-dkms_10_all.deb ]]
-			then
-				yes | sudo -n dpkg -i "$HOME"/core/installations/digimend-dkms/digimend-dkms_10_all.deb
-			fi
-			
-			sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y digimend-dkms
-			
-			curl -L "https://github.com/DIGImend/digimend-kernel-drivers/releases/download/v10/digimend-dkms_10_all.deb" -o "$safeTmp"/"digimend-dkms_10_all.deb"
-			yes | sudo -n dpkg -i "$safeTmp"/"digimend-dkms_10_all.deb"
-			sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y -f
-			sudo rm -f "$safeTmp"/"digimend-dkms_10_all.deb"
-		fi
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "openssl/ssl.h" ]] || [[ "$1" == "include/openssl/ssl.h" ]] || [[ "$1" == "/usr/include/openssl/ssl.h" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y libssl-dev
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "sqlite3.h" ]] || [[ "$1" == "sqlite3ext.h" ]] || [[ "$1" == "pkgconfig/sqlite3.pc" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y libsqlite3-dev
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "qalculate-gtk" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y qalculate-gtk
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y -t bullseye-backports qalc
-		
-		! _wantDep 'qalculate-gtk' && echo 'warn: missing: qalculate-gtk'
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "qalc" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y -t bullseye-backports qalc
-		
-		! _wantDep 'qalc' && echo 'warn: missing: qalc'
-		
-		return 0
-	fi
-	
-	if [[ "$1" == "nc" ]]
-	then
-		sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y netcat-openbsd
-		
-		! _wantDep 'nc' && echo 'warn: missing: nc'
-		
-		return 0
-	fi
-	
-	
-	return 1
-}
-
-_fetchDep_debianBullseye_sequence() {
-	_start
-	
-	_mustGetSudo
-	
-	_wantDep "$1" && _stop 0
-	
-	_fetchDep_debianBullseye_special "$@" && _wantDep "$1" && _stop 0
-	
-	sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y "$1" && _wantDep "$1" && _stop 0
-	
-	_apt-file search "$1" > "$safeTmp"/pkgsOut 2> "$safeTmp"/pkgsErr
-	
-	local sysPathAll
-	sysPathAll=$(sudo -n bash -c "echo \$PATH")
-	sysPathAll="$PATH":"$sysPathAll"
-	local sysPathArray
-	IFS=':' read -r -a sysPathArray <<< "$sysPathAll"
-	
-	local currentSysPath
-	local matchingPackageFile
-	local matchingPackagePattern
-	local matchingPackage
-	for currentSysPath in "${sysPathArray[@]}"
-	do
-		matchingPackageFile=""
-		matchingPackagePath=""
-		matchingPackage=""
-		matchingPackagePattern="$currentSysPath"/"$1"
-		matchingPackageFile=$(grep ': '$matchingPackagePattern'$' "$safeTmp"/pkgsOut | cut -f2- -d' ')
-		matchingPackage=$(grep ': '$matchingPackagePattern'$' "$safeTmp"/pkgsOut | cut -f1 -d':')
-		if [[ "$matchingPackage" != "" ]]
-		then
-			sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y "$matchingPackage"
-			_wantDep "$1" && _stop 0
-		fi
-	done
-	matchingPackage=""
-	matchingPackage=$(head -n 1 "$safeTmp"/pkgsOut | cut -f1 -d':')
-	sudo -n env DEBIAN_FRONTEND=noninteractive apt-get install --install-recommends -y "$matchingPackage"
-	_wantDep "$1" && _stop 0
-	
-	_stop 1
-}
-
-_fetchDep_debianBullseye() {
-	# ATTRIBUTION-AI: ChatGPT o1-preview 2024-11-20 .
-	echo 'APT::AutoRemove::RecommendsImportant "true";
-APT::AutoRemove::SuggestsImportant "true";' | sudo -n tee /etc/apt/apt.conf.d/99autoremove-recommends > /dev/null
-
-	
-	# https://askubuntu.com/questions/104899/make-apt-get-or-aptitude-run-with-y-but-not-prompt-for-replacement-of-configu
 	echo 'Dpkg::Options {"--force-confdef"};' | sudo -n tee /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
 	echo 'Dpkg::Options {"--force-confold"};' | sudo -n tee -a /etc/apt/apt.conf.d/50unattended-replaceconfig-ub > /dev/null
 	
 	export DEBIAN_FRONTEND=noninteractive
 	
 	#Run up to 2 times. On rare occasion, cache will become unusable again by apt-find before an installation can be completed. Overall, apt-find is the single weakest link in the system.
-	"$scriptAbsoluteLocation" _fetchDep_debianBullseye_sequence "$@"
-	"$scriptAbsoluteLocation" _fetchDep_debianBullseye_sequence "$@"
+	"$scriptAbsoluteLocation" _fetchDep_debianBookworm_sequence "$@"
+	"$scriptAbsoluteLocation" _fetchDep_debianBookworm_sequence "$@"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5845,12 +5510,13 @@ _fetchDep_debian() {
 	#fi
 	
 	
-	# WARNING: Obsolete. Declining support. Eventual removal expected approximately one year after two Debian stable releases.
-	if [[ -e /etc/debian_version ]] && cat /etc/debian_version | head -c 2 | grep 11 > /dev/null 2>&1
-	then
-		_fetchDep_debianBullseye "$@"
-		return
-	fi
+	# WARNING: Obsolete. Disabled.
+	# ATTENTION: May be revived if important deployments of Debian Bullseye are discovered to still exist. Revive from '_ref/debian_bullseye.sh' if necessary.
+	#if [[ -e /etc/debian_version ]] && cat /etc/debian_version | head -c 2 | grep 11 > /dev/null 2>&1
+	#then
+		#_fetchDep_debianBullseye "$@"
+		#return
+	#fi
 
 
 	if [[ -e /etc/debian_version ]] && cat /etc/debian_version | head -c 2 | grep 12 > /dev/null 2>&1
@@ -6431,8 +6097,8 @@ _getMost_debian11_aptSources() {
 		wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian bullseye contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
 		
-		curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] https://download.docker.com/linux/debian bullseye stable' | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
 		
 		## https://fasttrack.debian.net/
 		#if ! grep 'fasttrack' /etc/apt/sources.list
@@ -6450,9 +6116,9 @@ _getMost_debian11_aptSources() {
 		wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian focal contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
 		
-		curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
-		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-		echo "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
+		echo "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable"
 	elif [[ -e /etc/issue ]] && cat /etc/issue | grep 'Ubuntu' | grep '22.04' > /dev/null 2>&1
 	then
 		true
@@ -6461,12 +6127,12 @@ _getMost_debian11_aptSources() {
 		wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian jammy contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
 		
-		curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
-		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-		echo "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
+		echo "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable"
 	fi
 	
-	curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
+	curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
 	_getMost_backend wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | _getMost_backend apt-key add -
 	_getMost_backend wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 }
@@ -6495,7 +6161,7 @@ _getMost_debian12_aptSources() {
 		wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian bookworm contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
 		
-		curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
+		curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] https://download.docker.com/linux/debian bookworm stable' | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
 		
 		## https://fasttrack.debian.net/
@@ -6506,6 +6172,9 @@ _getMost_debian12_aptSources() {
 			#echo 'deb https://fasttrack.debian.net/debian-fasttrack/ bookworm-backports-staging main contrib' | _getMost_backend tee -a /etc/apt/sources.list
 		#fi
 		
+		# https://github.com/wireapp/wire-desktop/wiki/How-to-install-Wire-for-Desktop-on-Linux
+		#wget -q https://wire-app.wire.com/linux/releases.key -O- | sudo -n apt-key add -
+		#echo "deb [arch=amd64] https://wire-app.wire.com/linux/debian stable main" | sudo -n tee /etc/apt/sources.list.d/wire-desktop.list
 	fi
 	if [[ -e /etc/issue ]] && cat /etc/issue | grep 'Ubuntu' | grep '20.04' > /dev/null 2>&1
 	then
@@ -6515,9 +6184,9 @@ _getMost_debian12_aptSources() {
 		wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian focal contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
 		
-		curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
-		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-		echo "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
+		echo "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable"
 	fi
 	if [[ -e /etc/issue ]] && cat /etc/issue | grep 'Ubuntu' | grep '22.04' > /dev/null 2>&1
 	then
@@ -6527,9 +6196,9 @@ _getMost_debian12_aptSources() {
 		wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian jammy contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
 		
-		curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
-		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-		echo "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
+		echo "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable"
 	fi
 	if [[ -e /etc/issue ]] && cat /etc/issue | grep 'Ubuntu' | grep '24.04' > /dev/null 2>&1
 	then
@@ -6539,12 +6208,12 @@ _getMost_debian12_aptSources() {
 		wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 		echo 'deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian noble contrib' | _getMost_backend tee /etc/apt/sources.list.d/ub_vbox.list > /dev/null 2>&1
 		
-		curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
-		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable"
-		echo "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") $(lsb_release -cs) stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
+		echo "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable" | _getMost_backend tee /etc/apt/sources.list.d/ub_docker.list > /dev/null 2>&1
+		_getMost_backend add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"') $(_chroot bash -c 'lsb_release -cs') stable"
 	fi
 	
-	curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg | _getMost_backend apt-key add -
+	curl -fsSL https://download.docker.com/linux/$(_chroot bash -c '. /etc/os-release; echo "$ID"')/gpg | _getMost_backend apt-key add -
 	_getMost_backend wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | _getMost_backend apt-key add -
 	_getMost_backend wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | _getMost_backend apt-key add -
 }
@@ -6570,7 +6239,7 @@ _getMost_debian12_install() {
 	# CAUTION: Workaround. Debian defaults to an obsolete version of qalc which is unusable.
 	_getMost_backend_aptGetInstall -t bookworm-backports qalc
 
-
+	#_getMost_backend_aptGetInstall wire-desktop
 
 	# ATTENTION: SEVERE: Cause for concern. Absence of this is not properly detected by '_getDep python', '_getDep /usr/bin/python'  .
 	_getMost_backend_aptGetInstall python-is-python3
@@ -6610,6 +6279,8 @@ _getMost_debian11_install() {
 	_getMost_backend_aptGetInstall bash dash
 
 	_getMost_backend_aptGetInstall aria2 curl gpg
+	_getMost_backend_aptGetInstall gnupg
+	_getMost_backend_aptGetInstall lsb-release
 
 	if ! _getMost_backend dash -c 'type apt-fast' > /dev/null 2>&1
 	then
@@ -6633,6 +6304,9 @@ _getMost_debian11_install() {
 	# May be able to resize with some combination of 'dd' and 'gparted' , possibly '_gparted' . May be untested.
 	#_messagePlain_probe 'apt-get upgrade'
 	#_getMost_backend apt-get upgrade
+
+	# https://github.com/wireapp/wire-desktop/wiki/How-to-install-Wire-for-Desktop-on-Linux
+	_getMost_backend_aptGetInstall apt-transport-https
 	
 	
 	_getMost_backend_aptGetInstall locales-all
@@ -6656,7 +6330,15 @@ _getMost_debian11_install() {
 	_getMost_backend_aptGetInstall sockstat
 	_getMost_backend_aptGetInstall x11-xserver-utils
 	_getMost_backend_aptGetInstall arandr
-	
+
+	if _getMost_backend_fileExists "/curlftpfs_0.9.2-9+b1_amd64.deb"
+	then
+		_getMost_backend dpkg -i "/curlftpfs_0.9.2-9+b1_amd64.deb"
+		_getMost_backend rm -f "/curlftpfs_0.9.2-9+b1_amd64.deb"
+		_getMost_backend env DEBIAN_FRONTEND=noninteractive apt-get install -y -f
+	fi
+
+	_getMost_backend_aptGetInstall curlftpfs
 
 	_getMost_backend_aptGetInstall liblinear4 liblua5.3-0 lua-lpeg nmap nmap-common
 	
@@ -6675,6 +6357,8 @@ _getMost_debian11_install() {
 	#_getMost_backend_aptGetInstall synergy quicksynergy
 	
 	_getMost_backend_aptGetInstall vim
+
+	_getMost_backend_aptGetInstall man-db
 	
 	# WARNING: Rust is not yet (2023-11-12) anywhere near as editable on the fly or pervasively available as bash .
 	#  Criteria for such are far more necessarily far more stringent than might be intuitively obvious.
@@ -6897,6 +6581,8 @@ _getMost_debian11_install() {
 	
 	_getMost_backend_aptGetInstall p7zip
 	_getMost_backend_aptGetInstall p7zip-full
+	_getMost_backend_aptGetInstall unzip zip
+	_getMost_backend_aptGetInstall lbzip2
 
 	
 	_getMost_backend_aptGetInstall jp2a
@@ -6978,7 +6664,8 @@ _getMost_debian11_install() {
 	# WARNING: If VirtualBox was not installed by now (eg. due to 'if false' comment block or wrong distribution), this must be called later.
 	# https://en.wiktionary.org/wiki/poke_the_bear
 	# https://forums.virtualbox.org/viewtopic.php?t=25797
-	_getMost_backend VBoxManage setextradata global GUI/SuppressMessages "Update"
+	_getMost_backend /usr/bin/VBoxManage setextradata global GUI/SuppressMessages "Update"
+	_getMost_backend /usr/local/bin/VBoxManage setextradata global GUI/SuppressMessages "Update"
 	
 	
 	
@@ -8337,27 +8024,32 @@ _get_from_nix-user() {
 		
 		current_getMost_backend_wasSet="false"
 	fi
+
+
+	# ATTENTION: Though otherwise bad practice, some particularly both crucial and non-standard or particular version packages, such as 'geda', but also 'package_kde.tar.xz', are kept in "$HOME" . Thus,  bash -c 'cd ; ', followed by wget, etc, can be appropriate.
+
 	
 	# . "$HOME"/.nix-profile/etc/profile.d/nix.sh
 
 
 	#_nix_fetch_alternatives
-	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c '[[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c '[[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://web.archive.org/web/20230413214011/http://ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
-	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c '[[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://web.archive.org/web/http://ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
-	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c '[[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://github.com/soaringDistributions/ubDistBuild_bundle/raw/main/geda-gaf/geda-gaf-1.10.2.tar.gz'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; [[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; [[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://web.archive.org/web/20230413214011/http://ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; [[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://web.archive.org/web/http://ftp.geda-project.org/geda-gaf/stable/v1.10/1.10.2/geda-gaf-1.10.2.tar.gz'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; [[ ! -e geda-gaf-1.10.2.tar.gz ]] && wget https://github.com/soaringDistributions/ubDistBuild_bundle/raw/main/geda-gaf/geda-gaf-1.10.2.tar.gz'
 
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'nix-prefetch-url file://"$(~/.ubcore/ubiquitous_bash/ubiquitous_bash.sh _getAbsoluteLocation ./geda-gaf-1.10.2.tar.gz)"'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; nix-prefetch-url file://"$(~/.ubcore/ubiquitous_bash/ubiquitous_bash.sh _getAbsoluteLocation ./geda-gaf-1.10.2.tar.gz)"'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; nix-prefetch-url file:///home/'"$currentUser"'/geda-gaf-1.10.2.tar.gz'
 
 	#_nix_update
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'nix-channel --list'
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'nix-channel --update'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; nix-channel --list'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; nix-channel --update'
 
 	
 	# CAUTION: May correctly fail, due to marked insecure, due to CVE-2024-6775 , or similar. Do NOT force.
 	#_custom_installDeb /root/core/installations/Wire.deb
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'nix-env -iA nixpkgs.wire-desktop'
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'xdg-desktop-menu install "$HOME"/.nix-profile/share/applications/wire-desktop.desktop'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; nix-env -iA nixpkgs.wire-desktop'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; xdg-desktop-menu install "$HOME"/.nix-profile/share/applications/wire-desktop.desktop'
 	
 
 	_getMost_backend sudo -n -u "$currentUser" cp -a /home/"$currentUser"/.nix-profile/share/icons /home/"$currentUser"/.local/share/
@@ -8399,25 +8091,25 @@ _get_from_nix-user() {
 	
 	# ###
 	# Seems to have removed xorn, python2.7 . May not have been tested through ubdist/WSL . May be accepted for now due to some apparently successful testing expected to match this specific version.
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA geda -f https://github.com/NixOS/nixpkgs/archive/773a8314ef05364d856e46299722a9d849aacf8b.tar.gz'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA geda -f https://github.com/NixOS/nixpkgs/archive/773a8314ef05364d856e46299722a9d849aacf8b.tar.gz'
 	
 	# Seems to still have xorn, python2.7, etc . Should have the most functionality, and should match previously tested versions, both through ubdist/OS and ubdist/WSL .
-	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA geda -f https://github.com/NixOS/nixpkgs/archive/9957cd48326fe8dbd52fdc50dd2502307f188b0d.tar.gz'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA geda -f https://github.com/NixOS/nixpkgs/archive/9957cd48326fe8dbd52fdc50dd2502307f188b0d.tar.gz'
 	
 	# Most recent version. May freeze until there is sufficient experience with newer versions.
-	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.geda'
+	#_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.geda'
 	# ###
 	
 	
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'xdg-desktop-menu install "$HOME"/.nix-profile/share/applications/geda-gschem.desktop'
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'xdg-desktop-menu install "$HOME"/.nix-profile/share/applications/geda-gattrib.desktop'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; xdg-desktop-menu install "$HOME"/.nix-profile/share/applications/geda-gschem.desktop'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; xdg-desktop-menu install "$HOME"/.nix-profile/share/applications/geda-gattrib.desktop'
 	_getMost_backend sudo -n -u "$currentUser" cp -a /home/"$currentUser"/.nix-profile/share/icons /home/"$currentUser"/.local/share/
 
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.pcb'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.pcb'
 
 	
 	# Necessary, do NOT remove. Necessary for 'gsch2pcb' , 'gnetlist' , etc, since installation as a dependency does not make the necessary binaries available to the usual predictable PATH .
-	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.python2'
+	_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; export NIXPKGS_ALLOW_INSECURE=1 ; nix-env -iA nixpkgs.python2'
 
 
 	
@@ -8428,11 +8120,11 @@ _get_from_nix-user() {
 	# Workaround to make macros needed from 'pcb' package available to such programs as 'gsch2pcb' from the 'geda' package .
 	#sed 's/.*\/\(.*\)\/bin\/pcb.*/\1/')
 	local currentDerivationPath_pcb
-	currentDerivationPath_pcb=$(_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'readlink -f "$(type -p pcb)"')
+	currentDerivationPath_pcb=$(_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; readlink -f "$(type -p pcb)"')
 	currentDerivationPath_pcb=$(echo "$currentDerivationPath_pcb" | sed 's/\(.*\)\/bin\/pcb.*/\1/')
 
 	local currentDerivationPath_gsch2pcb
-	currentDerivationPath_gsch2pcb=$(_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'readlink -f "$(type -p gsch2pcb)"')
+	currentDerivationPath_gsch2pcb=$(_getMost_backend sudo -n -u "$currentUser" /bin/bash -l -c 'cd ; readlink -f "$(type -p gsch2pcb)"')
 	currentDerivationPath_gsch2pcb=$(echo "$currentDerivationPath_gsch2pcb" | sed 's/\(.*\)\/bin\/gsch2pcb.*/\1/')
 
 	_getMost_backend sudo -n cp -a "$currentDerivationPath_pcb"/share/pcb "$currentDerivationPath_gsch2pcb"/share/
@@ -8727,6 +8419,8 @@ _get_veracrypt() {
 	cd "$safeTmp"
 	
 	
+	_getDep lbzip2
+
 	_getDep libfuse.so.2
 	
 	
@@ -9942,16 +9636,25 @@ _unhook_systemd_shutdown() {
 }
 
 _stopwatch() {
+	local currentExitStatus_bin
+	local currentExitStatus_self
+	
 	local measureDateA
 	local measureDateB
 	
 	measureDateA=$(date +%s%N | cut -b1-13)
 
 	"$@"
+	currentExitStatus_bin="$?"
 
 	measureDateB=$(date +%s%N | cut -b1-13)
 
 	bc <<< "$measureDateB - $measureDateA"
+	currentExitStatus_self="$?"
+
+	[[ "$currentExitStatus_bin" != "0" ]] && return "$currentExitStatus_bin"
+	[[ "$currentExitStatus_self" != "0" ]] && return "$currentExitStatus_self"
+	return 0
 }
 
 _resetFakeHomeEnv_extra() {
@@ -10456,6 +10159,94 @@ _github_removeActionsHTTPS() {
 
 }
 
+
+
+
+
+
+
+# "$1" == build-${{ github.run_id }}-${{ github.run_attempt }}
+#shift
+# "$@" == ./_local/package_image_beforeBoot.tar.flx.part*
+_gh_release_upload_parts-multiple() {
+    "$scriptAbsoluteLocation" _gh_release_upload_parts-multiple_sequence "$@"
+}
+_gh_release_upload_parts-multiple_sequence() {
+    _messageNormal '_gh_release_upload_parts: '"$@"
+    local currentTag="$1"
+    shift
+
+    local currentStream_max=12
+
+    local currentStreamNum=0
+
+    for currentFile in "$@"
+    do
+        let currentStreamNum++
+
+        "$scriptAbsoluteLocation" _gh_release_upload_part-single_sequence "$currentTag" "$currentFile" &
+        eval local currentStream_${currentStreamNum}_PID="$!"
+        _messagePlain_probe_var currentStream_${currentStreamNum}_PID
+        
+        while [[ $(jobs | wc -l) -ge "$currentStream_max" ]]
+        do
+            echo
+            jobs
+            echo
+            sleep 2
+            true
+        done
+    done
+
+    local currentStreamPause
+    for currentStreamPause in $(seq "1" "$currentStreamNum")
+	do
+        _messagePlain_probe currentStream_${currentStreamPause}_PID= $(eval "echo \$currentStream_${currentStreamPause}_PID")
+		if eval "[[ \$currentStream_${currentStreamPause}_PID != '' ]]"
+        then
+           _messagePlain_probe _pauseForProcess $(eval "echo \$currentStream_${currentStreamPause}_PID")
+           _pauseForProcess $(eval "echo \$currentStream_${currentStreamPause}_PID")
+        fi
+	done
+
+    while [[ $(jobs | wc -l) -ge 1 ]]
+    do
+        echo
+        jobs
+        echo
+        sleep 2
+        true
+    done
+    
+    wait
+}
+_gh_release_upload_part-single_sequence() {
+    _messagePlain_nominal '_gh_release_upload: '"$1"' '"$2"
+    local currentTag="$1"
+    local currentFile="$2"
+
+    #local currentPID
+    #"$scriptAbsoluteLocation" _stopwatch gh release upload "$currentTag" "$currentFile" &
+    #currentPID="$!"
+
+    #_pauseForProcess "$currentPID"
+    #wait
+
+    #while ! "$scriptAbsoluteLocation" _stopwatch _timeout 10 dd if="$currentFile" bs=1M status=progress > /dev/null
+    #do
+        #sleep 7
+    #done
+    #return 0
+
+    # Maximum file size is 2GigaBytes .
+    local currentIteration=0
+    while ! "$scriptAbsoluteLocation" _stopwatch _timeout 600 gh release upload --clobber "$currentTag" "$currentFile" && [[ "$currentIteration" -lt 30 ]]
+    do
+        sleep 7
+        let currentIteration++
+    done
+    return 0
+}
 
 
 
@@ -10982,843 +10773,1679 @@ _test_gitBest() {
 
 
 
-# Requires "$GH_TOKEN" .
-_gh_downloadURL() {
-	local current_url
-	local current_repo
-	local current_tagName
-	local current_file
-	
-	
-	# ATTRIBUTION: ChatGPT GPT-4 2023-11-04 .
-	
-	# The provided URL
-	current_url="$1"
-	shift
-	
-	# Use `sed` to extract the parts of the URL
-	current_repo=$(echo "$current_url" | sed -n 's|https://github.com/\([^/]*\)/\([^/]*\)/.*|\1/\2|p')
-	current_tagName=$(echo "$current_url" | sed -n 's|https://github.com/[^/]*/[^/]*/releases/download/\([^/]*\)/.*|\1|p')
-	current_file=$(echo "$current_url" | sed -n 's|https://github.com/[^/]*/[^/]*/releases/download/[^/]*/\(.*\)|\1|p')
-	
-	local current_fileOut
-	current_fileOut="$current_file"
-	if [[ "$1" == "-O" ]]
-	then
-		#_gh_downloadURL "${currentURL_array_reversed[$currentIterationNext1]}" -O "$currentAxelTmpFileRelative".tmp2
-		current_fileOut="$2"
-	fi
-	
-	# Use variables to construct the gh release download command
-	local currentIteration
-	currentIteration=0
-	while ! [[ -e "$current_fileOut" ]] && [[ "$currentIteration" -lt 3 ]]
-	do
-		gh release download "$current_tagName" -R "$current_repo" -p "$current_file" "$@"
-		! [[ -e "$current_fileOut" ]] && sleep 7
-		let currentIteration=currentIteration+1
-	done
-	[[ -e "$current_fileOut" ]]
-	return "$?"
+# CAUTION: This file is very necessarily part of 'rotten' . Do NOT move functions or rename to other files without updating the build shellcode for 'rotten' !
+
+# Refactored from code which was very robust with fast ISP, however often failed with slower ISP, as explained by ChatGPT due to AWS S3 temporary link expiration.
+# See "_ref/wget_githubRelease_internal-OBSOLETE.sh" for original code, which due to the more iterative development process at the time, may be more reliable in untested cases.
+
+# WARNING: May be untested.
+
+# CAUTION: WARNING: Unusually, inheritance of local variables in procedure functions is relied upon. Theoretically, this has been long tested by 'ubiquitous_bash.sh _test' .
+#"$api_address_type"
+#"$currentStream"
+#"$currentAxelTmpFileRelative" "$currentAxelTmpFile"
+#
+#"$currentAbsoluteRepo"' '"$currentReleaseLabel"' '"$currentFile"
+#"$currentOutFile"
+
+# WARNING: CAUTION: Many functions rely on emitting to standard output . Experiment/diagnose by copying code to override with 'ops.sh' . CAUTION: Be very careful enabling or using diagnostic output to stderr, as stderr may also be redirected by calling functions, terminal may not be present, etc.
+#( echo x >&2 ) > /dev/null
+#_messagePlain_probe_var page >&2 | cat /dev/null
+#_messagePlain_probe_safe "currentAPI_URL= ""$currentAPI_URL" >&2 | cat /dev/null
+# WARNING: Limit stderr pollution for log (including CI logs) and terminal readability , using 'tail' .
+#( cat ubiquitous_bash.sh >&2 ) 2> >(tail -n 10 >&2) | tail -n 10
+#( set -o pipefail ; false | cat ubiquitous_bash.sh >&2 ) 2> >(tail -n 10 >&2) | cat > /dev/null
+#( set -o pipefail ; false 2> >(tail -n 10 >&2) | cat > /dev/null )
+
+# DANGER: Use _messagePlain_probe_safe , _safeEcho , _safeEcho_newline , etc .
+
+# CAUTION: ATTENTION: Uncommented lines add to ALL 'compiled' bash shell scripts - INCLUDING rotten_compressed.sh !
+# Thus, it may be preferable to keep example code as a separate line commented at the beginning of that line, rather than a comment character after code on the same line .
+
+
+
+
+
+# ATTENTION: 'MANDATORY_HASH == true' claim requirement can be imposed without any important effect on reliability or performance.
+# In practice, such multi-part-per-file download programs as 'aria2c' may or may not have any worse integrity safety concerns than other download programs.
+# NOTICE: Track record from historically imposing MANDATORY_HASH has been long enough to establish excellent confidence for imposing the requirement for this safety claim again without serious issue if necessary.
+# https://www.cvedetails.com/vulnerability-list/vendor_id-12682/Haxx.html
+#  'Haxx'
+# https://www.cvedetails.com/vulnerability-list/vendor_id-3385/Wget.html
+# https://www.cvedetails.com/vulnerability-list/vendor_id-19755/product_id-53327/Aria2-Project-Aria2.html
+# https://www.cvedetails.com/vulnerability-list/vendor_id-2842/Axel.html
+# ATTENTION: DANGER: Client downloading function explicitly sets 'MANDATORY_HASH == true' to claim resulting file EITHER will be checked by external hash before production use OR file is downloaded within an internal safer network (ie. GitHub Actions) using integrity guarded computers (ie. GitHub Runners). Potentially less integrity-safe downloading as multi-part-per-file parallel 'axel' 'download accelerator' style downloading can be limited to require a safety check for the MANDATORY_HASH claim.
+# NOTICE: Imposing safety check for MANDATORY_HASH claim has long track record and no known use cases combine BOTH the jittery contentious internet connections over which multi-part-per-file downloading may or may not be more reliable, AND cannot test build steps without download large files to cycle the entire build completely. That is to say, ONLY CI environments would be usefully faster from not requiring a MANDATORY_HASH claim, yet CI environments can already make an integrity claim relevant for MANDATORY_HASH, and CI environments usually have high-quality internet connections not needing complex trickery to improve download reliability/speed.
+#[[ "$FORCE_AXEL" != "" ]] && ( [[ "$MANDATORY_HASH" == "true" ]] )
+
+
+
+#export FORCE_DIRECT="true"
+#export FORCE_WGET="true"
+#export FORCE_AXEL="4"
+
+# Actually buffers files in progress behind completed files, in addition to downloading over multiple connections. Streaming without buffer underrun (ie. directly to packetDisc, ie. directly to optical disc) regardless of internet connection quality may require such buffer.
+#export FORCE_PARALLEL="3"
+
+# Already default. FORCE_BUFFER="true" implies FORCE_PARALLEL=3 or similar and sets FORCE_DIRECT="false". FORCE_BUFFER="false" implies and sets FORCE_DIRECT="true" .
+#FORCE_BUFFER="true"
+
+#export GH_TOKEN="..."
+
+
+
+
+
+#_get_vmImg_ubDistBuild_sequence
+#export MANDATORY_HASH="true"
+# write file
+#_wget_githubRelease_join-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "package_image.tar.flx" | _get_extract_ubDistBuild-tar xv --overwrite
+# write disk (eg. '/dev/sda')
+#_wget_githubRelease_join-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "package_image.tar.flx" | _get_extract_ubDistBuild-tar --extract ./vm.img --to-stdout | sudo -n dd of="$3" bs=1M status=progress
+#
+#export MANDATORY_HASH=
+#unset MANDATORY_HASH
+#_wget_githubRelease-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "_hash-ubdist.txt"
+
+
+#_get_vmImg_beforeBoot_ubDistBuild_sequence
+#export MANDATORY_HASH="true"
+# write file
+#_wget_githubRelease_join-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "package_image_beforeBoot.tar.flx" | _get_extract_ubDistBuild-tar xv --overwrite
+# write disk (eg. '/dev/sda')
+#_wget_githubRelease_join-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "package_image_beforeBoot.tar.flx" | _get_extract_ubDistBuild-tar --extract ./vm.img --to-stdout | sudo -n dd of="$3" bs=1M status=progress
+#
+#export MANDATORY_HASH=
+#unset MANDATORY_HASH
+#_wget_githubRelease-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "_hash-ubdist_beforeBoot.txt"
+
+
+#_get_vmImg_ubDistBuild-live_sequence
+#export MANDATORY_HASH="true"
+# write file
+#_wget_githubRelease_join "soaringDistributions/ubDistBuild" "$releaseLabel" "vm-live.iso"
+#currentHash_bytes=$(_wget_githubRelease-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "_hash-ubdist.txt" | head -n 14 | tail -n 1 | sed 's/^.*count=$(bc <<< '"'"'//' | cut -f1 -d\  )
+# write packetDisc (eg. '/dev/sr0', '/dev/dvd'*, '/dev/cdrom'*)
+#_wget_githubRelease_join-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "vm-live.iso" | tee >(openssl dgst -whirlpool -binary | xxd -p -c 256 >> "$scriptLocal"/hash-download.txt) ; dd if=/dev/zero bs=2048 count=$(bc <<< '1000000000000 / 2048' ) ) | sudo -n growisofs -speed=3 -dvd-compat -Z "$3"=/dev/stdin -use-the-force-luke=notray -use-the-force-luke=spare:min -use-the-force-luke=bufsize:128m
+# write disk (eg. '/dev/sda')
+#_wget_githubRelease_join-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "vm-live.iso" | tee >(openssl dgst -whirlpool -binary | xxd -p -c 256 >> "$scriptLocal"/hash-download.txt) ; dd if=/dev/zero bs=2048 count=$(bc <<< '1000000000000 / 2048' ) ) | sudo -n dd of="$3" bs=1M status=progress
+#
+#export MANDATORY_HASH=
+#unset MANDATORY_HASH
+#_wget_githubRelease-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "_hash-ubdist.txt"
+
+
+#_get_vmImg_ubDistBuild-rootfs_sequence
+#export MANDATORY_HASH="true"
+#_wget_githubRelease_join-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "package_rootfs.tar.flx" | lz4 -d -c > ./package_rootfs.tar
+#
+#export MANDATORY_HASH=
+#unset MANDATORY_HASH
+#_wget_githubRelease-stdout "soaringDistributions/ubDistBuild" "$releaseLabel" "_hash-ubdist.txt"
+
+
+
+#! "$scriptAbsoluteLocation" _wget_githubRelease_join "owner/repo" "internal" "file.ext"
+#! _wget_githubRelease "owner/repo" "" "file.ext"
+
+
+#_wget_githubRelease_join "soaringDistributions/Llama-augment_bundle" "" "llama-3.1-8b-instruct-abliterated.Q4_K_M.gguf"
+
+
+
+#_wget_githubRelease-stdout
+#export MANDATORY_HASH="true"
+#export MANDATORY_HASH=""
+
+#_wget_githubRelease_join
+#export MANDATORY_HASH="true"
+#export MANDATORY_HASH=""
+
+#_wget_githubRelease_join-stdout
+#export MANDATORY_HASH="true"
+
+
+
+
+
+
+
+#type -p gh > /dev/null 2>&1
+
+
+#_wget_githubRelease_internal
+
+#curl --no-progress-meter
+#gh release download "$current_tagName" -R "$current_repo" -p "$current_file" "$@" 2> >(tail -n 10 >&2) | tail -n 10
+
+## Use variables to construct the gh release download command
+#local currentIteration
+#currentIteration=0
+#while ! [[ -e "$current_fileOut" ]] && [[ "$currentIteration" -lt 3 ]]
+#do
+	##gh release download "$current_tagName" -R "$current_repo" -p "$current_file" "$@"
+	#gh release download "$current_tagName" -R "$current_repo" -p "$current_file" "$@" 2> >(tail -n 10 >&2) | tail -n 10
+	#! [[ -e "$current_fileOut" ]] && sleep 7
+	#let currentIteration=currentIteration+1
+#done
+#[[ -e "$current_fileOut" ]]
+#return "$?"
+
+
+
+# ATTENTION: Override with 'ops.sh' or similar. Do NOT attempt to override with exported variables: do indeed override the function.
+
+_set_wget_githubRelease() {
+	export githubRelease_retriesMax=25
+	export githubRelease_retriesWait=18
+}
+_set_wget_githubRelease
+
+_set_wget_githubRelease-detect() {
+	export githubRelease_retriesMax=2
+	export githubRelease_retriesWait=4
+}
+
+_set_wget_githubRelease-detect-parallel() {
+	export githubRelease_retriesMax=25
+	export githubRelease_retriesWait=18
 }
 
 
 
-_wget_githubRelease-URL() {
-	local currentURL
-	if [[ "$2" != "" ]]
+_if_gh() {
+	if type -p gh > /dev/null 2>&1 && [[ "$GH_TOKEN" != "" ]]
 	then
-		if [[ "$GH_TOKEN" == "" ]]
-		then
-			currentURL=$(curl -6 -s "https://api.github.com/repos/""$1""/releases" | jq -r ".[] | select(.name == \"""$2""\") | .assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1)
-			[[ "$currentURL" == "" ]] && currentURL=$(curl -4 -s "https://api.github.com/repos/""$1""/releases" | jq -r ".[] | select(.name == \"""$2""\") | .assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1)
-			echo "$currentURL"
-			return
-		else
-			currentURL=$(curl -6 -H "Authorization: Bearer $GH_TOKEN" -s "https://api.github.com/repos/""$1""/releases" | jq -r ".[] | select(.name == \"""$2""\") | .assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1)
-			[[ "$currentURL" == "" ]] && currentURL=$(curl -4 -H "Authorization: Bearer $GH_TOKEN" -s "https://api.github.com/repos/""$1""/releases" | jq -r ".[] | select(.name == \"""$2""\") | .assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1)
-			echo "$currentURL"
-			return
-		fi
-	else
-		if [[ "$GH_TOKEN" == "" ]]
-		then
-			currentURL=$(curl -6 -s "https://api.github.com/repos/""$1""/releases/latest" | jq -r ".assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1)
-			[[ "$currentURL" == "" ]] && currentURL=$(curl -4 -s "https://api.github.com/repos/""$1""/releases/latest" | jq -r ".assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1)
-			echo "$currentURL"
-			return
-		else
-			currentURL=$(curl -6 -H "Authorization: Bearer $GH_TOKEN" -s "https://api.github.com/repos/""$1""/releases/latest" | jq -r ".assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1)
-			[[ "$currentURL" == "" ]] && currentURL=$(curl -4 -H "Authorization: Bearer $GH_TOKEN" -s "https://api.github.com/repos/""$1""/releases/latest" | jq -r ".assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1)
-			echo "$currentURL"
-			return
-		fi
-	fi
-}
-
-_wget_githubRelease() {
-	local currentURL=$(_wget_githubRelease-URL "$@")
-	if [[ "$GH_TOKEN" == "" ]]
-	then
-		_messagePlain_probe curl -L -o "$3" "$currentURL" >&2
-		curl -L -o "$3" "$currentURL"
-	else
-		if type -p gh > /dev/null 2>&1 && [[ "$GH_TOKEN" != "" ]] && [[ "$FORCE_WGET" != "true" ]]
-		then
-			_messagePlain_probe _gh_downloadURL "$currentURL" -O "$3" >&2
-			_gh_downloadURL "$currentURL" -O "$3"
-		else
-			# Broken. Must use 'gh' instead.
-			_messagePlain_probe curl -H "Authorization: Bearer "'$GH_TOKEN' -L -o "$3" "$currentURL" >&2
-			curl -H "Authorization: Bearer $GH_TOKEN" -L -o "$3" "$currentURL"
-		fi
-	fi
-	[[ ! -e "$3" ]] && _messagePlain_bad 'missing: '"$1"' '"$2"' '"$3" && return 1
-	return 0
-}
-
-_wget_githubRelease-stdout() {
-	local currentURL=$(_wget_githubRelease-URL "$@")
-	if type -p gh > /dev/null 2>&1 && [[ "$GH_TOKEN" != "" ]] && [[ "$FORCE_WGET" != "true" ]]
-	then
-		_messagePlain_probe _gh_downloadURL "$currentURL" -O - >&2
-		_gh_downloadURL "$currentURL" -O -
-		return
-	else
-		if [[ "$GH_TOKEN" == "" ]]
-		then
-			_messagePlain_probe curl -L -o - "$currentURL" >&2
-			curl -L -o - "$currentURL"
-		else
-			# Broken. Must use 'gh' instead.
-			_messagePlain_probe curl -H "Authorization: Bearer "'$GH_TOKEN' -L -o - "$currentURL" >&2
-			curl -H "Authorization: Bearer $GH_TOKEN" -L -o - "$currentURL"
-		fi
-		return
-	fi
-}
-
-
-_wget_githubRelease_join-stdout() {
-	local functionEntryPWD
-	functionEntryPWD="$PWD"
-	cd "$scriptAbsoluteFolder"
-	
-	local currentURL
-	local currentURL_array
-
-	local currentIteration
-	currentIteration=0
-	for currentIteration in $(seq -f "%02g" 0 50)
-	do
-		currentURL=$(_wget_githubRelease-URL "$1" "$2" "$3"".part""$currentIteration")
-		[[ "$currentURL" == "" ]] && break
-		[[ "$currentURL" != "" ]] && currentURL_array+=( "$currentURL" )
-	done
-
-	# https://unix.stackexchange.com/questions/412868/bash-reverse-an-array
-	local currentValue
-	for currentValue in "${currentURL_array[@]}"
-	do
-		currentURL_array_reversed=("$currentValue" "${currentURL_array_reversed[@]}")
-	done
-	
-	# DANGER: Requires   ' "$MANDATORY_HASH" == true '   to indicate use of a hash obtained more securely to check download integrity. Do NOT set 'MANDATORY_HASH' explicitly, safe functions which already include appropriate checks for integrity will set this safety flag automatically.
-	# CAUTION: Do NOT use unless reasonable to degrade network traffic collision backoff algorithms. Unusual defaults, very aggressive, intended for load-balanced multi-WAN with at least 3 WANs .
-	if [[ "$FORCE_AXEL" != "" ]] && ( [[ "$MANDATORY_HASH" == "true" ]] )
-	then
-		#local currentAxelTmpFile
-		#currentAxelTmpFile="$scriptAbsoluteFolder"/.m_axelTmp_$(_uid 14)
-		export currentAxelTmpFileRelative=.m_axelTmp_$(_uid 14)
-		export currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
-
-		#local currentAxelPID
-
-		local currentForceAxel
-		currentForceAxel="$FORCE_AXEL"
-
-		( [[ "$currentForceAxel" == "true" ]] || [[ "$currentForceAxel" == "" ]] ) && currentForceAxel="48"
-		[[ "$currentForceAxel" -lt 2 ]] && currentForceAxel="2"
-
-		currentForceAxel=$(bc <<< "$currentForceAxel""*0.5" | cut -f1 -d\. )
-		[[ "$currentForceAxel" -lt 2 ]] && currentForceAxel="2"
-
-		#_messagePlain_probe axel -a -n "$FORCE_AXEL" -o "$currentAxelTmpFile" "${currentURL_array_reversed[@]}" >&2
-		#axel -a -n "$FORCE_AXEL" -o "$currentAxelTmpFile" "${currentURL_array_reversed[@]}" >&2 &
-		#currentAxelPID="$!"
-
-
-		local current_usable_ipv4
-		current_usable_ipv4="false"
-		#if _timeout 8 aria2c --async-dns=false -o "$currentAxelTmpFile" --disable-ipv6 --allow-overwrite=true --auto-file-renaming=false --file-allocation=none --timeout=6 "${currentURL_array_reversed[0]}" >&2
-		#then
-			#current_usable_ipv4="true"
-		#fi
-		if [[ "$GH_TOKEN" == "" ]]
-		then
-			if _timeout 5 wget -4 -O - "${currentURL_array_reversed[0]}" > /dev/null
-			then
-				current_usable_ipv4="true"
-			fi
-		else
-			if _timeout 5 wget -4 -O - --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[0]}" > /dev/null
-			then
-				current_usable_ipv4="true"
-			fi
-		fi
-
-		local current_usable_ipv6
-		current_usable_ipv6="false"
-		if [[ "$GH_TOKEN" == "" ]]
-		then
-			if _timeout 5 wget -6 -O - "${currentURL_array_reversed[0]}" > /dev/null
-			then
-				current_usable_ipv6="true"
-			fi
-		else
-			if _timeout 5 wget -6 -O - --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[0]}" > /dev/null
-			then
-				current_usable_ipv6="true"
-			fi
-		fi
-
-		local currentPID_1
-		local currentPID_2
-		currentIteration=0
-		local currentIterationNext1
-		let currentIterationNext1=currentIteration+1
-		rm -f "$currentAxelTmpFile"
-		rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-		while [[ "${currentURL_array_reversed[$currentIteration]}" != "" ]] || [[ "${currentURL_array_reversed[$currentIterationNext1]}" != "" ]] || [[ -e "$currentAxelTmpFile".tmp2 ]]
-		do
-			#rm -f "$currentAxelTmpFile"
-			rm -f "$currentAxelTmpFile".aria2
-			rm -f "$currentAxelTmpFile".tmp
-			rm -f "$currentAxelTmpFile".tmp.st
-			rm -f "$currentAxelTmpFile".tmp.aria2
-			rm -f "$currentAxelTmpFile".tmp1
-			rm -f "$currentAxelTmpFile".tmp1.st
-			rm -f "$currentAxelTmpFile".tmp1.aria2
-			#rm -f "$currentAxelTmpFile".tmp2
-			#rm -f "$currentAxelTmpFile".tmp2.st
-			#rm -f "$currentAxelTmpFile".tmp2.aria2
-			#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-			
-			#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-
-			# https://github.com/aria2/aria2/issues/1108
-
-			if [[ "${currentURL_array_reversed[$currentIteration]}" != "" ]]
-			then
-				# Download preferring from IPv6 address .
-				if [[ "$current_usable_ipv6" == "true" ]]
-				then
-					if [[ "$GH_TOKEN" == "" ]]
-					then
-						#--file-allocation=falloc
-						_messagePlain_probe aria2c -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false "${currentURL_array_reversed[$currentIteration]}" >&2
-						aria2c --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
-						currentPID_1="$!"
-					else
-						_messagePlain_probe aria2c -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIteration]}" >&2
-						aria2c --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
-						currentPID_1="$!"
-					fi
-				else
-					if [[ "$GH_TOKEN" == "" ]]
-					then
-						_messagePlain_probe aria2c -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=true "${currentURL_array_reversed[$currentIteration]}" >&2
-						aria2c --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=true "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
-						currentPID_1="$!"
-					else
-						_messagePlain_probe aria2c -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=true --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIteration]}" >&2
-						aria2c --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=true --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
-						currentPID_1="$!"
-					fi
-				fi
-			fi
-			
-			
-			# CAUTION: ATTENTION: Very important. Simultaneous reading and writing is *very* important for writing directly to slow media (ie. BD-R) .
-			#  NOTICE: Wirting directly to slow BD-R is essential for burning a Live disc from having booted a Live disc.
-			#   DANGER: Critical for rapid recovery back to recent upstream 'ubdist/OS' ! Do NOT unnecessarily degrade this capability!
-			#  Also theoretically helpful with especially fast network connections.
-			#if [[ "$currentIteration" != "0" ]]
-			if [[ -e "$currentAxelTmpFile".tmp2 ]]
-			then
-				# ATTENTION: Staggered.
-				#sleep 10 > /dev/null 2>&1
-				wait "$currentPID_2" >&2
-				#wait >&2
-
-				sleep 0.2 > /dev/null 2>&1
-				if [[ -e "$currentAxelTmpFile".tmp2 ]]
-				then
-					_messagePlain_probe dd if="$currentAxelTmpFile".tmp2 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
-					
-					# ### dd if="$currentAxelTmpFile".tmp2 bs=5M status=progress >> "$currentAxelTmpFile"
-					dd if="$currentAxelTmpFile".tmp2 bs=1M status=progress
-					#cat "$currentAxelTmpFile".tmp2
-					
-					du -sh "$currentAxelTmpFile".tmp2 >> "$currentAxelTmpFile"
-					
-					#cat "$currentAxelTmpFile".tmp2 >> "$currentAxelTmpFile"
-				fi
-			else
-				if [[ "$currentIteration" == "0" ]]
-				then
-					# ATTENTION: Staggered.
-					#sleep 6 > /dev/null 2>&1
-					true
-				fi
-			fi
-			rm -f "$currentAxelTmpFile".tmp2
-			rm -f "$currentAxelTmpFile".tmp2.st
-			rm -f "$currentAxelTmpFile".tmp2.aria2
-			#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-			
-			
-
-
-			if [[ "${currentURL_array_reversed[$currentIterationNext1]}" != "" ]]
-			then
-				# Download preferring from IPv4 address.
-				#--disable-ipv6
-				if [[ "$current_usable_ipv4" == "true" ]]
-				then
-					if [[ "$GH_TOKEN" == "" ]]
-					then
-						_messagePlain_probe aria2c -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true "${currentURL_array_reversed[$currentIterationNext1]}" >&2
-						aria2c --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
-						currentPID_2="$!"
-					else
-						_messagePlain_probe aria2c -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIterationNext1]}" >&2
-						aria2c --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
-						currentPID_2="$!"
-					fi
-				else
-					if [[ "$GH_TOKEN" == "" ]]
-					then
-						_messagePlain_probe aria2c -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false "${currentURL_array_reversed[$currentIterationNext1]}" >&2
-						aria2c --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
-						currentPID_2="$!"
-					else
-						_messagePlain_probe aria2c -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false --header="Authorization: Bearer "'$GH_TOKEN'"" "${currentURL_array_reversed[$currentIterationNext1]}" >&2
-						aria2c --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=false --header="Authorization: Bearer $GH_TOKEN" "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
-						currentPID_2="$!"
-					fi
-				fi
-			fi
-			
-
-			# ATTENTION: NOT staggered.
-			#wait "$currentPID_1" >&2
-			#wait "$currentPID_2" >&2
-			#wait >&2
-			
-			if [[ "$currentIteration" == "0" ]]
-			then
-				wait "$currentPID_1" >&2
-				sleep 6 > /dev/null 2>&1
-				[[ "$currentPID_2" == "" ]] && sleep 35 > /dev/null 2>&1
-				[[ "$currentPID_2" != "" ]] && wait "$currentPID_2" >&2
-				wait >&2
-			fi
-
-			wait "$currentPID_1" >&2
-			sleep 0.2 > /dev/null 2>&1
-			if [[ -e "$currentAxelTmpFile".tmp1 ]]
-			then
-				_messagePlain_probe dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
-				
-				if [[ ! -e "$currentAxelTmpFile" ]]
-				then
-					# ### mv -f "$currentAxelTmpFile".tmp1 "$currentAxelTmpFile"
-					dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress
-					
-					du -sh "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
-				else
-					# ATTENTION: Staggered.
-					#dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress >> "$currentAxelTmpFile" &
-				
-					# ATTENTION: NOT staggered.
-					# ### dd if="$currentAxelTmpFile".tmp1 bs=5M status=progress >> "$currentAxelTmpFile"
-					dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress
-					#cat "$currentAxelTmpFile".tmp1
-					
-					du -sh "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
-					
-					#cat "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
-				fi
-			fi
-
-			let currentIteration=currentIteration+2
-			let currentIterationNext1=currentIteration+1
-		done
-		
-
-		#for currentValue in "${currentURL_array_reversed[@]}"
-		#do
-			#rm -f "$currentAxelTmpFile".tmp
-			
-			
-			##_messagePlain_probe axel -a -n "$currentForceAxel" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
-			##axel -a -n "$currentForceAxel" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
-			#if [[ "$GH_TOKEN" == "" ]]
-			#then
-				#_messagePlain_probe axel -a -n "$currentForceAxel" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
-				#axel -a -n "$currentForceAxel" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
-			#else
-				#_messagePlain_probe axel -a -n "$currentForceAxel" -H '"Authorization: Bearer $GH_TOKEN"' -o "$currentAxelTmpFile".tmp "$currentValue" >&2
-				#axel -a -n "$currentForceAxel" -H "Authorization: Bearer $GH_TOKEN" -o "$currentAxelTmpFile".tmp "$currentValue" >&2
-			#fi
-			
-			
-			#_messagePlain_probe dd if="$currentAxelTmpFile".tmp bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
-			#dd if="$currentAxelTmpFile".tmp bs=1M status=progress >> "$currentAxelTmpFile"
-			#let currentIteration=currentIteration+1
-		#done
-
-		#while [[ "$currentIteration" -le 16 ]] && [[ ! -e "$currentAxelTmpFile" ]]
-		#do
-			#sleep 2 > /dev/null 2>&1
-			#let currentIteration="$currentIteration"+1
-		#done
-
-		#if [[ -e "$currentAxelTmpFile" ]]
-		#then
-			#tail --pid="$currentAxelPID" -c 100000000000 -f "$currentAxelTmpFile"
-			#wait "$currentAxelPID"
-		#else
-			#_messagePlain_bad 'missing: "$currentAxelTmpFile"' >&2
-			#kill -TERM "$currentAxelPID" > /dev/null 2>&1
-			#kill -TERM "$currentAxelPID" > /dev/null 2>&1
-			#sleep 3
-			#kill -TERM "$currentAxelPID" > /dev/null 2>&1
-			#sleep 3
-			#kill -TERM "$currentAxelPID" > /dev/null 2>&1
-			#kill -KILL "$currentAxelPID" > /dev/null 2>&1
-			#return 1
-		#fi
-
-		if ! [[ -e "$currentAxelTmpFile" ]]
-		then
-			true
-			# ### return 1
-		fi
-
-		# ### cat "$currentAxelTmpFile"
-
-		rm -f "$currentAxelTmpFile"
-		rm -f "$currentAxelTmpFile".aria2
-		rm -f "$currentAxelTmpFile".tmp
-		rm -f "$currentAxelTmpFile".tmp.st
-		rm -f "$currentAxelTmpFile".tmp.aria2
-		rm -f "$currentAxelTmpFile".tmp1
-		rm -f "$currentAxelTmpFile".tmp1.st
-		rm -f "$currentAxelTmpFile".tmp1.aria2
-		rm -f "$currentAxelTmpFile".tmp2
-		rm -f "$currentAxelTmpFile".tmp2.st
-		rm -f "$currentAxelTmpFile".tmp2.aria2
-		rm -f "$currentAxelTmpFile".tmp3
-		rm -f "$currentAxelTmpFile".tmp3.st
-		rm -f "$currentAxelTmpFile".tmp3.aria2
-		rm -f "$currentAxelTmpFile".tmp4
-		rm -f "$currentAxelTmpFile".tmp4.st
-		rm -f "$currentAxelTmpFile".tmp4.aria2
-			
-		rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-		
+		( _messagePlain_probe '_if_gh: gh' >&2 ) > /dev/null
 		return 0
+	fi
+	( _messagePlain_probe '_if_gh: NOT gh' >&2 ) > /dev/null
+	return 1
+}
+
+
+#_wget_githubRelease-URL "owner/repo" "" "file.ext"
+#_wget_githubRelease-URL "owner/repo" "latest" "file.ext"
+#_wget_githubRelease-URL "owner/repo" "internal" "file.ext"
+_wget_githubRelease-URL() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ init: _wget_githubRelease-URL' >&2 ) > /dev/null
+	if _if_gh
+	then
+		( _messagePlain_probe_safe _wget_githubRelease-URL-gh "$@" >&2 ) > /dev/null
+		_wget_githubRelease-URL-gh "$@"
+		return
 	else
-		if [[ "$GH_TOKEN" == "" ]]
-		then
-			_messagePlain_probe curl -L "${currentURL_array_reversed[@]}" >&2
-			curl -L "${currentURL_array_reversed[@]}"
-		elif type -p gh > /dev/null 2>&1 && [[ "$GH_TOKEN" != "" ]] && [[ "$FORCE_WGET" != "true" ]]
-		then
-			
-			if [[ $(cat /proc/meminfo | grep MemTotal | tr -cd '[[:digit:]]') -gt 16379210 ]] && [[ "$FORCE_LOWTMP" != "true" ]]
-			then
-				
-				
-				
-				
-				# ATTENTION: Follows structure based on functionality for 'aria2c' .
-				
-				#local currentAxelTmpFile
-				#currentAxelTmpFile="$scriptAbsoluteFolder"/.m_axelTmp_$(_uid 14)
-				export currentAxelTmpFileRelative=.m_axelTmp_$(_uid 14)
-				export currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
-				
-				local currentPID_1
-				local currentPID_2
-				local currentPID_3
-				local currentPID_4
-				local currentIteration
-				currentIteration=0
-				local currentIterationNext1
-				let currentIterationNext1=currentIteration+1
-				local currentIterationNext2
-				let currentIterationNext2=currentIteration+2
-				local currentIterationNext3
-				let currentIterationNext3=currentIteration+3
-				rm -f "$currentAxelTmpFile"
-				rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-				while [[ "${currentURL_array_reversed[$currentIteration]}" != "" ]] || [[ "${currentURL_array_reversed[$currentIterationNext1]}" != "" ]] || [[ -e "$currentAxelTmpFile".tmp2 ]] || [[ "${currentURL_array_reversed[$currentIterationNext2]}" != "" ]] || [[ -e "$currentAxelTmpFile".tmp3 ]] || [[ "${currentURL_array_reversed[$currentIterationNext3]}" != "" ]] || [[ -e "$currentAxelTmpFile".tmp4 ]]
-				do
-					#rm -f "$currentAxelTmpFile"
-					rm -f "$currentAxelTmpFile".aria2 > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp.st > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp.aria2 > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp1 > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp1.st > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp1.aria2 > /dev/null 2>&1
-					#rm -f "$currentAxelTmpFile".tmp2 > /dev/null 2>&1
-					#rm -f "$currentAxelTmpFile".tmp2.st > /dev/null 2>&1
-					#rm -f "$currentAxelTmpFile".tmp2.aria2 > /dev/null 2>&1
-					#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-					
-					#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-
-					# https://github.com/aria2/aria2/issues/1108
-
-					if [[ "${currentURL_array_reversed[$currentIteration]}" != "" ]]
-					then
-						_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIteration]}" -O "$currentAxelTmpFileRelative".tmp1 >&2
-						#"$scriptAbsoluteLocation"
-						_gh_downloadURL "${currentURL_array_reversed[$currentIteration]}" -O "$currentAxelTmpFileRelative".tmp1 >&2 &
-						currentPID_1="$!"
-					fi
-					
-					
-					# CAUTION: ATTENTION: Very important. Simultaneous reading and writing is *very* important for writing directly to slow media (ie. BD-R) .
-					#  NOTICE: Wirting directly to slow BD-R is essential for burning a Live disc from having booted a Live disc.
-					#   DANGER: Critical for rapid recovery back to recent upstream 'ubdist/OS' ! Do NOT unnecessarily degrade this capability!
-					#  Also theoretically helpful with especially fast network connections.
-					#if [[ "$currentIteration" != "0" ]]
-					if [[ -e "$currentAxelTmpFile".tmp2 ]]
-					then
-						# ATTENTION: Staggered.
-						#sleep 10 > /dev/null 2>&1
-						wait "$currentPID_2" >&2
-						[[ "$currentPID_2" != "" ]] && _pauseForProcess "$currentPID_2" >&2
-						#wait >&2
-
-						sleep 0.2 > /dev/null 2>&1
-						if [[ -e "$currentAxelTmpFile".tmp2 ]]
-						then
-							_messagePlain_probe dd if="$currentAxelTmpFile".tmp2 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
-							
-							# ### dd if="$currentAxelTmpFile".tmp2 bs=5M status=progress >> "$currentAxelTmpFile"
-							dd if="$currentAxelTmpFile".tmp2 bs=1M status=progress
-							#cat "$currentAxelTmpFile".tmp2
-							
-							du -sh "$currentAxelTmpFile".tmp2 >> "$currentAxelTmpFile"
-							
-							#cat "$currentAxelTmpFile".tmp2 >> "$currentAxelTmpFile"
-						fi
-					else
-						if [[ "$currentIteration" == "0" ]]
-						then
-							# ATTENTION: Staggered.
-							#sleep 6 > /dev/null 2>&1
-							true
-						fi
-					fi
-					rm -f "$currentAxelTmpFile".tmp2 > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp2.st > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp2.aria2 > /dev/null 2>&1
-					#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-					
-					if [[ "${currentURL_array_reversed[$currentIterationNext1]}" != "" ]]
-					then
-						_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIterationNext1]}" -O "$currentAxelTmpFileRelative".tmp2 >&2
-						#"$scriptAbsoluteLocation" 
-						_gh_downloadURL "${currentURL_array_reversed[$currentIterationNext1]}" -O "$currentAxelTmpFileRelative".tmp2 >&2 &
-						currentPID_2="$!"
-					fi
-					
-					
-					
-					if [[ -e "$currentAxelTmpFile".tmp3 ]]
-					then
-						# ATTENTION: Staggered.
-						#sleep 10 > /dev/null 2>&1
-						wait "$currentPID_3" >&2
-						[[ "$currentPID_3" != "" ]] && _pauseForProcess "$currentPID_3" >&2
-						#wait >&2
-
-						sleep 0.2 > /dev/null 2>&1
-						if [[ -e "$currentAxelTmpFile".tmp3 ]]
-						then
-							_messagePlain_probe dd if="$currentAxelTmpFile".tmp3 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
-							
-							# ### dd if="$currentAxelTmpFile".tmp3 bs=5M status=progress >> "$currentAxelTmpFile"
-							dd if="$currentAxelTmpFile".tmp3 bs=1M status=progress
-							#cat "$currentAxelTmpFile".tmp3
-							
-							du -sh "$currentAxelTmpFile".tmp3 >> "$currentAxelTmpFile"
-							
-							#cat "$currentAxelTmpFile".tmp3 >> "$currentAxelTmpFile"
-						fi
-					else
-						if [[ "$currentIteration" == "0" ]]
-						then
-							# ATTENTION: Staggered.
-							#sleep 6 > /dev/null 2>&1
-							true
-						fi
-					fi
-					rm -f "$currentAxelTmpFile".tmp3 > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp3.st > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp3.aria2 > /dev/null 2>&1
-					#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-					
-					if [[ "${currentURL_array_reversed[$currentIterationNext2]}" != "" ]]
-					then
-						_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIterationNext2]}" -O "$currentAxelTmpFileRelative".tmp3 >&2
-						#"$scriptAbsoluteLocation" 
-						_gh_downloadURL "${currentURL_array_reversed[$currentIterationNext2]}" -O "$currentAxelTmpFileRelative".tmp3 >&2 &
-						currentPID_3="$!"
-					fi
-					
-					
-					
-					if [[ -e "$currentAxelTmpFile".tmp4 ]]
-					then
-						# ATTENTION: Staggered.
-						#sleep 10 > /dev/null 2>&1
-						wait "$currentPID_4" >&2
-						[[ "$currentPID_4" != "" ]] && _pauseForProcess "$currentPID_4" >&2
-						#wait >&2
-
-						sleep 0.2 > /dev/null 2>&1
-						if [[ -e "$currentAxelTmpFile".tmp4 ]]
-						then
-							_messagePlain_probe dd if="$currentAxelTmpFile".tmp4 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
-							
-							# ### dd if="$currentAxelTmpFile".tmp4 bs=5M status=progress >> "$currentAxelTmpFile"
-							dd if="$currentAxelTmpFile".tmp4 bs=1M status=progress
-							#cat "$currentAxelTmpFile".tmp4
-							
-							du -sh "$currentAxelTmpFile".tmp4 >> "$currentAxelTmpFile"
-							
-							#cat "$currentAxelTmpFile".tmp4 >> "$currentAxelTmpFile"
-						fi
-					else
-						if [[ "$currentIteration" == "0" ]]
-						then
-							# ATTENTION: Staggered.
-							#sleep 6 > /dev/null 2>&1
-							true
-						fi
-					fi
-					rm -f "$currentAxelTmpFile".tmp4 > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp4.st > /dev/null 2>&1
-					rm -f "$currentAxelTmpFile".tmp4.aria2 > /dev/null 2>&1
-					#rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-					
-					if [[ "${currentURL_array_reversed[$currentIterationNext3]}" != "" ]]
-					then
-						_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIterationNext3]}" -O "$currentAxelTmpFileRelative".tmp4 >&2
-						#"$scriptAbsoluteLocation" 
-						_gh_downloadURL "${currentURL_array_reversed[$currentIterationNext3]}" -O "$currentAxelTmpFileRelative".tmp4 >&2 &
-						currentPID_4="$!"
-					fi
-					
-					
-
-					# ATTENTION: NOT staggered.
-					#wait "$currentPID_1" >&2
-					#[[ "$currentPID_1" != "" ]] && _pauseForProcess "$currentPID_1" >&2
-					#wait "$currentPID_2" >&2
-					#[[ "$currentPID_2" != "" ]] && _pauseForProcess "$currentPID_2" >&2
-					#wait "$currentPID_3" >&2
-					#[[ "$currentPID_3" != "" ]] && _pauseForProcess "$currentPID_3" >&2
-					#wait "$currentPID_4" >&2
-					#[[ "$currentPID_4" != "" ]] && _pauseForProcess "$currentPID_4" >&2
-					#wait >&2
-					
-					if [[ "$currentIteration" == "0" ]]
-					then
-						# CAUTION: Workaround for DUMMY , ONLY . Will NOT, by design, accept files that are both >1part and <4parts .
-						#  This is to confidently reject failures to acquire part4 during the initial multiple connections.
-						#sleep 7
-						sleep 90
-						if ( [[ ! -e "$currentAxelTmpFileRelative".tmp1 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp2 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp3 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp4 ]] ) && ! ( [[ -e "$currentAxelTmpFileRelative".tmp1 ]] && ( [[ ! -e "$currentAxelTmpFileRelative".tmp2 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp3 ]] || [[ ! -e "$currentAxelTmpFileRelative".tmp4 ]] ) )
-						then
-							_messageFAIL >&2
-							_messageFAIL
-							_stop 1
-							return 1
-						fi
-						wait "$currentPID_1" >&2
-						[[ "$currentPID_1" != "" ]] && _pauseForProcess "$currentPID_1" >&2
-						sleep 6 > /dev/null 2>&1
-						[[ "$currentPID_2" == "" ]] && sleep 35 > /dev/null 2>&1
-						[[ "$currentPID_2" != "" ]] && wait "$currentPID_2" >&2
-						[[ "$currentPID_2" != "" ]] && _pauseForProcess "$currentPID_2" >&2
-						[[ "$currentPID_3" != "" ]] && wait "$currentPID_3" >&2
-						[[ "$currentPID_3" != "" ]] && _pauseForProcess "$currentPID_3" >&2
-						[[ "$currentPID_4" != "" ]] && wait "$currentPID_4" >&2
-						[[ "$currentPID_4" != "" ]] && _pauseForProcess "$currentPID_4" >&2
-						wait >&2
-					fi
-
-					wait "$currentPID_1" >&2
-					[[ "$currentPID_1" != "" ]] && _pauseForProcess "$currentPID_1" >&2
-					sleep 0.2 > /dev/null 2>&1
-					if [[ -e "$currentAxelTmpFile".tmp1 ]]
-					then
-						_messagePlain_probe dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress' >> '"$currentAxelTmpFile" >&2
-						
-						if [[ ! -e "$currentAxelTmpFile" ]]
-						then
-							# ### mv -f "$currentAxelTmpFile".tmp1 "$currentAxelTmpFile"
-							dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress
-							
-							du -sh "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
-						else
-							# ATTENTION: Staggered.
-							#dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress >> "$currentAxelTmpFile" &
-						
-							# ATTENTION: NOT staggered.
-							# ### dd if="$currentAxelTmpFile".tmp1 bs=5M status=progress >> "$currentAxelTmpFile"
-							dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress
-							#cat "$currentAxelTmpFile".tmp1
-							
-							du -sh "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
-							
-							#cat "$currentAxelTmpFile".tmp1 >> "$currentAxelTmpFile"
-						fi
-					fi
-
-					let currentIteration=currentIteration+4
-					let currentIterationNext1=currentIteration+1
-					let currentIterationNext2=currentIteration+2
-					let currentIterationNext3=currentIteration+3
-				done
-
-				if ! [[ -e "$currentAxelTmpFile" ]]
-				then
-					true
-					# ### return 1
-				fi
-
-				# ### cat "$currentAxelTmpFile"
-
-				rm -f "$currentAxelTmpFile"
-				rm -f "$currentAxelTmpFile".aria2
-				rm -f "$currentAxelTmpFile".tmp
-				rm -f "$currentAxelTmpFile".tmp.st
-				rm -f "$currentAxelTmpFile".tmp.aria2
-				rm -f "$currentAxelTmpFile".tmp1
-				rm -f "$currentAxelTmpFile".tmp1.st
-				rm -f "$currentAxelTmpFile".tmp1.aria2
-				rm -f "$currentAxelTmpFile".tmp2
-				rm -f "$currentAxelTmpFile".tmp2.st
-				rm -f "$currentAxelTmpFile".tmp2.aria2
-				rm -f "$currentAxelTmpFile".tmp3
-				rm -f "$currentAxelTmpFile".tmp3.st
-				rm -f "$currentAxelTmpFile".tmp3.aria2
-				rm -f "$currentAxelTmpFile".tmp4
-				rm -f "$currentAxelTmpFile".tmp4.st
-				rm -f "$currentAxelTmpFile".tmp4.aria2
-				
-				rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-				
-				
-				
-			else
-				#local currentAxelTmpFile
-				#currentAxelTmpFile="$scriptAbsoluteFolder"/.m_axelTmp_$(_uid 14)
-				export currentAxelTmpFileRelative=.m_axelTmp_$(_uid 14)
-				export currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
-				
-				local currentPID_1
-				
-				local currentIteration
-				currentIteration=0
-				
-				while [[ "${currentURL_array_reversed[$currentIteration]}" != "" ]]
-				do
-					#_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIteration]}" -O - >&2
-					##"$scriptAbsoluteLocation"
-					#_gh_downloadURL "${currentURL_array_reversed[$currentIteration]}" -O - | dd bs=1M status=progress
-					
-					
-					
-					_messagePlain_probe _gh_downloadURL "${currentURL_array_reversed[$currentIteration]}" -O "$currentAxelTmpFile".tmp1 >&2
-					#"$scriptAbsoluteLocation"
-					_gh_downloadURL "${currentURL_array_reversed[$currentIteration]}" -O "$currentAxelTmpFile".tmp1 >&2 &
-					currentPID_1="$!"
-					
-					sleep 6 > /dev/null 2>&1
-					
-					wait "$currentPID_1" >&2
-					[[ "$currentPID_1" != "" ]] && wait "$currentPID_1" >&2
-					[[ "$currentPID_1" != "" ]] && _pauseForProcess "$currentPID_1" >&2
-					wait >&2
-					
-					
-					
-					dd if="$currentAxelTmpFile".tmp1 bs=1M status=progress
-					rm -f "$currentAxelTmpFile".tmp1
-					
-					
-					let currentIteration=currentIteration+1
-				done
-				
-				
-				rm -f "$currentAxelTmpFile"
-				rm -f "$currentAxelTmpFile".aria2
-				rm -f "$currentAxelTmpFile".tmp1
-				rm -f "$currentAxelTmpFile".* > /dev/null 2>&1
-			fi
-			
-			
-			
-			
-		else
-			_messagePlain_probe curl -H '"Authorization: Bearer $GH_TOKEN"' -L "${currentURL_array_reversed[@]}" >&2
-			curl -H "Authorization: Bearer $GH_TOKEN" -L "${currentURL_array_reversed[@]}"
-		fi
+		( _messagePlain_probe_safe _wget_githubRelease-URL-curl "$@" >&2 ) > /dev/null
+		_wget_githubRelease-URL-curl "$@"
 		return
 	fi
-
-
-	cd "$functionEntryPWD"
 }
-
-_wget_githubRelease_join() {
-	local functionEntryPWD
-	functionEntryPWD="$PWD"
-
-	_messagePlain_probe _wget_githubRelease_join-stdout "$@" '>' "$3" >&2
-	if [[ "$FORCE_AXEL" != "" ]]
-	then
-		_wget_githubRelease_join-stdout "$@" > "$3"
-	else
-		_wget_githubRelease_join-stdout "$@" > "$3"
-	fi
-
-	cd "$functionEntryPWD"
-	[[ ! -e "$3" ]] && _messagePlain_bad 'missing: '"$1"' '"$2"' '"$3" && return 1
-
-	cd "$functionEntryPWD"
-	return 0
-}
-
-
+#_wget_githubRelease-URL "owner/repo" "file.ext"
 _wget_githubRelease_internal-URL() {
 	_wget_githubRelease-URL "$1" "internal" "$2"
 }
+#_wget_githubRelease-address "owner/repo" "" "file.ext"
+#_wget_githubRelease-address "owner/repo" "latest" "file.ext"
+#_wget_githubRelease-address "owner/repo" "internal" "file.ext"
+_wget_githubRelease-address() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ init: _wget_githubRelease-address' >&2 ) > /dev/null
+	if _if_gh
+	then
+		( _messagePlain_probe_safe _wget_githubRelease-address-gh "$@" >&2 ) > /dev/null
+		_wget_githubRelease-address-gh "$@"
+		return
+	else
+		( _messagePlain_probe_safe _wget_githubRelease-address-curl "$@" >&2 ) > /dev/null
+		_wget_githubRelease-address-curl "$@"
+		return
+	fi
+}
 
+#"$api_address_type" == "tagName" || "$api_address_type" == "url"
+# ATTENTION: WARNING: Unusually, api_address_type , is a monolithic variable NEVER exported . Keep local, and do NOT use for any other purpose.
+_jq_github_browser_download_address() {
+	( _messagePlain_probe 'init: _jq_github_browser_download_address' >&2 ) > /dev/null
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+	
+	# 'latest'
+	if [[ "$currentReleaseLabel" == "latest" ]] || [[ "$currentReleaseLabel" == "" ]]
+	then
+		if [[ "$api_address_type" == "" ]] || [[ "$api_address_type" == "url" ]]
+        then
+            #jq -r ".assets[] | select(.name == \"""$3""\") | .browser_download_url" 
+            jq -r ".assets[] | select(.name == \"""$currentFile""\") | .browser_download_url"
+            return
+        fi
+		if [[ "$api_address_type" == "tagName" ]]
+        then
+            jq -r ".tag_name"
+            return
+        fi
+	# eg. 'internal', 'build', etc
+	else
+		if [[ "$api_address_type" == "" ]] || [[ "$api_address_type" == "url" ]]
+        then
+            #jq -r ".[] | select(.name == \"""$2""\") | .assets[] | select(.name == \"""$3""\") | .browser_download_url" | sort -n -r | head -n 1
+            jq -r "sort_by(.published_at) | reverse | .[] | select(.name == \"""$currentReleaseLabel""\") | .assets[] | select(.name == \"""$currentFile""\") | .browser_download_url"
+            return
+        fi
+		if [[ "$api_address_type" == "tagName" ]]
+        then
+            jq -r "sort_by(.published_at) | reverse | .[] | select(.name == \"""$currentReleaseLabel""\") | .tag_name"
+            return
+        fi
+		
+	fi
+}
+_curl_githubAPI_releases_page() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/ init: _curl_githubAPI_releases_page' >&2 ) > /dev/null
+	local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	[[ "$currentAbsoluteRepo" == "" ]] && return 1
+	[[ "$currentReleaseLabel" == "" ]] && currentReleaseLabel="latest"
+	[[ "$currentFile" == "" ]] && return 1
+
+	local currentPageNum="$4"
+	[[ "$currentPageNum" == "" ]] && currentPageNum="1"
+	_messagePlain_probe_var page >&2 | cat /dev/null
+	
+	local currentAPI_URL
+	currentAPI_URL="https://api.github.com/repos/""$currentAbsoluteRepo""/releases?per_page=100&page=""$currentPageNum"
+	[[ "$currentReleaseLabel" == "latest" ]] && currentAPI_URL="https://api.github.com/repos/""$currentAbsoluteRepo""/releases""/latest"
+	_messagePlain_probe_safe "currentAPI_URL= ""$currentAPI_URL" >&2 | cat /dev/null
+
+	local current_curl_args
+	current_curl_args=()
+	[[ "$GH_TOKEN" != "" ]] && current_curl_args+=( -H "Authorization: Bearer $GH_TOKEN" )
+	current_curl_args+=( -S )
+	current_curl_args+=( -s )
+
+	local currentPage
+	currentPage=""
+
+	local currentExitStatus_ipv4=1
+	local currentExitStatus_ipv6=1
+
+	( _messagePlain_probe '_curl_githubAPI_releases_page: IPv6 (false)' >&2 ) > /dev/null
+	# ATTENTION: IPv6 is NOT offered by GitHub API, and so usually only wastes time at best.
+	#currentPage=$(curl -6 "${current_curl_args[@]}" "$currentAPI_URL")
+	false
+	currentExitStatus_ipv6="$?"
+	if [[ "$currentExitStatus_ipv6" != "0" ]]
+	then
+		( _messagePlain_probe '_curl_githubAPI_releases_page: IPv4' >&2 ) > /dev/null
+		[[ "$currentPage" == "" ]] && currentPage=$(curl -4 "${current_curl_args[@]}" "$currentAPI_URL")
+		currentExitStatus_ipv4="$?"
+	fi
+	
+	_safeEcho_newline "$currentPage"
+
+	if [[ "$currentExitStatus_ipv6" != "0" ]] && [[ "$currentExitStatus_ipv4" != "0" ]]
+	then
+		( _messagePlain_bad 'bad: FAIL: _curl_githubAPI_releases_page' >&2 ) > /dev/null
+		[[ "$currentExitStatus_ipv4" != "1" ]] && [[ "$currentExitStatus_ipv4" != "0" ]] && return "$currentExitStatus_ipv4"
+		[[ "$currentExitStatus_ipv6" != "1" ]] && [[ "$currentExitStatus_ipv6" != "0" ]] && return "$currentExitStatus_ipv6"
+		return "$currentExitStatus_ipv4"
+	fi
+
+	[[ "$currentPage" == "" ]] && return 1
+	return 0
+}
+_wget_githubRelease_procedure-address-curl() {
+	local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	[[ "$currentAbsoluteRepo" == "" ]] && return 1
+	[[ "$currentReleaseLabel" == "" ]] && currentReleaseLabel="latest"
+	[[ "$currentFile" == "" ]] && return 1
+
+
+	local currentExitStatus_tmp=0
+	local currentExitStatus=0
+
+	if [[ "$currentReleaseLabel" == "latest" ]]
+	then
+		#(set -o pipefail ; _curl_githubAPI_releases_page "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" | _jq_github_browser_download_address "" "$currentReleaseLabel" "$currentFile")
+		#return
+
+		currentData_page=$(set -o pipefail ; _curl_githubAPI_releases_page "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile")
+		currentExitStatus="$?"
+
+		currentData="$currentData_page"
+
+		[[ "$currentExitStatus" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-curl: currentExitStatus' >&2 ) > /dev/null && return "$currentExitStatus"
+		
+		[[ "$currentData" == "" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-curl: empty: currentData' >&2 ) > /dev/null && return 1
+
+		( set -o pipefail ; _safeEcho_newline "$currentData" | _jq_github_browser_download_address "" "$currentReleaseLabel" "$currentFile" | head -n 1 )
+		currentExitStatus_tmp="$?"
+
+		[[ "$currentExitStatus_tmp" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-curl: pipefail: _jq_github_browser_download_address: currentExitStatus_tmp' >&2 ) > /dev/null && return "$currentExitStatus_tmp"
+
+		# ATTENTION: Part file does NOT exist upstream. Page did NOT match 'Not Found', page NOT empty, and data NOT empty, implying repo, releaseLabel , indeed EXISTS upstream.
+		# Retries/wait must NOT continue in that case - calling function must detect and either fail or skip file on empty address if appropriate.
+		#[[ "$(_safeEcho_newline "$currentData" | _jq_github_browser_download_address "" "$currentReleaseLabel" "$currentFile" | head -n 1 | wc -c )" -le 0 ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-curl: empty: _safeEcho_newline | _jq_github_browser_download_address' >&2 ) > /dev/null  && return 1
+		
+		return 0
+	else
+		local currentData
+		currentData=""
+		
+		local currentData_page
+		currentData_page="doNotMatch"
+		
+		local currentIteration
+		currentIteration=1
+		
+		while ( [[ "$currentData_page" != "" ]] && [[ "$currentData_page" != *$(echo 'WwoKXQo=' | base64 -d)* ]] ) && [[ "$currentIteration" -le "3" ]]
+		do
+			currentData_page=$(_curl_githubAPI_releases_page "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" "$currentIteration")
+			currentExitStatus_tmp="$?"
+			[[ "$currentIteration" == "1" ]] && currentExitStatus="$currentExitStatus_tmp"
+			currentData="$currentData"'
+'"$currentData_page"
+
+            ( _messagePlain_probe "_wget_githubRelease_procedure-address-curl: ""$currentIteration" >&2 ) > /dev/null
+            #( _safeEcho_newline "$currentData" | _jq_github_browser_download_address "" "$currentReleaseLabel" "$currentFile" | head -n 1 >&2 ) > /dev/null
+            [[ "$currentIteration" -ge 4 ]] && ( _safeEcho_newline "$currentData_page" >&2 ) > /dev/null
+
+			let currentIteration=currentIteration+1
+		done
+
+		( set -o pipefail ; _safeEcho_newline "$currentData" | _jq_github_browser_download_address "" "$currentReleaseLabel" "$currentFile" | head -n 1 )
+		currentExitStatus_tmp="$?"
+
+		[[ "$currentExitStatus" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-curl: _curl_githubAPI_releases_page: currentExitStatus' >&2 ) > /dev/null && return "$currentExitStatus"
+		[[ "$currentExitStatus_tmp" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-curl: pipefail: _jq_github_browser_download_address: currentExitStatus_tmp' >&2 ) > /dev/null && return "$currentExitStatus_tmp"
+		[[ "$currentData" == "" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-curl: empty: currentData' >&2 ) > /dev/null && return 1
+
+		# ATTENTION: Part file does NOT exist upstream. Page did NOT match 'Not Found', page NOT empty, and data NOT empty, implying repo, releaseLabel , indeed EXISTS upstream.
+		# Retries/wait must NOT continue in that case - calling function must detect and either fail or skip file on empty address if appropriate.
+		#[[ "$(_safeEcho_newline "$currentData" | _jq_github_browser_download_address "" "$currentReleaseLabel" "$currentFile" | head -n 1 | wc -c )" -le 0 ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-curl: empty: _safeEcho_newline | _jq_github_browser_download_address' >&2 ) > /dev/null  && return 1
+		
+        return 0
+	fi
+}
+_wget_githubRelease-address-backend-curl() {
+	local currentAddress
+	currentAddress=""
+
+	local currentExitStatus=1
+
+	local currentIteration=0
+
+	#[[ "$currentAddress" == "" ]] || 
+	while ( [[ "$currentExitStatus" != "0" ]] ) && [[ "$currentIteration" -lt "$githubRelease_retriesMax" ]]
+	do
+		currentAddress=""
+
+		if [[ "$currentIteration" != "0" ]]
+		then
+			( _messagePlain_warn 'warn: BAD: RETRY: _wget_githubRelease-URL-curl: _wget_githubRelease_procedure-address-curl: currentIteration != 0' >&2 ) > /dev/null
+			sleep "$githubRelease_retriesWait"
+		fi
+
+		( _messagePlain_probe _wget_githubRelease_procedure-address-curl >&2 ) > /dev/null
+		currentAddress=$(_wget_githubRelease_procedure-address-curl "$@")
+		currentExitStatus="$?"
+
+		let currentIteration=currentIteration+1
+	done
+	
+	_safeEcho_newline "$currentAddress"
+
+	[[ "$currentIteration" -ge "$githubRelease_retriesMax" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease-URL-curl: maxRetries' >&2 ) > /dev/null && return 1
+
+	return 0
+}
+_wget_githubRelease-address-curl() {
+	# Similar retry logic for all similar functions: _wget_githubRelease-URL-curl, _wget_githubRelease-URL-gh .
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/ init: _wget_githubRelease-address-curl' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease-URL-curl "$@" >&2 ) > /dev/null
+
+    # ATTENTION: WARNING: Unusually, api_address_type , is a monolithic variable NEVER exported . Keep local, and do NOT use for any other purpose.
+    local api_address_type="tagName"
+
+    _wget_githubRelease-address-backend-curl "$@"
+    return
+}
+_wget_githubRelease-URL-curl() {
+	# Similar retry logic for all similar functions: _wget_githubRelease-URL-curl, _wget_githubRelease-URL-gh .
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/ init: _wget_githubRelease-URL-curl' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease-URL-curl "$@" >&2 ) > /dev/null
+
+    # ATTENTION: WARNING: Unusually, api_address_type , is a monolithic variable NEVER exported . Keep local, and do NOT use for any other purpose.
+    local api_address_type="url"
+
+	local currentAddress
+
+	local currentExitStatus=1
+
+    #_wget_githubRelease-address-backend-curl "$@"
+	currentAddress=$(_wget_githubRelease-address-backend-curl "$@")
+	currentExitStatus="$?"
+	
+	_safeEcho_newline "$currentAddress"
+
+	[[ "$currentAddress" == "" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease-URL-curl: empty: currentAddress' >&2 ) > /dev/null && return 1
+
+    return "$currentExitStatus"
+}
+
+# Calling functions MUST attempt download unless skip function conclusively determines BOTH that releaseLabel exists in upstream repo, AND file does NOT exist upstream. Functions may use such skip to skip high-numbered part files that do not exist.
+_wget_githubRelease-skip-URL-curl() {
+	# Similar retry logic for all similar functions: _wget_githubRelease-skip-URL-curl, _wget_githubRelease-URL-gh .
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/ init: _wget_githubRelease-skip-URL-curl' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease-skip-URL-curl "$@" >&2 ) > /dev/null
+
+    # ATTENTION: WARNING: Unusually, api_address_type , is a monolithic variable NEVER exported . Keep local, and do NOT use for any other purpose.
+    local api_address_type="url"
+
+	local currentAddress
+
+	local currentExitStatus=1
+
+    #_wget_githubRelease-address-backend-curl "$@"
+	currentAddress=$(_wget_githubRelease-address-backend-curl "$@")
+	currentExitStatus="$?"
+	
+	( _safeEcho_newline "$currentAddress" >&2 ) > /dev/null
+	[[ "$currentExitStatus" != "0" ]] && return "$currentExitStatus"
+
+	if [[ "$currentAddress" == "" ]]
+	then
+		echo skip
+		( _messagePlain_good 'good: _wget_githubRelease-skip-URL-curl: empty: currentAddress: PRESUME skip' >&2 ) > /dev/null
+		return 0
+	fi
+
+	if [[ "$currentAddress" != "" ]]
+	then
+		echo download
+		( _messagePlain_good 'good: _wget_githubRelease-skip-URL-curl: found: currentAddress: PRESUME download' >&2 ) > /dev/null
+		return 0
+	fi
+
+	return 1
+}
+_wget_githubRelease-detect-URL-curl() {
+	_wget_githubRelease-skip-URL-curl "$@"
+}
+
+_wget_githubRelease_procedure-address-gh-awk() {
+	#( _messagePlain_probe 'init: _wget_githubRelease_procedure-address-gh-awk' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease_procedure-address-gh-awk "$@" >&2 ) > /dev/null
+    local currentReleaseLabel="$2"
+    #( _messagePlain_probe_var currentReleaseLabel >&2 ) > /dev/null
+    
+    # WARNING: Use of complex 'awk' scripts historically has seemed less resilient, less portable, less reliable.
+    # ATTRIBUTION-AI: ChatGPT o1 2025-01-22 , 2025-01-27 .
+	if [[ "$currentReleaseLabel" == "latest" ]]
+	then
+		#gh release list -L 1
+		# In theory, simply accepting single line output from gh release list (ie. -L 1) should provide the same result (in case this awk script ever breaks).
+		awk '
+			# Skip a header line if it appears first:
+			NR == 1 && $1 == "TITLE" && $2 == "TYPE" {
+				# Just move on to the next line and do nothing else
+				next
+			}
+			
+			# The real match: find the line whose second column is "Latest"
+			$2 == "Latest" {
+				# Print the third column (TAG NAME) and exit
+				print $3
+				exit
+			}
+		'
+	else
+		awk -v label="$currentReleaseLabel" '
+		# For each line where the first column equals the label we are looking for...
+		$1 == label {
+			# If the second column is one of the known “types,” shift fields left so
+			# the *real* tag moves into $2. Repeat until no more known types remain.
+			while ($2 == "Latest" || $2 == "draft" || $2 == "pre-release" || $2 == "prerelease") {
+			for (i=2; i<NF; i++) {
+				$i = $(i+1)
+			}
+			NF--
+			}
+			# At this point, $2 is guaranteed to be the actual tag.
+			print $2
+		}
+		'
+	fi
+}
+# Requires "$GH_TOKEN" .
+_wget_githubRelease_procedure-address-gh() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/ init: _wget_githubRelease_procedure-address-gh' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease_procedure-address-gh "$@" >&2 ) > /dev/null
+    ! _if_gh && return 1
+	
+	local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	[[ "$currentAbsoluteRepo" == "" ]] && return 1
+	[[ "$currentReleaseLabel" == "" ]] && currentReleaseLabel="latest"
+	[[ "$currentFile" == "" ]] && return 1
+
+    local currentTag
+
+	local currentExitStatus=0
+	local currentExitStatus_tmp=0
+
+    local currentIteration
+    currentIteration=1
+
+    while [[ "$currentTag" == "" ]] && [[ "$currentIteration" -le 3 ]]
+    do
+        #currentTag=$(gh release list -L 100 -R "$currentAbsoluteRepo" | sed 's/Latest//' | grep '^'"$currentReleaseLabel" | awk '{ print $2 }' | head -n 1)
+        
+        currentTag=$(set -o pipefail ; gh release list -L $(( $currentIteration * 100 )) -R "$currentAbsoluteRepo" | _wget_githubRelease_procedure-address-gh-awk "" "$currentReleaseLabel" "" | head -n 1)    # or pick whichever match you want
+        currentExitStatus_tmp="$?"
+		[[ "$currentIteration" == "1" ]] && currentExitStatus="$currentExitStatus_tmp"
+		
+        let currentIteration++
+    done
+
+    _safeEcho_newline "$currentTag"
+    #_safeEcho_newline "https://github.com/""$currentAbsoluteRepo""/releases/download/""$currentTag""/""$currentFile"
+
+	[[ "$currentExitStatus" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-gh: pipefail: currentExitStatus' >&2 ) > /dev/null && return "$currentExitStatus"
+    [[ "$currentTag" == "" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-address-gh: empty: currentTag' >&2 ) > /dev/null && return 1
+
+    return 0
+}
+_wget_githubRelease-address-gh() {
+	# Similar retry logic for all similar functions: _wget_githubRelease-URL-curl, _wget_githubRelease-address-gh .
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/ init: _wget_githubRelease-address-gh' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease-address-gh "$@" >&2 ) > /dev/null
+    ! _if_gh && return 1
+
+	#local currentURL
+	#currentURL=""
+	local currentTag
+	currentTag=""
+
+	local currentExitStatus=1
+
+	local currentIteration=0
+
+	#while ( [[ "$currentURL" == "" ]] || [[ "$currentExitStatus" != "0" ]] ) && [[ "$currentIteration" -lt "$githubRelease_retriesMax" ]]
+	while ( [[ "$currentTag" == "" ]] || [[ "$currentExitStatus" != "0" ]] ) && [[ "$currentIteration" -lt "$githubRelease_retriesMax" ]]
+	do
+		#currentURL=""
+		currentTag=""
+
+		if [[ "$currentIteration" != "0" ]]
+		then 
+			( _messagePlain_warn 'warn: BAD: RETRY: _wget_githubRelease-address-gh: _wget_githubRelease_procedure-address-gh: currentIteration != 0' >&2 ) > /dev/null
+			sleep "$githubRelease_retriesWait"
+		fi
+
+		( _messagePlain_probe _wget_githubRelease_procedure-address-gh >&2 ) > /dev/null
+		#currentURL=$(_wget_githubRelease_procedure-address-gh "$@")
+		currentTag=$(_wget_githubRelease_procedure-address-gh "$@")
+		currentExitStatus="$?"
+
+		let currentIteration=currentIteration+1
+	done
+	
+	#_safeEcho_newline "$currentURL"
+	_safeEcho_newline "$currentTag"
+
+	[[ "$currentIteration" -ge "$githubRelease_retriesMax" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease-address-gh: maxRetries' >&2 ) > /dev/null && return 1
+
+	return 0
+}
+_wget_githubRelease-URL-gh() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/ init: _wget_githubRelease-URL-gh' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease-URL-gh "$@" >&2 ) > /dev/null
+    ! _if_gh && return 1
+	
+	local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	[[ "$currentAbsoluteRepo" == "" ]] && return 1
+	[[ "$currentReleaseLabel" == "" ]] && currentReleaseLabel="latest"
+	[[ "$currentFile" == "" ]] && return 1
+
+    local currentTag
+
+	local currentExitStatus=1
+
+	currentTag=$(_wget_githubRelease-address-gh "$@")
+	currentExitStatus="$?"
+	
+
+	#echo "$currentTag"
+    _safeEcho_newline "https://github.com/""$currentAbsoluteRepo""/releases/download/""$currentTag""/""$currentFile"
+
+	[[ "$currentExitStatus" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease-URL-gh: currentExitStatus' >&2 ) > /dev/null && return "$currentExitStatus"
+	[[ "$currentTag" == "" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease-URL-gh: empty: currentTag' >&2 ) > /dev/null && return 1
+	
+	return 0
+}
+
+
+
+
+
+# _gh_download "$currentAbsoluteRepo" "$currentTagName" "$currentFile" -O "$currentOutFile"
+# Requires "$GH_TOKEN" .
+_gh_download() {
+	# Similar retry logic for all similar functions: _gh_download , _wget_githubRelease_loop-curl .
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ init: _gh_download' >&2 ) > /dev/null
+	
+	! _if_gh && return 1
+	
+	local currentAbsoluteRepo="$1"
+	local currentTagName="$2"
+	local currentFile="$3"
+
+	local currentOutParameter="$4"
+	local currentOutFileParameter="$5"
+
+	local currentOutFile="$currentFile"
+
+	shift
+	shift
+	shift
+	[[ "$currentOutParameter" == "--output" ]] && currentOutParameter="-O"
+	[[ "$currentOutParameter" == "-O" ]] && currentOutFile="$currentOutFileParameter" && shift && shift
+
+	[[ "$currentOutParameter" == "-O" ]] && [[ "$currentOutFile" == "" ]] && _messagePlain_bad 'bad: fail: unexpected: unspecified: currentOutFile' && return 1
+
+	[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile" > /dev/null 2>&1
+
+	# CAUTION: Assumed 'false' by 'rotten' !
+	# (ie. 'rotten' does NOT support Cygwin/MSW)
+	local currentOutFile_translated_cygwinMSW=""
+	( _if_cygwin && type -p cygpath > /dev/null 2>&1 ) && ( [[ "$currentOutFile" != "" ]] && [[ "$currentOutFile" != "-" ]] ) && currentOutFile_translated_cygwinMSW=$(cygpath -w $(_getAbsoluteLocation "$currentOutFile"))
+
+	local currentExitStatus=1
+
+	local currentIteration
+	currentIteration=0
+	# && ( [[ "$currentIteration" != "0" ]] && sleep "$githubRelease_retriesWait" )
+	while ( [[ "$currentExitStatus" != "0" ]] || ( ! [[ -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] ) ) && [[ "$currentIteration" -lt "$githubRelease_retriesMax" ]]
+	do
+		if [[ "$currentIteration" != "0" ]]
+		then 
+			( _messagePlain_warn 'warn: BAD: RETRY: _gh_download: gh release download: currentIteration != 0' >&2 ) > /dev/null
+			sleep "$githubRelease_retriesWait"
+		fi
+
+		# CAUTION: Assumed 'false' by 'rotten' !
+		# (ie. 'rotten' does NOT support Cygwin/MSW)
+		if [[ "$currentOutFile_translated_cygwinMSW" != "" ]]
+		then
+			# WARNING: Apparently, 'gh release download' will throw an error with filename '/cygdrive'...'.m_axelTmp__'"$(_uid14)" .
+			( _messagePlain_probe_safe gh release download --clobber "$currentTagName" -R "$currentAbsoluteRepo" -p "$currentFile" -O "$currentOutFile_translated_cygwinMSW" "$@" >&2 ) > /dev/null
+			( set -o pipefail ; gh release download --clobber "$currentTagName" -R "$currentAbsoluteRepo" -p "$currentFile" -O "$currentOutFile_translated_cygwinMSW" "$@" 2> >(tail -n 30 >&2) )
+			currentExitStatus="$?"
+		else
+			( _messagePlain_probe_safe gh release download --clobber "$currentTagName" -R "$currentAbsoluteRepo" -p "$currentFile" -O "$currentOutFile" "$@" >&2 ) > /dev/null
+			( set -o pipefail ; gh release download --clobber "$currentTagName" -R "$currentAbsoluteRepo" -p "$currentFile" -O "$currentOutFile" "$@" 2> >(tail -n 30 >&2) )
+			currentExitStatus="$?"
+		fi
+
+		let currentIteration=currentIteration+1
+	done
+	
+	[[ "$currentExitStatus" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _gh_download: gh release download: currentExitStatus' >&2 ) > /dev/null && return "$currentExitStatus"
+	! [[ -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] && ( _messagePlain_bad 'bad: FAIL: missing: currentOutFile' >&2 ) > /dev/null && return 1
+
+	return 0
+}
+#_gh_downloadURL "https://github.com/""$currentAbsoluteRepo""/releases/download/""$currentTagName""/""$currentFile" "$currentOutFile"
+# Requires "$GH_TOKEN" .
+_gh_downloadURL() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ init: _gh_downloadURL' >&2 ) > /dev/null
+	
+	! _if_gh && return 1
+
+	# ATTRIBUTION-AI: ChatGPT GPT-4 2023-11-04 ... refactored 2025-01-22 ... .
+
+	local currentURL="$1"
+	local currentOutParameter="$2"
+	local currentOutFileParameter="$3"
+
+	[[ "$currentURL" == "" ]] && return 1
+
+	# Use `sed` to extract the parts of the URL
+	local currentAbsoluteRepo=$(echo "$currentURL" | sed -n 's|https://github.com/\([^/]*\)/\([^/]*\)/.*|\1/\2|p')
+	[[ "$?" != "0" ]] && return 1
+	local currentTagName=$(echo "$currentURL" | sed -n 's|https://github.com/[^/]*/[^/]*/releases/download/\([^/]*\)/.*|\1|p')
+	[[ "$?" != "0" ]] && return 1
+	local currentFile=$(echo "$currentURL" | sed -n 's|https://github.com/[^/]*/[^/]*/releases/download/[^/]*/\(.*\)|\1|p')
+	[[ "$?" != "0" ]] && return 1
+
+	local currentOutFile="$currentFile"
+
+	shift
+	[[ "$currentOutParameter" == "--output" ]] && currentOutParameter="-O"
+	[[ "$currentOutParameter" == "-O" ]] && currentOutFile="$currentOutFileParameter" && shift && shift
+
+	[[ "$currentOutParameter" == "-O" ]] && [[ "$currentOutFile" == "" ]] && _messagePlain_bad 'bad: fail: unexpected: unspecified: currentOutFile' && return 1
+
+	#[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile"
+
+	local currentExitStatus=1
+	#currentExitStatus=1
+
+	#local currentIteration
+	#currentIteration=0
+	# && ( [[ "$currentIteration" != "0" ]] && sleep "$githubRelease_retriesWait" )
+	#while ( [[ "$currentExitStatus" != "0" ]] || ( ! [[ -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] ) ) && [[ "$currentIteration" -lt "$githubRelease_retriesMax" ]]
+	#do
+		#if [[ "$currentIteration" != "0" ]]
+		#then 
+			#( _messagePlain_warn 'warn: BAD: RETRY: _gh_downloadURL: _gh_download: currentIteration != 0' >&2 ) > /dev/null
+			#sleep "$githubRelease_retriesWait"
+		#fi
+
+		# CAUTION: Do NOT translate file parameter (ie. for Cygwin/MSW) for an underlying backend function (ie. '_gh_download') - that will be done by underlying backend function if at all. Similarly, also do NOT state '--clobber' or similar parameters to backend function.
+		#[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile"
+		( _messagePlain_probe_safe _gh_download "$currentAbsoluteRepo" "$currentTagName" "$currentFile" -O "$currentOutFile" "$@" >&2 ) > /dev/null
+		_gh_download "$currentAbsoluteRepo" "$currentTagName" "$currentFile" -O "$currentOutFile" "$@"
+		currentExitStatus="$?"
+
+		#let currentIteration=currentIteration+1
+	#done
+
+	[[ "$currentExitStatus" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _gh_downloadURL: _gh_download: currentExitStatus' >&2 ) > /dev/null && return "$currentExitStatus"
+	! [[ -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] && ( _messagePlain_bad 'bad: FAIL: missing: currentOutFile' >&2 ) > /dev/null && return 1
+
+	return 0
+}
+
+
+
+
+
+
+#_wget_githubRelease-stdout
+
+#_wget_githubRelease
+
+
+
+_wget_githubRelease-stdout() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ \/\/\/\/\/ init: _wget_githubRelease-stdout' >&2 ) > /dev/null
+	local currentAxelTmpFileRelative=.m_axelTmp_"$currentStream"_$(_uid 14)
+	local currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
+	
+	local currentExitStatus
+
+	# WARNING: Very strongly discouraged. Any retry/continue of any interruption will nevertheless unavoidably result in a corrupted output stream.
+	[[ "$FORCE_DIRECT" == "true" ]] && _wget_githubRelease_procedure-stdout "$@"
+
+	# ATTENTION: /dev/null assures that stdout is not corrupted by any unexpected output that should have been sent to stderr
+	[[ "$FORCE_DIRECT" != "true" ]] && _wget_githubRelease_procedure-stdout "$@" > /dev/null
+
+	if ! [[ -e "$currentAxelTmpFile".PASS ]]
+	then
+		currentExitStatus=$(cat "$currentAxelTmpFile".FAIL)
+		( [[ "$currentExitStatus" == "" ]] || [[ "$currentExitStatus" = "0" ]] || [[ "$currentExitStatus" = "0"* ]] ) && currentExitStatus=1
+		rm -f "$currentAxelTmpFile".PASS > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile".FAIL > /dev/null 2>&1
+		rm -f "$currentAxelTmpFile" > /dev/null 2>&1
+		return "$currentExitStatus"
+		#return 1
+	fi
+	[[ "$FORCE_DIRECT" != "true" ]] && cat "$currentAxelTmpFile"
+	rm -f "$currentAxelTmpFile" > /dev/null 2>&1
+	rm -f "$currentAxelTmpFile".PASS > /dev/null 2>&1
+	rm -f "$currentAxelTmpFile".FAIL > /dev/null 2>&1
+	return 0
+}
+_wget_githubRelease_procedure-stdout() {
+	( _messagePlain_probe_safe _wget_githubRelease_procedure-stdout "$@" >&2 ) > /dev/null
+
+	local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	local currentOutParameter="$4"
+	local currentOutFile="$5"
+
+	shift
+	shift
+	shift
+	if [[ "$currentOutParameter" == "-O" ]]
+	then
+		if [[ "$currentOutFile" != "-" ]]
+		then
+			( _messagePlain_bad 'bad: fail: unexpected: currentOutFile: NOT stdout' >&2 ) > /dev/null
+			echo "1" > "$currentAxelTmpFile".FAIL
+			return 1
+		fi
+		shift 
+		shift
+	fi
+
+	#local currentAxelTmpFileRelative=.m_axelTmp_"$currentStream"_$(_uid 14)
+	#local currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
+
+	local currentExitStatus
+
+	# WARNING: Very strongly discouraged. Any retry/continue of any interruption will nevertheless unavoidably result in a corrupted output stream.
+	if [[ "$FORCE_DIRECT" == "true" ]]
+	then
+		_wget_githubRelease_procedure "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" -O - "$@"
+		currentExitStatus="$?"
+		if [[ "$currentExitStatus" != "0" ]]
+		then
+			echo > "$currentAxelTmpFile".FAIL
+			return "$currentExitStatus"
+		fi
+		echo > "$currentAxelTmpFile".PASS
+		return 0
+	fi
+
+	_wget_githubRelease_procedure "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" -O "$currentAxelTmpFile" "$@"
+	currentExitStatus="$?"
+	if [[ "$currentExitStatus" != "0" ]]
+	then
+		echo "$currentExitStatus" > "$currentAxelTmpFile".FAIL
+		return "$currentExitStatus"
+	fi
+	echo > "$currentAxelTmpFile".PASS
+	return 0
+}
+
+
+
+
+
+#! "$scriptAbsoluteLocation" _wget_githubRelease_join "owner/repo" "internal" "file.ext" -O "file.ext"
+#! _wget_githubRelease "owner/repo" "" "file.ext" -O "file.ext"
+# ATTENTION: WARNING: Warn messages correspond to inability to assuredly, effectively, use GH_TOKEN .
+_wget_githubRelease() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ \/\/\/\/\/ init: _wget_githubRelease' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease "$@" >&2 ) > /dev/null
+
+	_wget_githubRelease_procedure "$@"
+}
 _wget_githubRelease_internal() {
 	_wget_githubRelease "$1" "internal" "$2"
 }
+_wget_githubRelease_procedure() {
+	# ATTENTION: Distinction nominally between '_wget_githubRelease' and '_wget_githubRelease_procedure' should only be necessary if a while loop retries the procedure .
+	# ATTENTION: Potentially more specialized logic within download procedures should remain delegated with the responsibility to attempt retries , for now.
+	# NOTICE: Several functions should already have retry logic: '_gh_download' , '_gh_downloadURL' , '_wget_githubRelease-address' , '_wget_githubRelease_procedure-curl' , '_wget_githubRelease-URL-curl' , etc .
+	#( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ \/\/\/\/ init: _wget_githubRelease_procedure' >&2 ) > /dev/null
+	#( _messagePlain_probe_safe _wget_githubRelease_procedure "$@" >&2 ) > /dev/null
+
+    local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	local currentOutParameter="$4"
+	local currentOutFile="$5"
+
+	shift
+	shift
+	shift
+	[[ "$currentOutParameter" != "-O" ]] && currentOutFile="$currentFile"
+	#[[ "$currentOutParameter" == "-O" ]] && currentOutFile="$currentOutFile"
+
+	#[[ "$currentOutParameter" == "-O" ]] && [[ "$currentOutFile" == "" ]] && currentOutFile="$currentFile"
+	[[ "$currentOutParameter" == "-O" ]] && [[ "$currentOutFile" == "" ]] && ( _messagePlain_bad 'bad: fail: unexpected: unspecified: currentOutFile' >&2 ) > /dev/null && return 1
+
+	[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile" > /dev/null 2>&1
+
+    local currentExitStatus=1
+
+    # Discouraged .
+    if [[ "$FORCE_WGET" == "true" ]]
+    then
+        _warn_githubRelease_FORCE_WGET
+        local currentURL=$(_wget_githubRelease-URL-curl "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile")
+
+        #"$GH_TOKEN"
+        #"$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" "$currentOutFile"
+        #_wget_githubRelease_procedure-curl
+		_wget_githubRelease_loop-curl
+        return "$?"
+    fi
+
+	# Discouraged . Benefits of multi-part-per-file downloading are less essential given that files are split into <2GB chunks.
+	if [[ "$FORCE_AXEL" != "" ]] # && [[ "$MANDATORY_HASH" == "true" ]]
+    then
+        ( _messagePlain_warn 'warn: WARNING: FORCE_AXEL not empty' >&2 ; echo 'FORCE_AXEL may have similar effects to FORCE_WGET and should not be necessary.' >&2  ) > /dev/null
+        local currentURL=$(_wget_githubRelease-URL-curl "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile")
+
+		[[ "$FORCE_DIRECT" == "true" ]] && ( _messagePlain_bad 'bad: fail: FORCE_AXEL==true is NOT compatible with FORCE_DIRECT==true' >&2 ) > /dev/null && return 1
+
+        #"$GH_TOKEN"
+        #"$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" "$currentOutFile"
+        #_wget_githubRelease_procedure-axel
+		_wget_githubRelease_loop-axel
+        return "$?"
+    fi
+
+    if _if_gh
+    then
+        #_wget_githubRelease-address-gh
+        local currentTag=$(_wget_githubRelease-address "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile")
+
+        ( _messagePlain_probe _gh_download "$currentAbsoluteRepo" "$currentTag" "$currentFile" "$@" >&2 ) > /dev/null
+        _gh_download "$currentAbsoluteRepo" "$currentTag" "$currentFile" "$@"
+        currentExitStatus="$?"
+
+        [[ "$currentExitStatus" != "0" ]] && _bad_fail_githubRelease_currentExitStatus && return "$currentExitStatus"
+        [[ ! -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] && _bad_fail_githubRelease_missing && return 1
+        return 0
+    fi
+
+    if ! _if_gh
+    then
+        ( _messagePlain_warn 'warn: WARNING: FALLBACK: wget/curl' >&2 ) > /dev/null
+        local currentURL=$(_wget_githubRelease-URL-curl "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile")
+
+        #"$GH_TOKEN"
+        #"$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" "$currentOutFile"
+        #_wget_githubRelease_procedure-curl
+		_wget_githubRelease_loop-curl
+        return "$?"
+    fi
+    
+    return 1
+}
+_wget_githubRelease_procedure-curl() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ \/\/\/ init: _wget_githubRelease_procedure-curl' >&2 ) > /dev/null
+    ( _messagePlain_probe_safe "currentURL= ""$currentURL" >&2 ) > /dev/null
+    ( _messagePlain_probe_safe "currentOutFile= ""$currentOutFile" >&2 ) > /dev/null
+
+	# ATTENTION: Better if the loop does this only once. Resume may be possible.
+	#[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile" > /dev/null 2>&1
+
+    local current_curl_args
+	current_curl_args=()
+	[[ "$GH_TOKEN" != "" ]] && current_curl_args+=( -H "Authorization: Bearer $GH_TOKEN" )
+	current_curl_args+=( -S )
+	current_curl_args+=( -s )
+	#current_curl_args+=( --clobber )
+	current_curl_args+=( --continue-at - )
+	
+	local currentExitStatus_ipv4=1
+	local currentExitStatus_ipv6=1
+
+	( _messagePlain_probe '_wget_githubRelease_procedure-curl: IPv6 (false)' >&2 ) > /dev/null
+	# ATTENTION: IPv6 is NOT offered by GitHub API, and so usually only wastes time at best.
+	#curl -6 "${current_curl_args[@]}" -L -o "$currentOutFile" "$currentURL"
+	false
+	# WARNING: May be untested.
+	#( set -o pipefail ; curl -6 "${current_curl_args[@]}" -L -o "$currentOutFile" "$currentURL" 2> >(tail -n 30 >&2) )
+	currentExitStatus_ipv6="$?"
+	if [[ "$currentExitStatus_ipv6" != "0" ]]
+	then
+		( _messagePlain_probe '_wget_githubRelease_procedure-curl: IPv4' >&2 ) > /dev/null
+		curl -4 "${current_curl_args[@]}" -L -o "$currentOutFile" "$currentURL"
+		# WARNING: May be untested.
+		#( set -o pipefail ; curl -4 "${current_curl_args[@]}" -L -o "$currentOutFile" "$currentURL" 2> >(tail -n 30 >&2) )
+		currentExitStatus_ipv4="$?"
+	fi
+
+	if [[ "$currentExitStatus_ipv6" != "0" ]] && [[ "$currentExitStatus_ipv4" != "0" ]]
+	then
+		#( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-curl' >&2 ) > /dev/null
+        _bad_fail_githubRelease_currentExitStatus
+		[[ "$currentExitStatus_ipv4" != "1" ]] && [[ "$currentExitStatus_ipv4" != "0" ]] && return "$currentExitStatus_ipv4"
+		[[ "$currentExitStatus_ipv6" != "1" ]] && [[ "$currentExitStatus_ipv6" != "0" ]] && return "$currentExitStatus_ipv6"
+		return "$currentExitStatus_ipv4"
+	fi
+
+    [[ ! -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] && _bad_fail_githubRelease_missing && return 1
+
+    return 0
+}
+_wget_githubRelease_loop-curl() {
+	# Similar retry logic for all similar functions: _gh_download , _wget_githubRelease_loop-curl .
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ \/\/\/\/ init: _wget_githubRelease_loop-curl' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease_loop-curl "$@" >&2 ) > /dev/null
+
+	[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile" > /dev/null 2>&1
+
+	local currentExitStatus=1
+
+	local currentIteration=0
+
+	while ( [[ "$currentExitStatus" != "0" ]] || ( ! [[ -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] ) ) && [[ "$currentIteration" -lt "$githubRelease_retriesMax" ]]
+	do
+		if [[ "$currentIteration" != "0" ]]
+		then 
+			( _messagePlain_warn 'warn: BAD: RETRY: _wget_githubRelease_procedure-curl: currentIteration != 0' >&2 ) > /dev/null
+			sleep "$githubRelease_retriesWait"
+		fi
+
+		( _messagePlain_probe_safe _wget_githubRelease_procedure-curl >&2 ) > /dev/null
+		_wget_githubRelease_procedure-curl
+		# WARNING: May be untested.
+		#( set -o pipefail ; _wget_githubRelease_procedure-curl 2> >(tail -n 100 >&2) )
+		currentExitStatus="$?"
+
+		let currentIteration=currentIteration+1
+	done
+	
+	[[ "$currentExitStatus" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_loop-curl: _wget_githubRelease_procedure-curl: currentExitStatus' >&2 ) > /dev/null && return "$currentExitStatus"
+	! [[ -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] && ( _messagePlain_bad 'bad: FAIL: missing: currentOutFile' >&2 ) > /dev/null && return 1
+
+	return 0
+}
+_wget_githubRelease_procedure-axel() {
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ \/\/\/ init: _wget_githubRelease_procedure-axel' >&2 ) > /dev/null
+    ( _messagePlain_probe_safe "currentURL= ""$currentURL" >&2 ) > /dev/null
+    ( _messagePlain_probe_safe "currentOutFile= ""$currentOutFile" >&2 ) > /dev/null
+
+    # ATTENTION: Quirk of aria2c , default dir is "$PWD" , is prepended to absolute paths , and the resulting '//' does not direct the absolute path to root.
+    local currentOutFile_relative=$(basename "$currentOutFile")
+    local currentOutDir=$(_getAbsoluteFolder "$currentOutFile")
+    ( _messagePlain_probe_safe "currentOutFile_relative= ""$currentOutFile_relative" >&2 ) > /dev/null
+    ( _messagePlain_probe_safe "currentOutDir= ""$currentOutFile" >&2 ) > /dev/null
+
+    ( _messagePlain_probe_safe "FORCE_AXEL= ""$FORCE_AXEL" >&2 ) > /dev/null
+
+	# ATTENTION: Better if the loop does this only once. Resume may be possible.
+	#[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile" > /dev/null 2>&1
+
+	#aria2c --timeout=180 --max-tries=25 --retry-wait=15 "$@"
+    ##_messagePlain_probe _aria2c_bin_githubRelease -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false "${currentURL_array_reversed[$currentIteration]}" >&2
+    ##_aria2c_bin_githubRelease --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp1 --disable-ipv6=false "${currentURL_array_reversed[$currentIteration]}" | grep --color -i -E "Name resolution|$" >&2 &
+    ##messagePlain_probe _aria2c_bin_githubRelease -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true "${currentURL_array_reversed[$currentIterationNext1]}" >&2
+    ##_aria2c_bin_githubRelease --log=- --log-level=info -x "$currentForceAxel" --async-dns=false -o "$currentAxelTmpFileRelative".tmp2 --disable-ipv6=true "${currentURL_array_reversed[$currentIterationNext1]}" | grep --color -i -E "Name resolution|$" >&2 &
+    local current_axel_args
+	current_axel_args=()
+	##[[ "$GH_TOKEN" != "" ]] && current_axel_args+=( -H "Authorization: Bearer $GH_TOKEN" )
+	#current_axel_args+=( --quiet=true )
+	#current_axel_args+=( --timeout=180 --max-tries=25 --retry-wait=15 )
+    current_axel_args+=( --stderr=true --summary-interval=0 --console-log-level=error --async-dns=false )
+    [[ "$FORCE_AXEL" != "" ]] && current_axel_args+=( -x "$FORCE_AXEL" )
+	
+	local currentExitStatus_ipv4=1
+	local currentExitStatus_ipv6=1
+
+	( _messagePlain_probe '_wget_githubRelease_procedure-axel: IPv6' >&2 ) > /dev/null
+    ( _messagePlain_probe_safe aria2c --disable-ipv6=false "${current_axel_args[@]}" -d "$currentOutDir" -o "$currentOutFile_relative" "$currentURL" >&2 ) > /dev/null
+	#aria2c --disable-ipv6=false "${current_axel_args[@]}" -d "$currentOutDir" -o "$currentOutFile_relative" "$currentURL"
+	# WARNING: May be untested.
+	( set -o pipefail ; aria2c --disable-ipv6=false "${current_axel_args[@]}" -d "$currentOutDir" -o "$currentOutFile_relative" "$currentURL" 2> >(tail -n 40 >&2) )
+	currentExitStatus_ipv6="$?"
+    if [[ "$currentExitStatus_ipv6" != "0" ]]
+    then
+        ( _messagePlain_probe '_wget_githubRelease_procedure-axel: IPv4' >&2 ) > /dev/null
+        ( _messagePlain_probe_safe aria2c --disable-ipv6=true "${current_axel_args[@]}" -d "$currentOutDir" -o "$currentOutFile_relative" "$currentURL" >&2 ) > /dev/null
+        #aria2c --disable-ipv6=true "${current_axel_args[@]}" -d "$currentOutDir" -o "$currentOutFile_relative" "$currentURL"
+        ( set -o pipefail ; aria2c --disable-ipv6=true "${current_axel_args[@]}" -d "$currentOutDir" -o "$currentOutFile_relative" "$currentURL" 2> >(tail -n 40 >&2) )
+        currentExitStatus_ipv4="$?"
+    fi
+
+	if [[ "$currentExitStatus_ipv6" != "0" ]] && [[ "$currentExitStatus_ipv4" != "0" ]]
+	then
+		#( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_procedure-axel' >&2 ) > /dev/null
+        _bad_fail_githubRelease_currentExitStatus
+		[[ "$currentExitStatus_ipv4" != "1" ]] && [[ "$currentExitStatus_ipv4" != "0" ]] && return "$currentExitStatus_ipv4"
+		[[ "$currentExitStatus_ipv6" != "1" ]] && [[ "$currentExitStatus_ipv6" != "0" ]] && return "$currentExitStatus_ipv6"
+		return "$currentExitStatus_ipv4"
+	fi
+
+    [[ ! -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] && _bad_fail_githubRelease_missing && return 1
+
+    return 0
+}
+_wget_githubRelease_loop-axel() {
+	# Similar retry logic for all similar functions: _gh_download , _wget_githubRelease_loop-axel .
+	( _messagePlain_nominal "$currentStream"'\/\/\/\/\/ \/\/\/\/ init: _wget_githubRelease_loop-axel' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease_loop-axel "$@" >&2 ) > /dev/null
+
+	[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile" > /dev/null 2>&1
+
+	local currentExitStatus=1
+
+	local currentIteration=0
+
+	while ( [[ "$currentExitStatus" != "0" ]] || ( ! [[ -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] ) ) && [[ "$currentIteration" -lt "$githubRelease_retriesMax" ]]
+	do
+		if [[ "$currentIteration" != "0" ]]
+		then 
+			( _messagePlain_warn 'warn: BAD: RETRY: _wget_githubRelease_procedure-axel: currentIteration != 0' >&2 ) > /dev/null
+			sleep "$githubRelease_retriesWait"
+		fi
+
+		( _messagePlain_probe_safe _wget_githubRelease_procedure-axel >&2 ) > /dev/null
+		_wget_githubRelease_procedure-axel
+		# WARNING: May be untested.
+		#( set -o pipefail ; _wget_githubRelease_procedure-axel 2> >(tail -n 100 >&2) )
+		currentExitStatus="$?"
+
+		let currentIteration=currentIteration+1
+	done
+	
+	[[ "$currentExitStatus" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease_loop-axel: _wget_githubRelease_procedure-axel: currentExitStatus' >&2 ) > /dev/null && return "$currentExitStatus"
+	! [[ -e "$currentOutFile" ]] && [[ "$currentOutFile" != "-" ]] && ( _messagePlain_bad 'bad: FAIL: missing: currentOutFile' >&2 ) > /dev/null && return 1
+
+	return 0
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+_wget_githubRelease_join() {
+    local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	local currentOutParameter="$4"
+	local currentOutFile="$5"
+
+	shift
+	shift
+	shift
+	[[ "$currentOutParameter" != "-O" ]] && currentOutFile="$currentFile"
+	#[[ "$currentOutParameter" == "-O" ]] && currentOutFile="$currentOutFile"
+
+	#[[ "$currentOutParameter" == "-O" ]] && [[ "$currentOutFile" == "" ]] && currentOutFile="$currentFile"
+	[[ "$currentOutParameter" == "-O" ]] && [[ "$currentOutFile" == "" ]] && ( _messagePlain_bad 'bad: fail: unexpected: unspecified: currentOutFile' >&2 ) > /dev/null && return 1
+
+	if [[ "$currentOutParameter" == "-O" ]]
+	then
+		shift
+		shift
+	fi
+
+	[[ "$currentOutFile" != "-" ]] && rm -f "$currentOutFile" > /dev/null 2>&1
+
+
+	# ATTENTION
+	currentFile=$(basename "$currentFile")
+
+
+
+
+	( _messagePlain_probe_safe _wget_githubRelease_join "$@" >&2 ) > /dev/null
+
+	_messagePlain_probe_safe _wget_githubRelease_join-stdout "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" "$@" '>' "$currentOutFile" >&2
+	_wget_githubRelease_join-stdout "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" "$@" > "$currentOutFile"
+
+	[[ ! -e "$currentOutFile" ]] && _messagePlain_bad 'missing: '"$1"' '"$2"' '"$3" && return 1
+
+	return 0
+}
+
+
+
+
+_wget_githubRelease_join-stdout() {
+	"$scriptAbsoluteLocation" _wget_githubRelease_join_sequence-stdout "$@"
+}
+_wget_githubRelease_join_sequence-stdout() {
+	( _messagePlain_nominal '\/\/\/\/\/ \/\/\/\/\/ init: _wget_githubRelease_join-stdout' >&2 ) > /dev/null
+	( _messagePlain_probe_safe _wget_githubRelease_join-stdout "$@" >&2 ) > /dev/null
+
+	local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	local currentOutParameter="$4"
+	local currentOutFile="$5"
+
+	shift
+	shift
+	shift
+	if [[ "$currentOutParameter" == "-O" ]]
+	then
+		if [[ "$currentOutFile" != "-" ]]
+		then
+			( _messagePlain_bad 'bad: fail: unexpected: currentOutFile: NOT stdout' >&2 ) > /dev/null
+			#echo "1" > "$currentAxelTmpFile".FAIL
+			return 1
+		fi
+		shift 
+		shift
+	fi
+
+
+    _set_wget_githubRelease "$@"
+
+
+    local currentPart
+    local currentSkip
+    local currentStream
+	local currentStream_wait
+	local currentBusyStatus
+
+	# CAUTION: Any greater than 50 is not expected to serve any purpose, may exhaust expected API rate limits, may greatly delay download, and may disrupt subsequent API requests. Any less than 50 may fall below the ~100GB capacity that is both expected necessary for some complete toolchains and at the limit of ~100GB archival quality optical disc .
+	local maxCurrentPart=50
+
+
+    local currentExitStatus=1
+
+
+
+    (( [[ "$FORCE_BUFFER" == "true" ]] && [[ "$FORCE_DIRECT" == "true" ]] ) || ( [[ "$FORCE_BUFFER" == "false" ]] && [[ "$FORCE_DIRECT" == "false" ]] )) && ( _messagePlain_bad 'bad: fail: FORCE_BUFFER , FORCE_DIRECT: conflict' >&2 ) > /dev/null && ( _messageError 'FAIL' >&2 ) > /dev/null && exit 1
+
+	[[ "$FORCE_PARALLEL" == "1" ]] && ( _messagePlain_bad 'bad: fail: FORCE_PARALLEL: sanity' >&2 ) > /dev/null && ( _messageError 'FAIL' >&2 ) > /dev/null && exit 1
+	[[ "$FORCE_PARALLEL" == "0" ]] && ( _messagePlain_bad 'bad: fail: FORCE_PARALLEL: sanity' >&2 ) > /dev/null && ( _messageError 'FAIL' >&2 ) > /dev/null && exit 1
+    
+    [[ "$FORCE_AXEL" != "" ]] && [[ "$FORCE_DIRECT" == "true" ]] && ( _messagePlain_bad 'bad: fail: FORCE_AXEL is NOT compatible with FORCE_DIRECT==true' >&2 ) > /dev/null && ( _messageError 'FAIL' >&2 ) > /dev/null && exit 1
+
+    [[ "$FORCE_AXEL" != "" ]] && ( _messagePlain_warn 'warn: WARNING: FORCE_AXEL not empty' >&2 ; echo 'FORCE_AXEL may have similar effects to FORCE_WGET and should not be necessary.' >&2  ) > /dev/null
+
+
+
+    _if_buffer() {
+        if ( [[ "$FORCE_BUFFER" == "true" ]] || [[ "$FORCE_DIRECT" == "false" ]] ) || [[ "$FORCE_BUFFER" == "" ]]
+        then
+            true
+            return
+        else
+            false
+            return
+        fi
+        true
+        return
+    }
+
+
+    
+    # WARNING: FORCE_DIRECT="true" , "FORCE_BUFFER="false" very strongly discouraged. Any retry/continue of any interruption will nevertheless unavoidably result in a corrupted output stream.
+    if ! _if_buffer
+    then
+        #export FORCE_DIRECT="true"
+
+        _set_wget_githubRelease-detect "$@"
+        currentSkip="skip"
+
+        currentStream="noBuf"
+        #local currentAxelTmpFileRelative=.m_axelTmp_"$currentStream"_$(_uid 14)
+	    #local currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
+
+        currentPart=""
+        for currentPart in $(seq -f "%02g" 0 "$maxCurrentPart" | sort -r)
+        do
+            if [[ "$currentSkip" == "skip" ]]
+            then
+                currentSkip=$(_wget_githubRelease-skip-URL-curl "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile".part"$currentPart")
+                #[[ "$?" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease-skip-URL-curl' >&2 ) > /dev/null && ( _messageError 'FAIL' >&2 ) > /dev/null && exit 1
+                #[[ "$?" != "0" ]] && currentSkip="skip"
+                [[ "$?" != "0" ]] && ( _messagePlain_warn 'bad: FAIL: _wget_githubRelease-skip-URL-curl' >&2 ) > /dev/null
+            fi
+            
+            [[ "$currentSkip" == "skip" ]] && continue
+
+            
+            if [[ "$currentExitStatus" == "0" ]] || [[ "$currentSkip" != "skip" ]]
+            then
+                _set_wget_githubRelease "$@"
+                currentSkip="download"
+            fi
+
+
+            _wget_githubRelease_procedure "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile".part"$currentPart" -O - "$@"
+            currentExitStatus="$?"
+            #[[ "$currentExitStatus" != "0" ]] && break
+        done
+
+        return "$currentExitStatus"
+    fi
+
+
+
+
+
+	# ### ATTENTION: _if_buffer (IMPLICIT)
+
+	# NOTICE: Parallel downloads may, if necessary, be adapted to first cache a list of addresses (ie. URLs) to download. API rate limits could then have as much time as possible to recover before subsequent commands (eg. analysis of builds). Such a cache must be filled with addresses BEFORE the download loop.
+
+
+	export currentAxelTmpFileUID="$(_uid 14)"
+	_axelTmp() {
+		echo .m_axelTmp_"$currentStream"_"$currentAxelTmpFileUID"
+	}
+	local currentAxelTmpFile
+	#currentAxelTmpFile="$scriptAbsoluteFolder"/$(_axelTmp)
+
+	local currentStream_min=1
+	local currentStream_max=3
+	[[ "$FORCE_PARALLEL" != "" ]] && currentStream_max="$FORCE_PARALLEL"
+
+	currentStream="$currentStream_min"
+
+
+	currentPart="$maxCurrentPart"
+
+
+	_set_wget_githubRelease-detect "$@"
+	currentSkip="skip"
+
+
+	currentPart=""
+	for currentPart in $(seq -f "%02g" 0 "$maxCurrentPart" | sort -r)
+	do
+		if [[ "$currentSkip" == "skip" ]]
+		then
+			# ATTENTION: EXPERIMENT
+			currentSkip=$(_wget_githubRelease-skip-URL-curl "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile".part"$currentPart")
+			#currentSkip=$([[ "$currentPart" -gt "17" ]] && echo 'skip' ; true)
+			
+			#[[ "$?" != "0" ]] && ( _messagePlain_bad 'bad: FAIL: _wget_githubRelease-skip-URL-curl' >&2 ) > /dev/null && ( _messageError 'FAIL' >&2 ) > /dev/null && exit 1
+			#[[ "$?" != "0" ]] && currentSkip="skip"
+			[[ "$?" != "0" ]] && ( _messagePlain_warn 'bad: FAIL: _wget_githubRelease-skip-URL-curl' >&2 ) > /dev/null
+		fi
+		
+		[[ "$currentSkip" == "skip" ]] && continue
+
+		#[[ "$currentExitStatus" == "0" ]] || 
+		if [[ "$currentSkip" != "skip" ]]
+		then
+			_set_wget_githubRelease "$@"
+			currentSkip="download"
+			break
+		fi
+	done
+
+	export currentSkipPart="$currentPart"
+	[[ "$currentStream_max" -gt "$currentSkipPart" ]] && currentStream_max=$(( "$currentSkipPart" + 1 ))
+
+	"$scriptAbsoluteLocation" _wget_githubRelease_join_sequence-parallel "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" &
+
+
+	# Prebuffer .
+	( _messagePlain_nominal '\/\/\/\/\/ \/\/\/\/  preBUFFER: WAIT  ...  currentPart='"$currentPart" >&2 ) > /dev/null
+	if [[ "$currentPart" -ge "01" ]] && [[ "$currentStream_max" -ge "2" ]]
+	then
+		#currentStream="2"
+		for currentStream in $(seq "$currentStream_min" "$currentStream_max" | sort -r)
+		do
+			( _messagePlain_probe 'prebuffer: currentStream= '"$currentStream" >&2 ) > /dev/null
+			while ( ! [[ -e "$scriptAbsoluteFolder"/$(_axelTmp).PASS ]] && ! [[ -e "$scriptAbsoluteFolder"/$(_axelTmp).FAIL ]] )
+			do
+				sleep 3
+			done
+		done
+	fi
+	currentStream="$currentStream_min"
+
+
+	for currentPart in $(seq -f "%02g" 0 "$currentSkipPart" | sort -r)
+	do
+	( _messagePlain_nominal '\/\/\/\/\/ \/\/\/\/  outputLOOP  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+	#( _messagePlain_probe_var currentPart >&2 ) > /dev/null
+	#( _messagePlain_probe_var currentStream >&2 ) > /dev/null
+
+		# Stream must have written PASS/FAIL file .
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  outputLOOP: WAIT: PASS/FAIL ... currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		while ! [[ -e "$scriptAbsoluteFolder"/$(_axelTmp).busy ]] || ( ! [[ -e "$scriptAbsoluteFolder"/$(_axelTmp).PASS ]] && ! [[ -e "$scriptAbsoluteFolder"/$(_axelTmp).FAIL ]] )
+		do
+			sleep 1
+		done
+		
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  outputLOOP: OUTPUT  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		# ATTENTION: EXPERIMENT
+		#status=none
+		dd if="$scriptAbsoluteFolder"/$(_axelTmp) bs=1M
+		#cat "$scriptAbsoluteFolder"/$(_axelTmp)
+		#dd if="$scriptAbsoluteFolder"/$(_axelTmp) bs=1M | pv --rate-limit 100M 2>/dev/null
+		[[ -e "$scriptAbsoluteFolder"/$(_axelTmp).PASS ]] && currentSkip="download"
+		[[ -e "$scriptAbsoluteFolder"/$(_axelTmp).FAIL ]] && [[ "$currentSkip" != "skip" ]] && ( _messageError 'FAIL' >&2 ) > /dev/null && return 1
+
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  outputLOOP: DELETE  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		rm -f "$scriptAbsoluteFolder"/$(_axelTmp) > /dev/null 2>&1
+		rm -f "$scriptAbsoluteFolder"/$(_axelTmp).busy > /dev/null 2>&1
+
+		let currentStream=currentStream+1
+		[[ "$currentStream" -gt "$currentStream_max" ]] && currentStream="$currentStream_min"
+	done
+
+	true
+}
+_wget_githubRelease_join_sequence-parallel() {
+	local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	local currentOutParameter="$4"
+	local currentOutFile="$5"
+
+	shift
+	shift
+	shift
+	if [[ "$currentOutParameter" == "-O" ]]
+	then
+		if [[ "$currentOutFile" != "-" ]]
+		then
+			( _messagePlain_bad 'bad: fail: unexpected: currentOutFile: NOT stdout' >&2 ) > /dev/null
+			#echo "1" > "$currentAxelTmpFile".FAIL
+			return 1
+		fi
+		shift 
+		shift
+	fi
+
+
+	#export currentAxelTmpFileUID="$(_uid 14)"
+	_axelTmp() {
+		echo .m_axelTmp_"$currentStream"_"$currentAxelTmpFileUID"
+	}
+	#local currentAxelTmpFile
+	#currentAxelTmpFile="$scriptAbsoluteFolder"/$(_axelTmp)
+
+	# Due to parallelism , only API rate limits, NOT download speeds, are a concern with larger number of retries. 
+	_set_wget_githubRelease "$@"
+	#_set_wget_githubRelease-detect "$@"
+	#_set_wget_githubRelease-detect-parallel "$@"
+	local currentSkip="skip"
+	
+	local currentStream_min=1
+	local currentStream_max=3
+	[[ "$FORCE_PARALLEL" != "" ]] && currentStream_max="$FORCE_PARALLEL"
+	[[ "$currentStream_max" -gt "$currentSkipPart" ]] && currentStream_max=$(( "$currentSkipPart" + 1 ))
+	
+	currentStream="$currentStream_min"
+	for currentPart in $(seq -f "%02g" 0 "$currentSkipPart" | sort -r)
+	do
+	( _messagePlain_nominal '\/\/\/\/\/ \/\/\/\/  downloadLOOP  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+	#( _messagePlain_probe_var currentPart >&2 ) > /dev/null
+	#( _messagePlain_probe_var currentStream >&2 ) > /dev/null
+
+		# Slot in use. Downloaded  "$scriptAbsoluteFolder"/$(_axelTmp)  file will be DELETED after use by calling process.
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  downloadLOOP: WAIT: BUSY  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		while ( ls -1 "$scriptAbsoluteFolder"/$(_axelTmp) > /dev/null 2>&1 ) || ( ls -1 "$scriptAbsoluteFolder"/$(_axelTmp).busy > /dev/null 2>&1 )
+		do
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  downloadLOOP: WAIT: BUSY  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+			sleep 1
+		done
+
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  downloadLOOP: detect skip  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		[[ -e "$scriptAbsoluteFolder"/$(_axelTmp).PASS ]] && _set_wget_githubRelease "$@" && currentSkip="download"
+		[[ -e "$scriptAbsoluteFolder"/$(_axelTmp).FAIL ]] && [[ "$currentSkip" != "skip" ]] && ( _messageError 'FAIL' >&2 ) > /dev/null && return 1
+
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  downloadLOOP: DELETE  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		rm -f "$scriptAbsoluteFolder"/$(_axelTmp).PASS > /dev/null 2>&1
+		rm -f "$scriptAbsoluteFolder"/$(_axelTmp).FAIL > /dev/null 2>&1
+
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  downloadLOOP: DELAY: stagger, Inter-Process Communication, _stop  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		# Staggered Delay.
+		[[ "$currentPart" == "$currentSkipPart" ]] && sleep 2
+		[[ "$currentPart" != "$currentSkipPart" ]] && sleep 6
+		# Inter-Process Communication Delay.
+		# Prevents new download from starting before previous download process has done  rm -f "$currentAxelTmpFile"*  .
+		#  Beware that  rm  is inevitable or at least desirable - called by _stop() through trap, etc.
+		sleep 7
+		
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  downloadLOOP: DOWNLOAD  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		export currentAxelTmpFile="$scriptAbsoluteFolder"/$(_axelTmp)
+		"$scriptAbsoluteLocation" _wget_githubRelease_procedure-join "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile".part$(printf "%02g" "$currentPart") &
+		echo "$!" > "$scriptAbsoluteFolder"/$(_axelTmp).pid
+
+		# Stream must have written either in-progress download or PASS/FAIL file .
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  downloadLOOP: WAIT: BEGIN  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+		while ! ( ls -1 "$scriptAbsoluteFolder"/$(_axelTmp)* > /dev/null 2>&1 )
+		do
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  downloadLOOP: WAIT: BEGIN  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+			sleep 0.6
+		done
+
+		let currentStream=currentStream+1
+		[[ "$currentStream" -gt "$currentStream_max" ]] && currentStream="$currentStream_min"
+	done
+
+	( _messagePlain_nominal '\/\/\/\/\/ \/\/\/\/  download: DELETE' >&2 ) > /dev/null
+	for currentStream in $(seq "$currentStream_min" "$currentStream_max")
+	do
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  download: WAIT: BUSY  ...  currentStream='"$currentStream" >&2 ) > /dev/null
+		while ( ls -1 "$scriptAbsoluteFolder"/$(_axelTmp) > /dev/null 2>&1 ) || ( ls -1 "$scriptAbsoluteFolder"/$(_axelTmp).busy > /dev/null 2>&1 )
+		do
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  download: WAIT: BUSY  ...  currentStream='"$currentStream" >&2 ) > /dev/null
+			sleep 1
+		done
+
+		( _messagePlain_nominal '\/\/\/\/\/ \/\/\/  download: DELETE ...  currentStream='"$currentStream" >&2 ) > /dev/null
+		rm -f "$scriptAbsoluteFolder"/$(_axelTmp).PASS > /dev/null 2>&1
+		rm -f "$scriptAbsoluteFolder"/$(_axelTmp).FAIL > /dev/null 2>&1
+	done
+
+	( _messagePlain_nominal '\/\/\/\/\/ \/\/\/\/  download: WAIT PID  ...  currentPart='"$currentPart"' currentStream='"$currentStream" >&2 ) > /dev/null
+	for currentStream in $(seq "$currentStream_min" "$currentStream_max")
+	do
+		[[ -e "$scriptAbsoluteFolder"/$(_axelTmp).pid ]] && _pauseForProcess $(cat "$scriptAbsoluteFolder"/$(_axelTmp).pid) > /dev/null
+	done
+	wait >&2
+
+	true
+}
+_wget_githubRelease_procedure-join() {
+	( _messagePlain_probe_safe _wget_githubRelease_procedure-join "$@" >&2 ) > /dev/null
+
+	local currentAbsoluteRepo="$1"
+	local currentReleaseLabel="$2"
+	local currentFile="$3"
+
+	local currentOutParameter="$4"
+	local currentOutFile="$5"
+
+	shift
+	shift
+	shift
+	if [[ "$currentOutParameter" == "-O" ]]
+	then
+		if [[ "$currentOutFile" != "-" ]]
+		then
+			( _messagePlain_bad 'bad: fail: unexpected: currentOutFile: NOT stdout' >&2 ) > /dev/null
+			echo "1" > "$currentAxelTmpFile".FAIL
+			return 1
+		fi
+		shift 
+		shift
+	fi
+
+	#local currentAxelTmpFileRelative=.m_axelTmp_"$currentStream"_$(_uid 14)
+	#local currentAxelTmpFile="$scriptAbsoluteFolder"/"$currentAxelTmpFileRelative"
+
+	local currentExitStatus
+
+	echo -n > "$currentAxelTmpFile".busy
+
+	# ATTENTION: EXPERIMENT
+	_wget_githubRelease_procedure "$currentAbsoluteRepo" "$currentReleaseLabel" "$currentFile" -O "$currentAxelTmpFile" "$@"
+    #dd if=/dev/zero bs=1M count=1500 > "$currentAxelTmpFile"
+	#echo "$currentFile" >> "$currentAxelTmpFile"
+    #dd if=/dev/urandom bs=1M count=1500 | pv --rate-limit 300M 2>/dev/null > "$currentAxelTmpFile"
+	currentExitStatus="$?"
+
+	# Inter-Process Communication Delay
+	# Essentially a 'minimum download time' .
+	sleep 7
+
+	[[ "$currentExitStatus" == "0" ]] && echo "$currentExitStatus" > "$currentAxelTmpFile".PASS
+	if [[ "$currentExitStatus" != "0" ]]
+	then
+		echo -n > "$currentAxelTmpFile"
+		echo "$currentExitStatus" > "$currentAxelTmpFile".FAIL
+	fi
+
+    while [[ -e "$currentAxelTmpFile" ]] || [[ -e "$currentAxelTmpFile".busy ]] || [[ -e "$currentAxelTmpFile".PASS ]] || [[ -e "$currentAxelTmpFile".FAIL ]]
+    do
+        sleep 1
+    done
+
+    [[ "$currentAxelTmpFile" != "" ]] && rm -f "$currentAxelTmpFile".*
+
+    #unset currentAxelTmpFile
+
+    [[ "$currentExitStatus" == "0" ]] && return 0
+    return "$currentExitStatus"
+}
+
+
+
+
+
+
+
+
+
+
+_warn_githubRelease_FORCE_WGET() {
+    ( _messagePlain_warn 'warn: WARNING: FORCE_WGET=true' >&2 ; echo 'FORCE_WGET is a workaround. Only expected FORCE_WGET uses: low RAM , cloud testing/diagnostics .' >&2  ) > /dev/null
+    return 0
+}
+_bad_fail_githubRelease_currentExitStatus() {
+    ( _messagePlain_bad 'fail: wget_githubRelease: currentExitStatus: '"$currentAbsoluteRepo"' '"$currentReleaseLabel"' '"$currentFile" >&2 ) > /dev/null
+    return 0
+}
+_bad_fail_githubRelease_missing() {
+    ( _messagePlain_bad 'fail: wget_githubRelease: missing: '"$currentAbsoluteRepo"' '"$currentReleaseLabel"' '"$currentFile" >&2 ) > /dev/null
+    return 0
+}
+
+
+
+
+
+
+_vector_wget_githubRelease-URL-gh() {
+    local currentReleaseLabel="build"
+    
+    [[ $(
+cat <<'CZXWXcRMTo8EmM8i4d' | _wget_githubRelease_procedure-address-gh-awk "" "$currentReleaseLabel" "" 2> /dev/null
+TITLE  TYPE    TAG NAME             PUBLISHED        
+build  Latest  build-1002-1  about 1 days ago
+build          build-1001-1  about 2 days ago
+CZXWXcRMTo8EmM8i4d
+) == "build-1002-1
+build-1001-1" ]] || ( _messagePlain_bad 'fail: bad: _wget_githubRelease_procedure-address-gh-awk' && _messageFAIL )
+
+	return 0
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -18592,22 +19219,22 @@ _stop() {
 	if [[ "$currentAxelTmpFile" != "" ]]
 	then
 		rm -f "$currentAxelTmpFile" > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".st > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp.st > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp.aria2 > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp1 > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp1.st > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp1.aria2 > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp2 > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp2.st > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp2.aria2 > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp3 > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp3.st > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp3.aria2 > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp4 > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp4.st > /dev/null 2>&1
-		rm -f "$currentAxelTmpFile".tmp4.aria2 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".st > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp.st > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp.aria2 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp1 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp1.st > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp1.aria2 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp2 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp2.st > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp2.aria2 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp3 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp3.st > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp3.aria2 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp4 > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp4.st > /dev/null 2>&1
+		#rm -f "$currentAxelTmpFile".tmp4.aria2 > /dev/null 2>&1
 			
 		rm -f "$currentAxelTmpFile"* > /dev/null 2>&1
 	fi
@@ -19014,6 +19641,9 @@ _vector() {
 	
 	
 	_tryExec "_vector_virtUser"
+
+
+	_tryExec "_vector_wget_githubRelease-URL-gh"
 	
 	
 	_tryExec "_vector_ollama"
@@ -19584,7 +20214,9 @@ _variableLocalTest_sequence() {
 	unset doubleLocalDefinitionA
 	[[ "$doubleLocalDefinitionA" != "" ]] && _messageFAIL && _stop 1
 	
-	
+
+	variableLocalTest_evalTest() { local currentVariableNum=1 ; eval local currentVariable_${currentVariableNum}_currentData=PASS ; ( eval "[[ \$currentVariable_${currentVariableNum}_currentData == PASS ]]" && eval "[[ \$currentVariable_${currentVariableNum}_currentData != '' ]]" && eval "echo \$currentVariable_${currentVariableNum}_currentData" ) ;} ; variableLocalTest_evalTest > /dev/null ; [[ $(variableLocalTest_evalTest) != "PASS" ]] && _messageFAIL && _stop 1
+
 	_stop
 }
 
@@ -20336,6 +20968,20 @@ _test_sanity() {
 	#[[ $(echo -e -n "c" | _messagePlain_probe_cmd cat /dev/stdin "$safeTmp"/a | tail -c 2) != "cb" ]] && _messageFAIL && _stop 1
 	[[ $(echo -e -n "c" | _messagePlain_probe_cmd cat /proc/self/fd/0 "$safeTmp"/a | tail -c 2) != "cb" ]] && _messageFAIL && _stop 1
 	rm -f "$safeTmp"/a
+
+
+
+
+	! (set -o pipefail; true | echo x | cat) > /dev/null 2>&1 && _messageFAIL && return 1
+	(set -o pipefail; false | echo x | cat) > /dev/null 2>&1 && _messageFAIL && return 1
+
+	[[ $(set -o pipefail; true | echo x | cat) != "x" ]] && _messageFAIL && return 1
+	[[ $(set -o pipefail; false | echo x | cat) != "x" ]] && _messageFAIL && return 1
+
+	! false | true && _messageFAIL && return 1
+	false | true || _messageFAIL
+	false | true || return 1
+	true | false && _messageFAIL && return 1
 	
 	
 	
@@ -20585,6 +21231,16 @@ _test() {
 			echo -e '\E[0;36m Timing: _test_timeoutRead \E[0m'
 			! _test_timeoutRead && echo '_test_timeoutRead broken' && _stop 1
 		fi
+
+		echo -e '\E[0;36m Timing: true/false \E[0m'
+		! _timeout 10 true && echo '! _timeout 10 true  broken' && _stop 1
+		_timeout 10 false && echo '_timeout 10 false  broken' && _stop 1
+		if type _stopwatch > /dev/null 2>&1
+		then
+    		! _stopwatch _timeout 10 true > /dev/null 2>&1 && echo '! _stopwatch _timeout 10 true  broken' && _stop 1
+    		_stopwatch _timeout 10 false > /dev/null 2>&1 && echo '_stopwatch _timeout 10 false  broken' && _stop 1
+		fi
+		
 		
 		echo -e '\E[0;36m Timing: _timetest \E[0m'
 		! _timetest && echo '_timetest broken' && _stop 1

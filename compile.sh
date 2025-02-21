@@ -36,7 +36,7 @@ _ub_cksum_special_derivativeScripts_contents() {
 #export ub_setScriptChecksum_disable='true'
 ( [[ -e "$0".nck ]] || [[ "${BASH_SOURCE[0]}" != "${0}" ]] || [[ "$1" == '--profile' ]] || [[ "$1" == '--script' ]] || [[ "$1" == '--call' ]] || [[ "$1" == '--return' ]] || [[ "$1" == '--devenv' ]] || [[ "$1" == '--shell' ]] || [[ "$1" == '--bypass' ]] || [[ "$1" == '--parent' ]] || [[ "$1" == '--embed' ]] || [[ "$1" == '--compressed' ]] || [[ "$0" == "/bin/bash" ]] || [[ "$0" == "-bash" ]] || [[ "$0" == "/usr/bin/bash" ]] || [[ "$0" == "bash" ]] ) && export ub_setScriptChecksum_disable='true'
 export ub_setScriptChecksum_header='2591634041'
-export ub_setScriptChecksum_contents='3480762536'
+export ub_setScriptChecksum_contents='765495136'
 
 # CAUTION: Symlinks may cause problems. Disable this test for such cases if necessary.
 # WARNING: Performance may be crucial here.
@@ -1447,6 +1447,11 @@ _report_setup_ubcp() {
 	[[ "$currentCygdriveC_equivalent" == "" ]] && currentCygdriveC_equivalent=$(cygpath -S | sed 's/\/Windows\/System32//g')
 	[[ "$1" == "/" ]] && currentCygdriveC_equivalent=$(echo "$PWD" | sed 's/\(\/cygdrive\/[a-zA-Z]*\).*/\1/')
 
+
+	mkdir -p "$currentCygdriveC_equivalent"/core/infrastructure/
+	#cd "$currentCygdriveC_equivalent"/core/infrastructure/
+
+
 	find /bin/ /usr/bin/ /sbin/ /usr/sbin/ | tee "$currentCygdriveC_equivalent"/core/infrastructure/ubcp-binReport > /dev/null
 
 
@@ -1926,6 +1931,75 @@ _package-cygwin() {
 
 
 
+
+
+
+
+# Discouraged. Few file paths, some setup, etc, may be different. Otherwise, WSL should not be treated differently.
+_if_wsl() {
+    uname -a | grep -i 'microsoft' > /dev/null 2>&1 || uname -a | grep -i 'WSL2' > /dev/null 2>&1
+}
+
+
+
+# Ingredients. Debian pacakges mirror, docker images, pre-built dist/OS images, etc.
+_set_ingredients() {
+    export ub_INGREDIENTS=""
+
+    local currentDriveLetter
+
+    if ! _if_cygwin
+    then
+        [[ -e /mnt/ingredients/ingredients ]] && mountpoint /mnt/ingredients && export ub_INGREDIENTS=/mnt/ingredients/ingredients && return 0
+
+        # STRONGLY PREFERRED.
+        [[ -e /mnt/ingredients ]] && mountpoint /mnt/ingredients && export ub_INGREDIENTS=/mnt/ingredients && return 0
+
+        # STRONGLY DISCOURAGED.
+        # Do NOT create "$HOME"/core/ingredients unless for some very unexpected reason it is necessary for a non-root user to use ingredients.
+        [[ -e "$HOME"/core/ingredients ]] && export ub_INGREDIENTS="$HOME"/core/ingredients && return 0
+
+        # WSL(2) specific.
+        #_if_wsl
+        #uname -a | grep -i 'microsoft' > /dev/null 2>&1 || uname -a | grep -i 'WSL2' > /dev/null 2>&1
+        if type _if_wsl > /dev/null 2>&1 && _if_wsl
+        then
+            [[ -e /mnt/host/z/mnt/ingredients ]] && export ub_INGREDIENTS=/mnt/host/z/mnt/ingredients && return 0
+            [[ -e /mnt/z/mnt/ingredients ]] && export ub_INGREDIENTS=/mnt/z/mnt/ingredients && return 0
+            [[ -e /mnt/c/core/ingredients ]] && export ub_INGREDIENTS=/mnt/c/core/ingredients && return 0
+            [[ -e /mnt/host/c/core/ingredients ]] && export ub_INGREDIENTS=/mnt/host/c/core/ingredients && return 0
+            #
+            for currentDriveLetter in d e f g h i j k l m n o p q r s t u v w D E F G H I J K L M N O P Q R S T U V W
+            do
+                [[ -e /mnt/"$currentDriveLetter"/ingredients ]] && export ub_INGREDIENTS=/mnt/"$currentDriveLetter"/ingredients && return 0
+            done
+            if [[ -e /mnt/host ]]
+            then
+                for currentDriveLetter in d e f g h i j k l m n o p q r s t u v w D E F G H I J K L M N O P Q R S T U V W
+                do
+                    [[ -e /mnt/host/"$currentDriveLetter"/ingredients ]] && export ub_INGREDIENTS=/mnt/host/"$currentDriveLetter"/ingredients && return 0
+                done
+            fi
+        fi
+    fi
+
+    if _if_cygwin
+    then
+        [[ -e /cygdrive/z/mnt/ingredients ]] && export ub_INGREDIENTS=/cygdrive/z/mnt/ingredients && return 0
+        [[ -e /cygdrive/c/core/ingredients ]] && export ub_INGREDIENTS=/cygdrive/c/core/ingredients && return 0
+        #
+        for currentDriveLetter in d e f g h i j k l m n o p q r s t u v w D E F G H I J K L M N O P Q R S T U V W
+        do
+            [[ -e /cygdrive/"$currentDriveLetter"/ingredients ]] && export ub_INGREDIENTS=/cygdrive/"$currentDriveLetter"/ingredients && return 0
+        done
+    fi
+
+
+
+
+    [[ "$ub_INGREDIENTS" == "" ]] && return 1
+    return 0
+}
 
 
 
@@ -3643,6 +3717,17 @@ _messagePlain_probe_noindent() {
 	_color_end
 	echo
 	return 0
+}
+# WARNING: Less track record with very unusual text. May or may not output correctly in some (unknown, unexpected) situations.
+# DANGER: MUST use this function instead of _messagePlain_probe when text is from external origins!
+_messagePlain_probe_safe() {
+	_color_begin_probe
+	#_color_begin_probe_noindent
+	#echo -n "$@"
+	_safeEcho "$@"
+	_color_end
+	echo
+	return
 }
 
 #Blue. Diagnostic instrumentation.
@@ -5996,6 +6081,12 @@ _deps_dev_heavy_atom() {
 	export enUb_dev_heavy_atom="true"
 }
 
+_deps_dev_buildOps() {
+	_deps_generic
+	
+	export enUb_dev_buildOps="true"
+}
+
 _deps_cloud_heavy() {
 	_deps_notLean
 	export enUb_cloud_heavy="true"
@@ -6847,6 +6938,8 @@ _compile_bash_deps() {
 	
 	if [[ "$1" == "lean" ]]
 	then
+		_deps_dev_buildOps
+		
 		#_deps_git
 		
 		#_deps_virt_translation
@@ -6865,7 +6958,10 @@ _compile_bash_deps() {
 	# Specifically intended to be imported into user profile.
 	if [[ "$1" == "ubcore" ]]
 	then
+		_deps_dev_buildOps
+		
 		_deps_notLean
+		_deps_os_x11
 		
 		_deps_serial
 
@@ -6924,6 +7020,8 @@ _compile_bash_deps() {
 	
 	if [[ "$1" == "cautossh" ]]
 	then
+		_deps_dev_buildOps
+		
 		_deps_os_x11
 		_deps_proxy
 		_deps_proxy_special
@@ -6965,6 +7063,7 @@ _compile_bash_deps() {
 	if [[ "$1" == "processor" ]]
 	then
 		_deps_dev
+		_deps_dev_buildOps
 		
 		_deps_generic
 		
@@ -6991,6 +7090,7 @@ _compile_bash_deps() {
 	if [[ "$1" == "abstract" ]] || [[ "$1" == "abstractfs" ]]
 	then
 		_deps_dev
+		_deps_dev_buildOps
 		
 		_deps_python
 		_deps_haskell
@@ -7017,6 +7117,7 @@ _compile_bash_deps() {
 	if [[ "$1" == "fakehome" ]]
 	then
 		_deps_dev
+		_deps_dev_buildOps
 		
 		_deps_python
 		_deps_haskell
@@ -7045,6 +7146,7 @@ _compile_bash_deps() {
 		_deps_dev_heavy
 		#_deps_dev_heavy_atom
 		_deps_dev
+		_deps_dev_buildOps
 		
 		#_deps_cloud_heavy
 		
@@ -7150,6 +7252,7 @@ _compile_bash_deps() {
 		_deps_dev_heavy
 		#_deps_dev_heavy_atom
 		_deps_dev
+		_deps_dev_buildOps
 		
 		#_deps_cloud_heavy
 		
@@ -7187,7 +7290,7 @@ _compile_bash_deps() {
 		_deps_python
 		_deps_haskell
 		
-		_deps_ai
+		#_deps_ai
 		_deps_ai_shortuts
 		
 		_deps_calculators
@@ -7249,12 +7352,19 @@ _compile_bash_deps() {
 		
 		return 0
 	fi
+
+	if [[ "$1" == "core_ai" ]]
+	then
+		_deps_ai
+		_compile_bash_deps 'core'
+	fi
 	
 	if [[ "$1" == "" ]] || [[ "$1" == "ubiquitous_bash" ]] || [[ "$1" == "ubiquitous_bash.sh" ]] || [[ "$1" == "complete" ]]
 	then
 		_deps_dev_heavy
 		#_deps_dev_heavy_atom
 		_deps_dev
+		_deps_dev_buildOps
 		
 		_deps_cloud_heavy
 		
@@ -7377,6 +7487,9 @@ _compile_bash_header() {
 	includeScriptList+=( "os/override"/override_prog.sh )
 	
 	includeScriptList+=( "os/override"/override_cygwin.sh )
+	includeScriptList+=( "os/override"/override_wsl.sh )
+
+	includeScriptList+=( "special"/ingredients.sh )
 }
 
 _compile_bash_header_program() {
@@ -7667,6 +7780,7 @@ _compile_bash_shortcuts() {
 	[[ "$enUb_dev" == "true" ]] && includeScriptList+=( "shortcuts/dev/scope"/devscope_app.sh )
 
 	( [[ "$enUb_github" == "true" ]] || [[ "$enUb_notLean" == "true" ]] || [[ "$enUb_cloud" == "true" ]] || [[ "$enUb_cloud_heavy" == "true" ]] || [[ "$enUb_cloud_self" == "true" ]] ) && includeScriptList+=( "shortcuts/github"/github_removeHTTPS.sh )
+	( [[ "$enUb_github" == "true" ]] || [[ "$enUb_notLean" == "true" ]] || [[ "$enUb_cloud" == "true" ]] || [[ "$enUb_cloud_heavy" == "true" ]] || [[ "$enUb_cloud_self" == "true" ]] ) && includeScriptList+=( "shortcuts/github"/github_upload_parts.sh )
 	
 	( [[ "$enUb_repo" == "true" ]] && [[ "$enUb_git" == "true" ]] ) && includeScriptList+=( "shortcuts/git"/git.sh )
 	( [[ "$enUb_repo" == "true" ]] && [[ "$enUb_git" == "true" ]] ) && includeScriptList+=( "shortcuts/git"/gitBare.sh )
@@ -7960,6 +8074,7 @@ _compile_bash_selfHost() {
 _compile_bash_overrides() {
 	export includeScriptList
 	
+	[[ "$enUb_dev_buildOps" == "true" ]] && includeScriptList+=( "build/zSpecial"/build-ops.sh )
 	
 	includeScriptList+=( "structure"/overrides.sh )
 }
@@ -8124,11 +8239,14 @@ _compile_bash() {
 		includeScriptList+=( "generic"/rottenheader.sh )
 		#includeScriptList+=( "generic"/minimalheader.sh )
 		#includeScriptList+=( "generic"/ubiquitousheader.sh )
+
+		includeScriptList+=( "special"/ingredients.sh )
 		
 		#includeScriptList+=( "os/override"/override.sh )
 		#includeScriptList+=( "os/override"/override_prog.sh )
 		
 		#includeScriptList+=( "os/override"/override_cygwin.sh )
+		#includeScriptList+=( "os/override"/override_wsl.sh )
 		
 		
 		
