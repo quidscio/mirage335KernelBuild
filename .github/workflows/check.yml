@@ -22,7 +22,7 @@ on:
     inputs:
       runnerName:
         required: false
-        default: ubuntu-latest-h
+        default: ubuntu-latest
         type: choice
         options:
         - ubuntu-latest
@@ -30,7 +30,7 @@ on:
         - ubuntu-latest-h
       forceKernel_mainline:
         required: false
-        default: latest
+        default: none
         type: choice
         options:
         - latest
@@ -38,7 +38,7 @@ on:
         - none
       forceKernel_lts:
         required: false
-        default: latest
+        default: 6.12.
         type: choice
         options:
         - latest
