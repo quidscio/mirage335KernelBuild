@@ -114,6 +114,8 @@ _check_vbox_sequence() {
     local functionEntryPWD="$PWD"
     _start
 
+    local currentExitStatus=0
+
     _messagePlain_nominal 'kernel'
 
     export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$1"/linux-* | sort -n | head -n 1)
@@ -147,7 +149,15 @@ _check_vbox_sequence() {
         cd "$safeTmp"/vboxhost
         make clean
         make -C "$currentKernelPath" M=`pwd` -j $(nproc)
-        _stop "$?"
+        [[ "$?" != "0" ]] && _messagePlain_bad 'bad: make -C "$currentKernelPath" M=`pwd` -j $(nproc)' && currentExitStatus=1
+        #_stop "$?"
+
+        ! [[ -e "$safeTmp"/vboxhost/vboxdrv/vboxdrv.ko ]] && _messagePlain_bad 'bad: missing: vboxdrv.ko' && currentExitStatus=1
+
+        ! [[ -e "$safeTmp"/vboxhost/vboxnetadp/vboxnetadp.ko ]] && _messagePlain_bad 'bad: missing: vboxnetadp.ko' && currentExitStatus=1
+        ! [[ -e "$safeTmp"/vboxhost/vboxpci/vboxpci.ko ]] && _messagePlain_bad 'bad: missing: vboxnetadp.ko' && currentExitStatus=1
+
+        [[ "$currentExitStatus" == "0" ]] && _stop 0
     fi
 
 
