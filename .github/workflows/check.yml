@@ -174,7 +174,7 @@ jobs:
 
 
     - name: _check_vbox-lts
-      shell: bash
+      shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_vbox-lts
@@ -186,7 +186,7 @@ jobs:
       
       
     - name: _check_nv-lts-series535p
-      shell: bash
+      shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_nv-lts-series535p
@@ -195,7 +195,7 @@ jobs:
         exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
     - name: _check_nv-lts-legacy470
-      shell: bash
+      shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_nv-lts-legacy470
@@ -320,7 +320,7 @@ jobs:
 
 
     - name: _check_vbox-mainline
-      shell: bash
+      shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_vbox-mainline
@@ -344,7 +344,7 @@ jobs:
       
       
     - name: _check_nv-mainline-series535p
-      shell: bash
+      shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_nv-mainline-series535p
@@ -353,7 +353,7 @@ jobs:
         exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
     - name: _check_nv-mainline-legacy470
-      shell: bash
+      shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_nv-mainline-legacy470
