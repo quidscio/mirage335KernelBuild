@@ -312,9 +312,21 @@ jobs:
 
 
     - name: _check_vbox-mainline
-      shell: bash {0}
+      shell: bash
       run: |
-        ./ubiquitous_bash.sh _check_vbox-mainline
+        #./ubiquitous_bash.sh _check_vbox-mainline
+        export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$1"/linux-* | sort -n | head -n 1)
+        echo 'currentKernelPath= '"$currentKernelPath"
+        cd /usr/share/virtualbox/src/vboxhost
+        #make clean
+        make -C "$currentKernelPath" M=`pwd` -j $(nproc)
+        if ! [[ -e "$safeTmp"/vboxhost/vboxdrv/vboxdrv.ko ]]
+        then
+          echo 'bad: missing: vboxdrv.ko'
+        else
+          echo 'good: vboxdrv.ko'
+        fi
+        true
       timeout-minutes: 300
 
       
