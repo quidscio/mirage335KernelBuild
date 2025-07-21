@@ -174,9 +174,13 @@ jobs:
 
 
     - name: _check_vbox-lts
-      shell: bash
+      shell: bash {0}
       run: |
-        ./ubiquitous_bash.sh _check_vbox-lts
+        set -Eeuo pipefail          # keep strict mode
+        trap 'echo "::error::checker crashed"; exit 1' ERR
+        ./ubiquitous_bash.sh _check_vbox-lts || rc=$?
+        echo "exit_code=$rc" >>"$GITHUB_OUTPUT"
+        [ "$rc" -eq 0 ]
       timeout-minutes: 300
       
       
@@ -308,7 +312,7 @@ jobs:
 
 
     - name: _check_vbox-mainline
-      shell: bash
+      shell: bash {0}
       run: |
         ./ubiquitous_bash.sh _check_vbox-mainline
       timeout-minutes: 300
