@@ -174,13 +174,8 @@ jobs:
 
 
     - name: _check_vbox-lts
-      shell: bash {0}
       run: |
-        set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_vbox-lts
-        rc=$?                      # capture the script’s exit code
-        echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
-        exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
       
       
