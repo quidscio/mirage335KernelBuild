@@ -174,19 +174,34 @@ jobs:
 
 
     - name: _check_vbox-lts
+      shell: bash
       run: |
+        set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_vbox-lts
+        rc=$?                      # capture the script’s exit code
+        echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
+        exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
       
       
       
     - name: _check_nv-lts-series535p
+      shell: bash
       run: |
+        set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_nv-lts-series535p
+        rc=$?                      # capture the script’s exit code
+        echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
+        exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
     - name: _check_nv-lts-legacy470
+      shell: bash
       run: |
+        set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_nv-lts-legacy470
+        rc=$?                      # capture the script’s exit code
+        echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
+        exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
 
 
@@ -307,19 +322,23 @@ jobs:
     - name: _check_vbox-mainline
       shell: bash
       run: |
-        #./ubiquitous_bash.sh _check_vbox-mainline
-        export currentKernelPath=$(ls -d -1 "$scriptLocal"/"$1"/linux-* | sort -n | head -n 1)
-        echo 'currentKernelPath= '"$currentKernelPath"
-        cd /usr/share/virtualbox/src/vboxhost
-        #make clean
-        make -C "$currentKernelPath" M=`pwd` -j $(nproc)
-        if ! [[ -e "$safeTmp"/vboxhost/vboxdrv/vboxdrv.ko ]]
-        then
-          echo 'bad: missing: vboxdrv.ko'
-        else
-          echo 'good: vboxdrv.ko'
-        fi
-        true
+        set +e                     # disable automatic exit‑on‑error
+        ./ubiquitous_bash.sh _check_vbox-mainline
+        rc=$?                      # capture the script’s exit code
+        echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
+        exit $rc                   # explicitly exit with that code
+        #export currentKernelPath=$(ls -d -1 "$scriptLocal"/mainline/linux-* | sort -n | head -n 1)
+        #echo 'currentKernelPath= '"$currentKernelPath"
+        #cd /usr/share/virtualbox/src/vboxhost
+        ##make clean
+        #make -C "$currentKernelPath" M=`pwd` -j $(nproc)
+        #if ! [[ -e "$safeTmp"/vboxhost/vboxdrv/vboxdrv.ko ]]
+        #then
+          #echo 'bad: missing: vboxdrv.ko'
+        #else
+          #echo 'good: vboxdrv.ko'
+        #fi
+        #true
       timeout-minutes: 300
 
       
@@ -336,7 +355,11 @@ jobs:
     - name: _check_nv-mainline-legacy470
       shell: bash
       run: |
+        set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_nv-mainline-legacy470
+        rc=$?                      # capture the script’s exit code
+        echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
+        exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
 
 
