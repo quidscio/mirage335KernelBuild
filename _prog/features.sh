@@ -154,9 +154,10 @@ _check_vbox_sequence() {
 
         ! [[ -e "$safeTmp"/vboxhost/vboxdrv/vboxdrv.ko ]] && _messagePlain_bad 'bad: missing: vboxdrv.ko' && currentExitStatus=1
 
-        ! [[ -e "$safeTmp"/vboxhost/vboxnetadp/vboxnetadp.ko ]] && _messageplain_warn 'warn: possibly cosmetic: missing: vboxnetadp.ko' #&& currentExitStatus=1
-        ! [[ -e "$safeTmp"/vboxhost/vboxpci/vboxpci.ko ]] && _messageplain_warn 'warn: possibly cosmetic: missing: vboxpci.ko' #&& currentExitStatus=1
+        ! [[ -e "$safeTmp"/vboxhost/vboxnetadp/vboxnetadp.ko ]] && _messagePlain_warn 'warn: possibly cosmetic: missing: vboxnetadp.ko' #&& currentExitStatus=1
+        ! [[ -e "$safeTmp"/vboxhost/vboxpci/vboxpci.ko ]] && _messagePlain_warn 'warn: possibly cosmetic: missing: vboxpci.ko' #&& currentExitStatus=1
 
+        _messagePlain_good 'good: presumed adequate'
         [[ "$currentExitStatus" == "0" ]] && _stop 0
     fi
 
