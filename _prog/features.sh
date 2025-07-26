@@ -157,6 +157,7 @@ _check_vbox_sequence() {
         ! [[ -e "$safeTmp"/vboxhost/vboxnetadp/vboxnetadp.ko ]] && _messagePlain_warn 'warn: possibly cosmetic: missing: vboxnetadp.ko' #&& currentExitStatus=1
         ! [[ -e "$safeTmp"/vboxhost/vboxpci/vboxpci.ko ]] && _messagePlain_warn 'warn: possibly cosmetic: missing: vboxpci.ko' #&& currentExitStatus=1
 
+        _messagePlain_probe_var currentExitStatus
         _messagePlain_good 'good: presumed adequate'
         [[ "$currentExitStatus" == "0" ]] && _stop 0
     fi
