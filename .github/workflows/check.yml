@@ -179,6 +179,7 @@ jobs:
         set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_vbox-lts
         rc=$?                      # capture the script’s exit code
+        echo "$rc"
         echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
         exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
@@ -325,6 +326,7 @@ jobs:
         set +e                     # disable automatic exit‑on‑error
         ./ubiquitous_bash.sh _check_vbox-mainline
         rc=$?                      # capture the script’s exit code
+        echo "$rc"
         echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
         exit $rc                   # explicitly exit with that code
         #export currentKernelPath=$(ls -d -1 "$scriptLocal"/mainline/linux-* | sort -n | head -n 1)
