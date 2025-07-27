@@ -177,6 +177,7 @@ jobs:
       shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
+        set +o pipefail
         ./ubiquitous_bash.sh _check_vbox-lts
         rc=$?                      # capture the script’s exit code
         echo "$rc"
