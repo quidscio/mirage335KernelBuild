@@ -191,6 +191,7 @@ jobs:
       shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
+        set +o pipefail
         ./ubiquitous_bash.sh _check_nv-lts-series535p
         rc=$?                      # capture the script’s exit code
         echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
@@ -200,6 +201,7 @@ jobs:
       shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
+        set +o pipefail
         ./ubiquitous_bash.sh _check_nv-lts-legacy470
         rc=$?                      # capture the script’s exit code
         echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
@@ -325,6 +327,7 @@ jobs:
       shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
+        set +o pipefail
         ./ubiquitous_bash.sh _check_vbox-mainline
         rc=$?                      # capture the script’s exit code
         echo "$rc"
@@ -350,6 +353,7 @@ jobs:
       shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
+        set +o pipefail
         ./ubiquitous_bash.sh _check_nv-mainline-series535p
         rc=$?                      # capture the script’s exit code
         echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
@@ -359,6 +363,7 @@ jobs:
       shell: bash {0}
       run: |
         set +e                     # disable automatic exit‑on‑error
+        set +o pipefail
         ./ubiquitous_bash.sh _check_nv-mainline-legacy470
         rc=$?                      # capture the script’s exit code
         echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
