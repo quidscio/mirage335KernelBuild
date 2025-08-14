@@ -4,7 +4,7 @@ name: check
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#permissions
 permissions:
-  actions: none
+  actions: write
   checks: none
   contents: read
   deployments: none
@@ -366,9 +366,27 @@ jobs:
         set +o pipefail
         ./ubiquitous_bash.sh _check_nv-mainline-legacy470
         rc=$?                      # capture the script’s exit code
-        echo "exit_code=$rc" >> "$GITHUB_OUTPUT"  
+        echo "exit_code=$rc" >> "$GITHUB_OUTPUT"
         exit $rc                   # explicitly exit with that code
       timeout-minutes: 300
+    - name: Archive NVIDIA legacy470 artifacts
+      if: always()
+      run: |
+        mkdir -p nvidia_legacy470
+        sudo cp /var/log/nvidia-installer.log nvidia_legacy470/ || true
+        if [ -d "$HOME/.ubtmp" ]; then
+          sudo find "$HOME/.ubtmp" -maxdepth 2 -name 'NVIDIA-Linux*' -exec cp -r {} nvidia_legacy470/ + || true
+        fi
+        if [ -d _local ]; then
+          sudo cp -r _local nvidia_legacy470/ || true
+        fi
+    - name: Upload NVIDIA legacy470 artifacts
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: nv-mainline-legacy470
+        path: nvidia_legacy470
+        if-no-files-found: ignore
 
 
 
